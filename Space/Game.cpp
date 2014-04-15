@@ -13,6 +13,10 @@
 #include <memory>
 #include "..\Engine\SpriteBatch.h"
 #include "..\Engine\Font.h"
+#include "..\Engine\Camera.h"
+#include <gtc/matrix_transform.hpp>
+#include "../Engine/SphereTesselator.h"
+
 
 void mySleep(int sleepMs)
 {
@@ -151,21 +155,40 @@ void Game::Run()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 1);
 
-	auto BasicShader = new JargShader();
+	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
 	BasicShader->LoadFromFile("Shaders/t2.fs", "Shaders/t2.vs");
 	auto mvpBasic = BasicShader->LocateVars("MVP");
 	auto worldID = BasicShader->LocateVars("World");
+	auto colorTextureLocation = BasicShader->LocateVars("colorTexture");
 
-	auto LinesShader = new JargShader();
+	auto LinesShader = std::shared_ptr<JargShader>(new JargShader());
 	LinesShader->LoadFromFile("Shaders/lines.fs", "Shaders/lines.vs");
 	auto mvpLine = LinesShader->LocateVars("MVP");
 
 	auto sb = std::unique_ptr<Batched>(new Batched());
-	sb->Initialize(BasicShader, LinesShader);
+	sb->Initialize(BasicShader.get(), LinesShader.get());
+
+	Texture test;
+	test.Load("img.png");
+
+	const glm::mat4 Identity = glm::mat4(1.0f);
+
+	auto m = new Mesh(Cube::getMesh());
+	m->Bind();
+	m->Shader = BasicShader.get();
+	m->Texture = &test;
+	m->World = glm::scale(Identity, vec3(14,14,14));
+
+	Camera camera;
+	camera.SetWindowSize(width, height);
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
 	//auto font = std::unique_ptr<Font>(new Font());
 	//font->Initialize();
 	//font->Create("font.json");
+
+    int iters = 0;
 
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
@@ -179,22 +202,58 @@ void Game::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(204/255.0F, 1.0f, 1.0f, 1.0f);
 
+		if(Keyboard::isKeyPress(GLFW_KEY_F3)){
+			iters--;
+			if(iters < 0){
+				iters = 0;
+			}
+			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
+			m->Bind();
+			m->Shader = BasicShader.get();
+			m->Texture = &test;
+			m->World = glm::scale(Identity, vec3(14,14,14));
+		}
+
+		if(Keyboard::isKeyPress(GLFW_KEY_F4)){
+			iters++;
+			if(iters > 9){
+				iters = 9;
+			}
+			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
+			m->Bind();
+			m->Shader = BasicShader.get();
+			m->Texture = &test;
+			m->World = glm::scale(Identity, vec3(14,14,14));
+		}
+
 		if(Keyboard::isKeyPress(GLFW_KEY_F2)){
 			switch(wire){
 			case 0:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 				wire = 1;
 				break;	
-			case 1:
-				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-				wire = 2;
-				break;
+			//case 1:
+			//	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			//	wire = 2;
+			//	break;
 			default:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 				wire = 0;
 				break;
 			}
 		}
+
+		camera.view = glm::lookAt(vec3(20,20,20), vec3(0,0,0), vec3(0,1,0));
+		MVP = camera.CalculateMatrix() * model;
+
+
+		// Use our shader
+		BasicShader->BindProgram();
+		glUniformMatrix4fv(mvpBasic, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(colorTextureLocation, 1);
+
+		m->World = glm::rotate(m->World, (float)gt.elapsed*50, vec3(1,0,1));
+		m->Render();
 
 		//glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
 		//sb->DrawString(Vector2(10,10), std::to_string((long double)fps.GetCount()), *font);
@@ -203,6 +262,6 @@ void Game::Run()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		//mySleep(16);
+		mySleep(16);
 	}
 }

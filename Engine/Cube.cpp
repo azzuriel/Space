@@ -55,8 +55,8 @@ Mesh Cube::getMesh()
 		m->Indeces.push_back(__vertexIndex[i]);
 	}
 
-	sm_mesh = m;
-	return *m;
+	sm_mesh = std::shared_ptr<Mesh>(m);
+	return *sm_mesh;
 }
 
-Mesh* Cube::sm_mesh = nullptr;
+std::shared_ptr<Mesh> Cube::sm_mesh;
