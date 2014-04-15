@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A252726B-481C-4A2C-9DBB-22B55F2BE2AA}</ProjectGuid>
+    <RootNamespace>Engine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\local\boost_1_55_0;..\libs\glew-1.10.0\include\GL\;..\libs\jsoncpp-src-0.5.0\include;..\libs\utf8_v2_3_4\source\;..\libs\freetype-2.5.2\include\;..\libs\glm\glm\;..\libs\glfw-3.0.4\include\GLFW\;..\libs\glog-0.3.3\src\windows;..\libs\libpng-1.6.8;..\libs\bullet3-master\src;..\Engine;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\local\boost_1_55_0\lib32-msvc-10.0;..\lib\Release\Win32\;..\libs\jsoncpp-src-0.5.0\build\vs71\release\lib_json\;..\libs\freetype-2.5.2\objs\win32\vc2010\;..\libs\libpng-1.6.8\projects\vstudio\Release Library\;..\libs\glog-0.3.3\Release;..\libs\glew-1.10.0\lib\Release\Win32;..\libs\glfw-3.0.4\lib\;..\libs\bullet3-master\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\local\boost_1_55_0;..\libs\release\glog;..\libs\release\utf8cpp\include;..\libs\release\libpng\include;..\libs\release\json\include;..\libs\release\glm\include;..\libs\release\glfw\include;..\libs\release\glew\include;..\libs\release\freetype\include;..\libs\release\bullet\src;..\Engine;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>C:\local\boost_1_55_0\lib32-msvc-10.0;..\libs\release\glog\lib;..\libs\release\utf8cpp\lib;..\libs\release\libpng\lib;..\libs\release\json\lib;..\libs\release\glfw\lib;..\libs\release\glew\lib;..\libs\release\freetype\lib;..\libs\release\glog;..\libs\release\bullet\lib;$(LibraryPath)</LibraryPath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libpng16.lib;zlib.lib;freetype252.lib;json_vc71_libmt.lib;glew32.lib;libglog.lib;BulletDynamics_vs2010_debug.lib;LinearMath_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;MSVCRT.lib;LIBCMT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)_debug$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libpng16.lib;zlib.lib;freetype252MT.lib;json_vc71_libmt.lib;glew32.lib;libglog.lib;BulletDynamics_vs2010.lib;BulletCollision_vs2010.lib;LinearMath_vs2010.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="FPSCounter.cpp" />
+    <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="Icosahedron.cpp" />
+    <ClCompile Include="ImageAtlas.cpp" />
+    <ClCompile Include="JargFont.cpp" />
+    <ClCompile Include="JargShader.cpp" />
+    <ClCompile Include="JRectangle.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Quad.cpp" />
+    <ClCompile Include="Render.cpp" />
+    <ClCompile Include="SpriteBatch.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Vector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="FPSCounter.h" />
+    <ClInclude Include="GameMath.h" />
+    <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="Icosahedron.h" />
+    <ClInclude Include="ImageAtlas.h" />
+    <ClInclude Include="JargFont.h" />
+    <ClInclude Include="JargShader.h" />
+    <ClInclude Include="JRectangle.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Quad.h" />
+    <ClInclude Include="Render.h" />
+    <ClInclude Include="SpriteBatch.h" />
+    <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Vector.h" />
+    <ClInclude Include="VertexPositionTexture.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

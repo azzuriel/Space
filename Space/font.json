@@ -1,0 +1,18 @@
+{
+	"FontList" :
+	[
+		{
+			"FileName" : "fonts/arial.ttf",
+			"Size" : 14,
+			"Glyphs" : 
+			[
+				"1234567890",
+				"abcdefghijklmnopqrstuvwxyz",
+				"абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
+				".,;_+-=",
+				"ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ",
+				"QWERTYUIOPASDFGHJKLZXCVBNM"
+			]
+		}
+	]
+}
