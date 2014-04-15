@@ -152,12 +152,12 @@ void Game::Run()
 	glBindTexture(GL_TEXTURE_2D, 1);
 
 	auto BasicShader = new JargShader();
-	BasicShader->LoadFromFile("shaders/t2.fs", "shaders/t2.vs");
+	BasicShader->LoadFromFile("Shaders/t2.fs", "Shaders/t2.vs");
 	auto mvpBasic = BasicShader->LocateVars("MVP");
 	auto worldID = BasicShader->LocateVars("World");
 
 	auto LinesShader = new JargShader();
-	LinesShader->LoadFromFile("shaders/lines.fs", "shaders/lines.vs");
+	LinesShader->LoadFromFile("Shaders/lines.fs", "Shaders/lines.vs");
 	auto mvpLine = LinesShader->LocateVars("MVP");
 
 	auto sb = std::unique_ptr<Batched>(new Batched());
