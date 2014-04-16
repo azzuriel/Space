@@ -94,8 +94,8 @@ int Game::Initialize()
 	}
 
 	//glfwWindowHint(GLFW_SAMPLES, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWmonitor *monitor = nullptr;
@@ -211,8 +211,8 @@ void Game::Run()
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
 	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
 	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
-	BasicShader->loadShaderFromSource(GL_TESS_CONTROL_SHADER, "Shaders/basic.glsl");
-	BasicShader->loadShaderFromSource(GL_TESS_EVALUATION_SHADER, "Shaders/basic.glsl");
+	//BasicShader->loadShaderFromSource(GL_TESS_CONTROL_SHADER, "Shaders/basic.glsl");
+	//BasicShader->loadShaderFromSource(GL_TESS_EVALUATION_SHADER, "Shaders/basic.glsl");
 	BasicShader->link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
 	auto worldID = BasicShader->LocateVars("transform.model");

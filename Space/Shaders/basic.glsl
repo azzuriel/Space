@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 #define VERT_POSITION 0
 #define VERT_TEXCOORD 1
 #define VERT_NORMAL   2
@@ -99,77 +99,6 @@ void main(void)
         float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
         color += material.specular * light.specular * RdotVpow * attenuation;
         color *= texture(material.texture, Vert.texcoord);
-		color = vec4(0.0,0.0,0.0,1.0);
-}
-#endif
-
-#ifdef _TESSCONTROL_
-#define ID gl_InvocationID
-layout ( vertices = 3 ) out;            // input patch consists of 3 vertices
-
-uniform int InnerLevel = 2;
-uniform int OuterLevel = 2;
-
-uniform float level;
-
-out VertVS {
-        vec2  texcoord;
-        vec3  normal;
-        vec3  lightDir;
-        vec3  viewDir;
-        float distance;
-} vertvs[];
-
-in VertES {
-        vec2  texcoord;
-        vec3  normal;
-        vec3  lightDir;
-        vec3  viewDir;
-        float distance;
-} vertes[];
-
-void main ()
-{                                       // copy current vertex to output
-	vertvs[ID].texcoord = vertes[ID].texcoord; 
-	vertvs[ID].normal = vertes[ID].normal; 
-	vertvs[ID].lightDir = vertes[ID].lightDir; 
-	vertvs[ID].viewDir = vertes[ID].viewDir; 
-	vertvs[ID].distance = vertes[ID].distance; 
-    if ( gl_InvocationID == 0 )         // set tessellation level, can do only for one vertex
-    {
-        gl_TessLevelInner [0] = InnerLevel;
-        gl_TessLevelOuter [0] = OuterLevel;
-        gl_TessLevelOuter [1] = OuterLevel;
-        gl_TessLevelOuter [2] = OuterLevel;
-   }
-   gl_out [ID].gl_Position = gl_in[ID].gl_Position;
-}
-#endif
-
-#ifdef _TESSEVAL_
-layout(triangles, equal_spacing) in;
-
-in VertES {
-        vec2  texcoord;
-        vec3  normal;
-        vec3  lightDir;
-        vec3  viewDir;
-        float distance;
-} vertes[];
-
-out Vertex {
-        vec2  texcoord;
-        vec3  normal;
-        vec3  lightDir;
-        vec3  viewDir;
-        float distance;
-} vertfs;
-
-void main(void)
-{
-		vertfs.texcoord = vertes[0].texcoord;
-		gl_Position = gl_TessCoord.x * gl_in [0].gl_Position + 
-					  gl_TessCoord.y * gl_in [1].gl_Position +
-					  gl_TessCoord.z * gl_in [2].gl_Position;
+		//color = vec4(0.0,0.0,0.0,1.0);
 }
 #endif

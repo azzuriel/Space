@@ -152,8 +152,7 @@ void Mesh::Render()
 		glBindTexture(GL_TEXTURE_2D, Texture->textureId);
 	}
 	glBindVertexArray(m_vao);
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
-	glDrawElements(GL_PATCHES, Indeces.size(), GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, Indeces.size(), GL_UNSIGNED_INT, NULL);
 }
 
 void Mesh::Combine()
