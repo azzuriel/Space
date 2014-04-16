@@ -37,17 +37,17 @@ Mesh Cube::getMesh()
 	m->Verteces.resize(VERTEXCOUNT);
 	for(unsigned int i = 0; i < 6; i++)
 	{
-		m->Verteces[i*4].pos = __vertexPositions[i * 4 + 0];
-		m->Verteces[i*4].uv = Vector2(1,1);
+		m->Verteces[i*4].Position = __vertexPositions[i * 4 + 0];
+		m->Verteces[i*4].Uv = Vector2(1,1);
 
-		m->Verteces[i*4 + 1].pos = __vertexPositions[i * 4 + 1];
-		m->Verteces[i*4 + 1].uv = Vector2(1,0);
+		m->Verteces[i*4 + 1].Position = __vertexPositions[i * 4 + 1];
+		m->Verteces[i*4 + 1].Uv = Vector2(1,0);
 
-		m->Verteces[i*4 + 2].pos = __vertexPositions[i * 4 + 2];
-		m->Verteces[i*4 + 2].uv = Vector2(0,0);
+		m->Verteces[i*4 + 2].Position = __vertexPositions[i * 4 + 2];
+		m->Verteces[i*4 + 2].Uv = Vector2(0,0);
 
-		m->Verteces[i*4 + 3].pos = __vertexPositions[i * 4 + 3];
-		m->Verteces[i*4 + 3].uv = Vector2(0,1);
+		m->Verteces[i*4 + 3].Position = __vertexPositions[i * 4 + 3];
+		m->Verteces[i*4 + 3].Uv = Vector2(0,1);
 	}
 
 	for (int i =0; i< INDEXCOUNT; i++)

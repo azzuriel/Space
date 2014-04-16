@@ -1,21 +1,22 @@
+#pragma once
 #include "Engine.h"
 #include <glew.h>
 #include <glfw3.h>
 #include <Keyboard.h>
 #include <Mouse.h>
-
+#include <memory>
+#include "..\Engine\SpriteBatch.h"
+#include "..\Engine\Font.h"
+#include "..\Engine\Camera.h"
+#include "../Engine/SphereTesselator.h"
+#include "../Engine/MAterial.h"
 #ifdef LINUX
 #include <unistd.h>
 #endif
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include <memory>
-#include "..\Engine\SpriteBatch.h"
-#include "..\Engine\Font.h"
-#include "..\Engine\Camera.h"
-#include <gtc/matrix_transform.hpp>
-#include "../Engine/SphereTesselator.h"
+
 
 
 void mySleep(int sleepMs)
@@ -145,6 +146,47 @@ int Game::Initialize()
 	return true;
 }
 
+void PointLightSetup(GLuint program, const PointLight &light)
+{
+	// установка параметров
+	glUniform4fv(glGetUniformLocation(program, "light.position"),    1, &light.position[0]);
+	glUniform4fv(glGetUniformLocation(program, "light.ambient"),     1, &light.ambient[0]);
+	glUniform4fv(glGetUniformLocation(program, "light.diffuse"),     1, &light.diffuse[0]);
+	glUniform4fv(glGetUniformLocation(program, "light.specular"),    1, &light.specular[0]);
+	glUniform3fv(glGetUniformLocation(program, "light.attenuation"), 1, &light.attenuation[0]);
+}
+
+void MaterialSetup(GLuint program, const Material &material)
+{
+	// установка текстуры
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, material.texture);
+	glUniform1i(glGetUniformLocation(program, "material.texture"), 0);
+
+	// установка параметров
+	glUniform4fv(glGetUniformLocation(program, "material.ambient"),  1, &material.ambient[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.diffuse"),  1, &material.diffuse[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.specular"), 1, &material.specular[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.emission"), 1, &material.emission[0]);
+
+	glUniform1fv(glGetUniformLocation(program, "material.shininess"), 1, &material.shininess);
+}
+
+void CameraSetup(GLuint program, Camera &camera, const mat4 &model, const mat4 &mvp)
+{
+	// расчитаем необходимые матрицы
+	//mat4 view           = glm::rotate(camera.rotation) * glm::translate(view, -camera.position);
+	mat3 normal         = transpose(mat3(inverse(model)));
+
+	// передаем матрицы в шейдерную программу
+	glUniformMatrix4fv(glGetUniformLocation(program, "transform.model"),          1, GL_TRUE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "transform.viewProjection"), 1, GL_FALSE, &mvp[0][0]);
+	glUniformMatrix3fv(glGetUniformLocation(program, "transform.normal"),         1, GL_TRUE, &normal[0][0]);
+
+	// передаем позицию наблюдателя (камеры) в шейдерную программу
+	glUniform3fv(glGetUniformLocation(program, "transform.viewPosition"), 1, &camera.position[0]);
+}
+
 void Game::Run()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -157,9 +199,31 @@ void Game::Run()
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
 	BasicShader->LoadFromFile("Shaders/t2.fs", "Shaders/t2.vs");
-	auto mvpBasic = BasicShader->LocateVars("MVP");
-	auto worldID = BasicShader->LocateVars("World");
-	auto colorTextureLocation = BasicShader->LocateVars("colorTexture");
+	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
+	auto worldID = BasicShader->LocateVars("transform.model");
+	auto colorTextureLocation = BasicShader->LocateVars("material.texture");
+
+	Texture test;
+	test.Load("img.png");
+
+	Material mat;
+	mat.texture = test.textureId;
+	mat.ambient = vec4(0.2f, 0.2f, 0.2f, 1.0f);
+	mat.diffuse = vec4(0.3f, 0.5f, 1.0f, 1.0f);
+	mat.specular = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	mat.emission = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	mat.shininess = 20.0f;
+
+	MaterialSetup(BasicShader->program, mat);
+
+	PointLight pl;
+	pl.position = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	pl.ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+	pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	pl.attenuation = vec3(0.5f, 0.0f, 0.02f);
+
+	PointLightSetup(BasicShader->program, pl);
 
 	auto LinesShader = std::shared_ptr<JargShader>(new JargShader());
 	LinesShader->LoadFromFile("Shaders/lines.fs", "Shaders/lines.vs");
@@ -168,16 +232,14 @@ void Game::Run()
 	auto sb = std::unique_ptr<Batched>(new Batched());
 	sb->Initialize(BasicShader.get(), LinesShader.get());
 
-	Texture test;
-	test.Load("img.png");
-
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
 	auto m = new Mesh(Cube::getMesh());
+	m->loadOBJ("Data\\untitled.obj");
 	m->Bind();
 	m->Shader = BasicShader.get();
 	m->Texture = &test;
-	m->World = glm::scale(Identity, vec3(14,14,14));
+	m->World = glm::scale(Identity, vec3(8.5,8.5,8.5));
 
 	Camera camera;
 	camera.SetWindowSize(width, height);
@@ -211,7 +273,7 @@ void Game::Run()
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
-			m->World = glm::scale(Identity, vec3(14,14,14));
+			m->World = glm::scale(Identity, vec3(1,1,1));
 		}
 
 		if(Keyboard::isKeyPress(GLFW_KEY_F4)){
@@ -243,19 +305,22 @@ void Game::Run()
 			}
 		}
 
+		BasicShader->BindProgram();
 		camera.view = glm::lookAt(vec3(20,20,20), vec3(0,0,0), vec3(0,1,0));
 		MVP = camera.CalculateMatrix() * model;
+		CameraSetup(BasicShader->program, camera, m->World, MVP);
+
 
 
 		// Use our shader
-		BasicShader->BindProgram();
+		
 		glUniformMatrix4fv(mvpBasic, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(colorTextureLocation, 1);
 
 		m->World = glm::rotate(m->World, (float)gt.elapsed*50, vec3(1,0,1));
 		m->Render();
 
-		//glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
+		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
 		//sb->DrawString(Vector2(10,10), std::to_string((long double)fps.GetCount()), *font);
 
 		Mouse::Update();
@@ -264,4 +329,8 @@ void Game::Run()
 		glfwPollEvents();
 		mySleep(16);
 	}
+
+	//delete m;
+	//glfwDestroyWindow(window);
+	//glfwTerminate();
 }

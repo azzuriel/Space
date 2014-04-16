@@ -35,32 +35,32 @@ Mesh* Tesselator::SphereSubTesselate(const Mesh& mesh)
 	int off = 0;
 	for (int i =0; i< mesh.Indeces.size() -2; i+= 3)
 	{
-		VertexPositionTexture t;
+		VertexPositionNormalTexture t;
 
-		VertexPositionTexture v0 = mesh.Verteces[mesh.Indeces[i]];
-		VertexPositionTexture v1 = mesh.Verteces[mesh.Indeces[i+1]];
-		VertexPositionTexture v2 = mesh.Verteces[mesh.Indeces[i+2]];
+		VertexPositionNormalTexture v0 = mesh.Verteces[mesh.Indeces[i]];
+		VertexPositionNormalTexture v1 = mesh.Verteces[mesh.Indeces[i+1]];
+		VertexPositionNormalTexture v2 = mesh.Verteces[mesh.Indeces[i+2]];
 
 		t = v0;
-		t.pos.Normalize();
+		t.Position.Normalize();
 		m->Verteces.push_back(t);
 		t = v1;
-		t.pos.Normalize();
+		t.Position.Normalize();
 		m->Verteces.push_back(t);
 		t = v2;
-		t.pos.Normalize();
+		t.Position.Normalize();
 		m->Verteces.push_back(t);
 
 		t = (v0 + v1)/2;
-		t.pos.Normalize();
+		t.Position.Normalize();
 		m->Verteces.push_back(t);
 
 		t = (v0 + v2)/2;
-		t.pos.Normalize();
+		t.Position.Normalize();
 		m->Verteces.push_back(t);
 
 		t = (v1 + v2)/2;
-		t.pos.Normalize();
+		t.Position.Normalize();
 		m->Verteces.push_back(t);
 
 		m->Indeces.push_back(off+0);
@@ -91,31 +91,31 @@ Mesh* Tesselator::SubTesselate(const Mesh& mesh)
 	int off = 0;
 	for (int i =0; i< mesh.Indeces.size() -2; i+= 3)
 	{
-		VertexPositionTexture t;
+		VertexPositionNormalTexture t;
 
 		m->Verteces.push_back(mesh.Verteces[mesh.Indeces[i]]);
 		m->Verteces.push_back(mesh.Verteces[mesh.Indeces[i+1]]);
 		m->Verteces.push_back(mesh.Verteces[mesh.Indeces[i+2]]);
 
-		t.pos.x = (mesh.Verteces[mesh.Indeces[i]].pos.x + mesh.Verteces[mesh.Indeces[i+1]].pos.x)/2;
-		t.pos.y = (mesh.Verteces[mesh.Indeces[i]].pos.y + mesh.Verteces[mesh.Indeces[i+1]].pos.y)/2;
-		t.pos.z = (mesh.Verteces[mesh.Indeces[i]].pos.z + mesh.Verteces[mesh.Indeces[i+1]].pos.z)/2;
-		t.uv.x = (mesh.Verteces[mesh.Indeces[i]].uv.x + mesh.Verteces[mesh.Indeces[i+1]].uv.x)/2;
-		t.uv.y = (mesh.Verteces[mesh.Indeces[i]].uv.y + mesh.Verteces[mesh.Indeces[i+1]].uv.y)/2;
+		t.Position.x = (mesh.Verteces[mesh.Indeces[i]].Position.x + mesh.Verteces[mesh.Indeces[i+1]].Position.x)/2;
+		t.Position.y = (mesh.Verteces[mesh.Indeces[i]].Position.y + mesh.Verteces[mesh.Indeces[i+1]].Position.y)/2;
+		t.Position.z = (mesh.Verteces[mesh.Indeces[i]].Position.z + mesh.Verteces[mesh.Indeces[i+1]].Position.z)/2;
+		t.Uv.x = (mesh.Verteces[mesh.Indeces[i]].Uv.x + mesh.Verteces[mesh.Indeces[i+1]].Uv.x)/2;
+		t.Uv.y = (mesh.Verteces[mesh.Indeces[i]].Uv.y + mesh.Verteces[mesh.Indeces[i+1]].Uv.y)/2;
 		m->Verteces.push_back(t);
 
-		t.pos.x = (mesh.Verteces[mesh.Indeces[i]].pos.x + mesh.Verteces[mesh.Indeces[i+2]].pos.x)/2;
-		t.pos.y = (mesh.Verteces[mesh.Indeces[i]].pos.y + mesh.Verteces[mesh.Indeces[i+2]].pos.y)/2;
-		t.pos.z = (mesh.Verteces[mesh.Indeces[i]].pos.z + mesh.Verteces[mesh.Indeces[i+2]].pos.z)/2;
-		t.uv.x = (mesh.Verteces[mesh.Indeces[i]].uv.x + mesh.Verteces[mesh.Indeces[i+2]].uv.x)/2;
-		t.uv.y = (mesh.Verteces[mesh.Indeces[i]].uv.y + mesh.Verteces[mesh.Indeces[i+2]].uv.y)/2;
+		t.Position.x = (mesh.Verteces[mesh.Indeces[i]].Position.x + mesh.Verteces[mesh.Indeces[i+2]].Position.x)/2;
+		t.Position.y = (mesh.Verteces[mesh.Indeces[i]].Position.y + mesh.Verteces[mesh.Indeces[i+2]].Position.y)/2;
+		t.Position.z = (mesh.Verteces[mesh.Indeces[i]].Position.z + mesh.Verteces[mesh.Indeces[i+2]].Position.z)/2;
+		t.Uv.x = (mesh.Verteces[mesh.Indeces[i]].Uv.x + mesh.Verteces[mesh.Indeces[i+2]].Uv.x)/2;
+		t.Uv.y = (mesh.Verteces[mesh.Indeces[i]].Uv.y + mesh.Verteces[mesh.Indeces[i+2]].Uv.y)/2;
 		m->Verteces.push_back(t);
 
-		t.pos.x = (mesh.Verteces[mesh.Indeces[i+1]].pos.x + mesh.Verteces[mesh.Indeces[i+2]].pos.x)/2;
-		t.pos.y = (mesh.Verteces[mesh.Indeces[i+1]].pos.y + mesh.Verteces[mesh.Indeces[i+2]].pos.y)/2;
-		t.pos.z = (mesh.Verteces[mesh.Indeces[i+1]].pos.z + mesh.Verteces[mesh.Indeces[i+2]].pos.z)/2;
-		t.uv.x = (mesh.Verteces[mesh.Indeces[i+1]].uv.x + mesh.Verteces[mesh.Indeces[i+2]].uv.x)/2;
-		t.uv.y = (mesh.Verteces[mesh.Indeces[i+1]].uv.y + mesh.Verteces[mesh.Indeces[i+2]].uv.y)/2;
+		t.Position.x = (mesh.Verteces[mesh.Indeces[i+1]].Position.x + mesh.Verteces[mesh.Indeces[i+2]].Position.x)/2;
+		t.Position.y = (mesh.Verteces[mesh.Indeces[i+1]].Position.y + mesh.Verteces[mesh.Indeces[i+2]].Position.y)/2;
+		t.Position.z = (mesh.Verteces[mesh.Indeces[i+1]].Position.z + mesh.Verteces[mesh.Indeces[i+2]].Position.z)/2;
+		t.Uv.x = (mesh.Verteces[mesh.Indeces[i+1]].Uv.x + mesh.Verteces[mesh.Indeces[i+2]].Uv.x)/2;
+		t.Uv.y = (mesh.Verteces[mesh.Indeces[i+1]].Uv.y + mesh.Verteces[mesh.Indeces[i+2]].Uv.y)/2;
 		m->Verteces.push_back(t);
 
 		m->Indeces.push_back(off+0);

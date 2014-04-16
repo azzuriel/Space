@@ -7,8 +7,6 @@
 
 
 class JargShader{
-private:
-	int program;
 public:
 	JargShader();
 	~JargShader(void);
@@ -16,5 +14,6 @@ public:
 	void LoadFromFile(std::string fragment, std::string vertex);
 	void BindProgram();
 	int LocateVars(std::string s);
+	int program;
 };
 #endif // JargShader_h__

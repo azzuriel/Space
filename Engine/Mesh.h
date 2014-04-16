@@ -7,16 +7,18 @@
 #include <vector>
 #include "JargShader.h"
 #include "TextureManager.h"
+#include <string>
 class Mesh
 {
 public:
 	Mesh(void);
 	~Mesh(void);
-	void Create(std::vector<VertexPositionTexture> verteces, std::vector<GLuint> indeces);
+	void Create(std::vector<VertexPositionNormalTexture> verteces, std::vector<GLuint> indeces);
 	void Bind();
 	void Render();
 	void Combine();
-	std::vector<VertexPositionTexture> Verteces;
+	bool loadOBJ(std::string path);
+	std::vector<VertexPositionNormalTexture> Verteces;
 	std::vector<GLuint> Indeces;
 	JargShader* Shader;
 	Texture* Texture;

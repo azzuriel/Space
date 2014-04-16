@@ -96,6 +96,7 @@
     <ClCompile Include="JargShader.cpp" />
     <ClCompile Include="JRectangle.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="MAterial.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Quad.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="VertexPositionTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
@@ -119,6 +121,7 @@
     <ClInclude Include="JargShader.h" />
     <ClInclude Include="JRectangle.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="MAterial.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Quad.h" />
