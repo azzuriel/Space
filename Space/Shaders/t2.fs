@@ -43,7 +43,7 @@ void main(void)
                 light.attenuation[2] * Vert.distance * Vert.distance);
         color = material.emission;
         color += material.ambient * light.ambient * attenuation;
-      //  float NdotL = max(dot(normal, lightDir), 0.0);
+        float NdotL = max(dot(normal, lightDir), 0.0);
        // color += material.diffuse * light.diffuse * NdotL * attenuation;
        // float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
         //color += material.specular * light.specular * RdotVpow * attenuation;
