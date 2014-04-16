@@ -21,6 +21,10 @@ Mesh Quad::GetMesh()
 	m->Verteces[1].Uv = Vector2(1,0);
 	m->Verteces[2].Uv = Vector2(0,1);
 	m->Verteces[3].Uv = Vector2(1,1);
+	m->Verteces[0].Normal = Vector3(0,0,1);
+	m->Verteces[1].Normal = Vector3(0,0,1);
+	m->Verteces[2].Normal = Vector3(0,0,1);
+	m->Verteces[3].Normal = Vector3(0,0,1);
 
 	m->Indeces[0] = 0;
 	m->Indeces[1] = 1;

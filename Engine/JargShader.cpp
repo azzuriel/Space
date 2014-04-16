@@ -1,21 +1,26 @@
 #include "JargShader.h"
 #include <glew.h>
-#include <fstream>
-#include <sstream>
 #include <algorithm>
 #include <vector>
-#include <math.h>
+#include <ostream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sstream>
+#include <fstream>
 
 JargShader::JargShader()
 {
-	program = 0;
+	 program =  glCreateProgram();
 }
 
 JargShader::~JargShader(void)
 {
-	if(!program) {
-		glDeleteProgram(program);
+	while(!shaders_.empty()) {
+		glDeleteShader(shaders_.back());
+		shaders_.pop_back();
 	}
+	glDeleteProgram(program);
 }
 
 void JargShader::BindProgram()
@@ -30,6 +35,74 @@ GLint JargShader::LocateVars(std::string s)
 	vars.push_back(a);
 	return a;
 }
+
+#define printLog(obj){int infologLength = 0; \
+char infoLog[1024]; \
+if (glIsShader(obj)) \
+	glGetShaderInfoLog(obj, 1024, &infologLength, infoLog); \
+else \
+	glGetProgramInfoLog(obj, 1024, &infologLength, infoLog); \
+if (infologLength > 0) { \
+	LOG(INFO) << infoLog; \
+} else { \
+LOG(INFO) << "     no errors"; \
+} }
+
+void JargShader::loadShaderFromSource(GLenum type, std::string source) {
+
+	std::stringstream ss;
+	std::string name;
+	if(type == GL_FRAGMENT_SHADER) {
+		name = "#define _FRAGMENT_";
+		ss << name << std::endl;
+	}
+	else if(type == GL_VERTEX_SHADER) {
+		name = "#define _VERTEX_";
+		ss << name << std::endl;
+	}
+	else if(type == GL_GEOMETRY_SHADER) {
+		name = "#define _GEOMETRY_";
+		ss << name << std::endl;
+	}
+	else if(type == GL_TESS_EVALUATION_SHADER) {
+		name = "#define _TESSEVAL_";
+		ss << name << std::endl;
+	}
+	else if(type == GL_TESS_CONTROL_SHADER) {
+		name = "#define _TESSCONTROL_";
+		ss << name << std::endl;
+	}
+	std::ifstream file(source.c_str());
+	std::string line;
+	if (file.is_open()) {
+		while (file.good()) {
+			getline(file, line);
+			ss << line << std::endl;
+		}
+		file.close();
+	} else {
+		LOG(ERROR) << "Failed to open file " << source << std::endl;
+		return;
+	}
+	std::string str = ss.str();
+	int length = str.length();
+	const char *data = str.c_str();
+	GLuint id = glCreateShader(type);
+	glShaderSource(id, 1, (const char **)&data, &length);
+	glCompileShader(id);
+	LOG(INFO) << source << " file " << name << "PART";
+	printLog(id);
+	glAttachShader(program, id);
+	shaders_.push_back(id);
+}
+
+bool JargShader::link() {
+	glLinkProgram(program);
+	LOG(INFO) << "Program " << program << " linking";
+	printLog(program);
+	return true;
+}
+
 
 void JargShader::LoadFromFile(std::string fragment_file_path, std::string vertex_file_path)
 {

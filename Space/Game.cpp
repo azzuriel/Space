@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine.h"
+#define GLM_FORCE_RADIANS
 #include <glew.h>
 #include <glfw3.h>
 #include <Keyboard.h>
@@ -16,6 +17,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include <math.h>
 
 
 
@@ -92,10 +94,9 @@ int Game::Initialize()
 	}
 
 	//glfwWindowHint(GLFW_SAMPLES, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	LOG(INFO) <<"OpenGL: 3.3 glfw: " << glfwGetVersionString();
 
 	GLFWmonitor *monitor = nullptr;
 	if(fullscreen)
@@ -114,6 +115,12 @@ int Game::Initialize()
 	//glfwSetWindowTitle(window, AutoVersion::GetTitle().c_str());
 
 	glfwSwapInterval(0);
+
+	int glVersion[2] = {-1, -1};
+	glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
+	glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
+	LOG(INFO) <<"OpenGL: "<<glVersion[0]<<"."<<glVersion[1]<<" glfw: " << glfwGetVersionString();
+
 
 	render = std::unique_ptr<Render>(new Render());
 	render->Initialize();
@@ -160,8 +167,11 @@ void MaterialSetup(GLuint program, const Material &material)
 {
 	// установка текстуры
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material.texture);
+	glBindTexture(GL_TEXTURE_2D, material.normal);
 	glUniform1i(glGetUniformLocation(program, "material.texture"), 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, material.normal);
+	glUniform1i(glGetUniformLocation(program, "material.normal"), 0);
 
 	// установка параметров
 	glUniform4fv(glGetUniformLocation(program, "material.ambient"),  1, &material.ambient[0]);
@@ -176,7 +186,7 @@ void CameraSetup(GLuint program, Camera &camera, const mat4 &model, const mat4 &
 {
 	// расчитаем необходимые матрицы
 	//mat4 view           = glm::rotate(camera.rotation) * glm::translate(view, -camera.position);
-	mat3 normal         = transpose(mat3(inverse(model)));
+	mat3 normal         = transpose(mat3(inverse(mat4(1.0f))));
 
 	// передаем матрицы в шейдерную программу
 	glUniformMatrix4fv(glGetUniformLocation(program, "transform.model"),          1, GL_TRUE, &model[0][0]);
@@ -196,32 +206,45 @@ void Game::Run()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 1);
+	//glEnable(GL_SMOOTH);
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
-	BasicShader->LoadFromFile("Shaders/t2.fs", "Shaders/t2.vs");
+	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
+	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
+	BasicShader->loadShaderFromSource(GL_TESS_CONTROL_SHADER, "Shaders/basic.glsl");
+	BasicShader->loadShaderFromSource(GL_TESS_EVALUATION_SHADER, "Shaders/basic.glsl");
+	BasicShader->link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
 	auto worldID = BasicShader->LocateVars("transform.model");
+	auto innerT = BasicShader->LocateVars("InnerLevel"); int innerLevel = 2;
+	glUniform1i(innerT, innerLevel);
+	auto outerT = BasicShader->LocateVars("OuterLevel"); int outerLevel = 2;
+	glUniform1i(outerT, outerLevel);
 	auto colorTextureLocation = BasicShader->LocateVars("material.texture");
 
 	Texture test;
 	test.Load("img.png");
 
+	Texture hm;
+	hm.Load("face.png");
+
 	Material mat;
 	mat.texture = test.textureId;
+	mat.normal = hm.textureId;
 	mat.ambient = vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	mat.diffuse = vec4(0.3f, 0.5f, 1.0f, 1.0f);
 	mat.specular = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	mat.emission = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	mat.emission = vec4(0.0f, 0.0f, 0.0f, 1.f);
 	mat.shininess = 20.0f;
 
 	MaterialSetup(BasicShader->program, mat);
 
 	PointLight pl;
-	pl.position = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	pl.position = vec4(30.0f, 30.0f, 30.0f, 1.0f);
 	pl.ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	pl.attenuation = vec3(0.5f, 0.0f, 0.02f);
+	pl.attenuation = vec3(0.0001f, 0.0001f, 0.0001f);
 
 	PointLightSetup(BasicShader->program, pl);
 
@@ -234,12 +257,25 @@ void Game::Run()
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
-	auto m = new Mesh(Cube::getMesh());
-	m->loadOBJ("Data\\untitled.obj");
+	auto m = Tesselator::SphereTesselate(5, Cube::getMesh());
+	//m->loadOBJ("Data\\untitled.obj");
 	m->Bind();
 	m->Shader = BasicShader.get();
 	m->Texture = &test;
 	m->World = glm::scale(Identity, vec3(8.5,8.5,8.5));
+
+	auto plane =Tesselator::Tesselate(5, Quad::GetMesh());
+	plane->Bind();
+	plane->Shader = BasicShader.get();
+	plane->Texture = &test;
+	plane->World = glm::rotate(Identity, (float)(3.1415/2.0), vec3(1.0,0.0,0.0));
+	plane->World = glm::translate(plane->World, vec3(0.0,0.0,10.0));
+	plane->World = glm::scale(plane->World, vec3(80.5,80.5,80.5));
+	
+	auto cube = new Mesh(Cube::getMesh());
+	cube->Bind();
+	cube->Shader = BasicShader.get();
+	cube->Texture = &test;
 
 	Camera camera;
 	camera.SetWindowSize(width, height);
@@ -255,6 +291,7 @@ void Game::Run()
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		glEnable(GL_DEPTH_TEST);
+		glShadeModel (GL_SMOOTH);
 		gt.Update(glfwGetTime());
 		fps.Update(gt);
 
@@ -273,7 +310,7 @@ void Game::Run()
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
-			m->World = glm::scale(Identity, vec3(1,1,1));
+			m->World = glm::scale(Identity, vec3(18,18,18));
 		}
 
 		if(Keyboard::isKeyPress(GLFW_KEY_F4)){
@@ -285,7 +322,7 @@ void Game::Run()
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
-			m->World = glm::scale(Identity, vec3(14,14,14));
+			m->World = glm::scale(Identity, vec3(18,18,18));
 		}
 
 		if(Keyboard::isKeyPress(GLFW_KEY_F2)){
@@ -305,8 +342,40 @@ void Game::Run()
 			}
 		}
 
+		if(Keyboard::isKeyPress(GLFW_KEY_F6)){
+			innerLevel++;
+			glUniform1i(innerT, innerLevel);
+		}
+		if(Keyboard::isKeyPress(GLFW_KEY_F5)){
+			innerLevel--;
+			if(innerLevel < 1) {
+				innerLevel = 1;
+			}
+			glUniform1i(innerT, innerLevel);
+		}
+		if(Keyboard::isKeyPress(GLFW_KEY_F8)){
+			outerLevel++;
+			glUniform1i(outerT, outerLevel);
+		}
+		if(Keyboard::isKeyPress(GLFW_KEY_F7)){
+			outerLevel--;
+			if(outerLevel < 1) {
+				outerLevel = 1;
+			}
+			glUniform1i(outerT, outerLevel);
+		}
+
+		glUniform1f(innerT, 1);
+
+		auto mpos = Mouse::GetCursorPos();
+		pl.position = vec4(mpos.x/10-10, 10, mpos.y/10-10, 1.0);
+		camera.position = vec3(40,40,40);
+
+		PointLightSetup(BasicShader->program, pl);
+		MaterialSetup(BasicShader->program, mat);
+
 		BasicShader->BindProgram();
-		camera.view = glm::lookAt(vec3(20,20,20), vec3(0,0,0), vec3(0,1,0));
+		camera.view = glm::lookAt(vec3(40,40,40), vec3(30,30,30), vec3(0,1,0));
 		MVP = camera.CalculateMatrix() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
@@ -317,8 +386,12 @@ void Game::Run()
 		glUniformMatrix4fv(mvpBasic, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(colorTextureLocation, 1);
 
-		m->World = glm::rotate(m->World, (float)gt.elapsed*50, vec3(1,0,1));
+		m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
 		m->Render();
+		//plane->Render();
+
+		cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
+		cube->Render();
 
 		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
 		//sb->DrawString(Vector2(10,10), std::to_string((long double)fps.GetCount()), *font);

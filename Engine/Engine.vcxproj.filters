@@ -78,6 +78,9 @@
     <ClCompile Include="MAterial.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="TreeSphere.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Quad.h">
@@ -147,6 +150,9 @@
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
     <ClInclude Include="MAterial.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeSphere.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

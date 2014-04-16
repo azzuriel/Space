@@ -1,15 +1,15 @@
 #pragma once
 #include <glew.h>
 #include <gtc\matrix_transform.inl>
-struct Material
+struct Material	
 {
-	GLuint texture;
+	GLuint texture, normal;
 	glm::vec4 ambient;
 	glm::vec4 diffuse;
 	glm::vec4 specular;
 	glm::vec4 emission;
 	float shininess;
-};
+};	
 
 struct PointLight
 {
