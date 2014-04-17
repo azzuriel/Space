@@ -13,7 +13,7 @@
 
 Mesh::Mesh(void)
 {
-	m_vao = -1;
+	m_vao = 0;
 	m_vbo = nullptr;
 	Texture = nullptr;
 	Shader = nullptr;
@@ -22,7 +22,7 @@ Mesh::Mesh(void)
 
 Mesh::~Mesh(void)
 {
-	if(m_vao == -1) {
+	if(m_vao == 0) {
 		return;
 	}
 	glDeleteBuffers(2, m_vbo);
@@ -113,8 +113,19 @@ bool Mesh::loadOBJ(std::string path)
 }
 
 void Mesh::Bind()
-{
-	if(m_vao == -1){
+{ 
+	if(m_vbo) {
+		glBindVertexArray(0);
+		glDisableVertexAttribArray(BUFFER_TYPE_VERTEX);
+		glDisableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
+		glDisableVertexAttribArray(BUFFER_TYPE_NORMALE);
+
+		glDeleteBuffers(2, m_vbo);
+		glDeleteVertexArrays(1, &m_vao);
+		m_vao = 0;
+	}
+
+	if(m_vao == 0){
 		glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 		m_vbo = new GLuint[2];
@@ -155,7 +166,23 @@ void Mesh::Render()
 	glDrawElements(GL_TRIANGLES, Indeces.size(), GL_UNSIGNED_INT, NULL);
 }
 
-void Mesh::Combine()
-{
+void Mesh::Combine(Mesh* com)
+{	
+	GLuint lastIndex = Verteces.size();
 
+	int t = Verteces.size();
+	Verteces.resize(Verteces.size() + com->Verteces.size());
+	for (int i =0; i<com->Verteces.size();i++)
+	{
+		Verteces[t] = com->Verteces[i];
+		t++;
+	}
+
+	t = Indeces.size();
+	Indeces.resize(Indeces.size() + com->Indeces.size());
+	for (int i =0; i<com->Indeces.size();i++)
+	{
+		Indeces[t] = com->Indeces[i] + lastIndex;
+		t++;
+	}
 }

@@ -16,7 +16,7 @@ public:
 	void Create(std::vector<VertexPositionNormalTexture> verteces, std::vector<GLuint> indeces);
 	void Bind();
 	void Render();
-	void Combine();
+	void Combine(Mesh* com);
 	bool loadOBJ(std::string path);
 	std::vector<VertexPositionNormalTexture> Verteces;
 	std::vector<GLuint> Indeces;

@@ -98,7 +98,7 @@ void main(void)
         color += material.diffuse * light.diffuse * NdotL * attenuation;
         float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
         color += material.specular * light.specular * RdotVpow * attenuation;
-        color *= texture(material.texture, Vert.texcoord);
+        color = texture(material.texture, Vert.texcoord);
 		//color = vec4(0.0,0.0,0.0,1.0);
 }
 #endif

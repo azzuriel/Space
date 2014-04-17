@@ -64,30 +64,30 @@ Mesh* Tesselator::SphereSubTesselate(const Mesh& mesh)
 
 		t = v0;
 		t.Position.Normalize();
-		t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
+	//	t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 		t = v1;
 		t.Position.Normalize();
-		t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
+	//	t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 		t = v2;
 		t.Position.Normalize();
-		t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
+		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		t = (v0 + v1)/2;
 		t.Position.Normalize();
-		t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
+		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		t = (v0 + v2)/2;
 		t.Position.Normalize();
-		t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
+		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		t = (v1 + v2)/2;
 		t.Position.Normalize();
-		t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
+		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		m->Indeces.push_back(off+0);

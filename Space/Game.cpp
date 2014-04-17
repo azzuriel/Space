@@ -18,6 +18,7 @@
 #include <windows.h>
 #endif
 #include <math.h>
+#include "../Engine/TreeSphere.h"
 
 
 
@@ -216,8 +217,8 @@ void Game::Run()
 	BasicShader->link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
 	auto worldID = BasicShader->LocateVars("transform.model");
-	auto innerT = BasicShader->LocateVars("InnerLevel"); int innerLevel = 2;
-	glUniform1i(innerT, innerLevel);
+	auto innerT = BasicShader->LocateVars("InnerLevel"); int camTest = 2;
+	glUniform1i(innerT, camTest);
 	auto outerT = BasicShader->LocateVars("OuterLevel"); int outerLevel = 2;
 	glUniform1i(outerT, outerLevel);
 	auto colorTextureLocation = BasicShader->LocateVars("material.texture");
@@ -287,6 +288,11 @@ void Game::Run()
 	//font->Create("font.json");
 
     int iters = 0;
+	float sec = 0;
+
+	auto ts = std::unique_ptr<TreeSphere>(new TreeSphere());
+	ts->GenerateFrom(glm::vec4(0.0,0.0,0.0,0.0));
+	ts->Bind();
 
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
@@ -342,27 +348,13 @@ void Game::Run()
 			}
 		}
 
-		if(Keyboard::isKeyPress(GLFW_KEY_F6)){
-			innerLevel++;
-			glUniform1i(innerT, innerLevel);
+		if(Keyboard::isKeyDown(GLFW_KEY_F6)){
+			camTest++;
+	camTest++;camTest++;camTest++;
 		}
-		if(Keyboard::isKeyPress(GLFW_KEY_F5)){
-			innerLevel--;
-			if(innerLevel < 1) {
-				innerLevel = 1;
-			}
-			glUniform1i(innerT, innerLevel);
-		}
-		if(Keyboard::isKeyPress(GLFW_KEY_F8)){
-			outerLevel++;
-			glUniform1i(outerT, outerLevel);
-		}
-		if(Keyboard::isKeyPress(GLFW_KEY_F7)){
-			outerLevel--;
-			if(outerLevel < 1) {
-				outerLevel = 1;
-			}
-			glUniform1i(outerT, outerLevel);
+		if(Keyboard::isKeyDown(GLFW_KEY_F5)){
+			camTest--;
+		camTest--;camTest--;camTest--;
 		}
 
 		glUniform1f(innerT, 1);
@@ -375,7 +367,7 @@ void Game::Run()
 		MaterialSetup(BasicShader->program, mat);
 
 		BasicShader->BindProgram();
-		camera.view = glm::lookAt(vec3(40,40,40), vec3(30,30,30), vec3(0,1,0));
+		camera.view = glm::lookAt(vec3(40+camTest,40,40), vec3(0,0,0), vec3(0,1,0));
 		MVP = camera.CalculateMatrix() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
@@ -386,9 +378,20 @@ void Game::Run()
 		glUniformMatrix4fv(mvpBasic, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(colorTextureLocation, 1);
 
-		m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
-		m->Render();
+		//m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
+		//m->Render();
 		//plane->Render();
+		sec += gt.elapsed;
+		if(sec > 0.5) {
+			sec = 0;
+			delete ts->root;
+			ts->m->Indeces.clear();
+			ts->m->Verteces.clear();
+			ts->root = nullptr;
+			ts->GenerateFrom(vec4(40+camTest,40.0,40.0,0.0));
+			ts->Bind();
+		}
+		ts->Render();
 
 		cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
 		cube->Render();

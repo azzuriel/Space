@@ -37,6 +37,7 @@ public:
 };
 
 struct Vector3 {
+public:
 	float x, y, z;
 	Vector3();
 	Vector3(float a, float b, float c);
@@ -57,5 +58,6 @@ struct Vector3 {
 	bool operator <= (const Vector3& a){return (x <= a.x && y <= a.y && z <= a.z);}
 	bool operator == (const Vector3& a){return (x == a.x && y == a.y && z == a.z);}
 	bool operator != (const Vector3& a){return (x != a.x && y != a.y && z != a.z);}
+	static float Distance(Vector3 one, Vector3 two);
 };
 #endif // Vector_h__

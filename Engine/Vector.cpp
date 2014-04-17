@@ -1,5 +1,6 @@
 #include "Vector.h"
 #include <math.h>
+#define sqr(x)(x)*(x)
 
 Color4::Color4()
 {
@@ -77,4 +78,9 @@ void Vector3::Normalize()
 	x *= inv_length;
 	y *= inv_length;
 	z *= inv_length;
+}
+
+float Vector3::Distance(Vector3 one, Vector3 two)
+{
+	return abs(sqrt((one.x-two.x)*(one.x-two.x)  + (one.y-two.y)*(one.y-two.y) + (one.z-two.z)*(one.z-two.z)));
 }
