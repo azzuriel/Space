@@ -36,7 +36,7 @@ void Generate(int level, TreeSpherePart* node, Vector3 cam){
 	node->SW = new TreeSpherePart();
 	node->SW->rect = node->rect/2.0F;
 	node->SW->rect = vec4(node->rect.x, (node->rect.y + node->rect.w)/2.0F, (node->rect.x + node->rect.z)/2.0F, node->rect.w);
-	float size = pow(abs((float)node->rect.x - (float)node->rect.z), 0.9F);	if( level > 1){
+	float size =  glm::log(abs((float)node->rect.x - (float)node->rect.z))*25;	if( level > 1){
 		float d = Vector3::Distance(cam, Vector3((node->NE->rect.x + node->NE->rect.z)/2.0F,0,(node->NE->rect.y + node->NE->rect.w)/2.0F));
 		int m = max(1, (int)(d/size));
 		Generate(level - m, node->NE, cam);

@@ -367,7 +367,7 @@ void Game::Run()
 		MaterialSetup(BasicShader->program, mat);
 
 		BasicShader->BindProgram();
-		camera.view = glm::lookAt(vec3(5000+camTest,500,40), vec3(40+camTest,30,30), vec3(0,1,0));
+		camera.view = glm::lookAt(vec3(5000+camTest,50000,40), vec3(40+camTest,30,30), vec3(0,1,0));
 		MVP = camera.CalculateMatrix() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
@@ -388,13 +388,12 @@ void Game::Run()
 			ts->m->Indeces.clear();
 			ts->m->Verteces.clear();
 			ts->root = nullptr;
-			ts->GenerateFrom(vec4(5000+camTest,500,40,1));
+			ts->GenerateFrom(pl.position);
 			ts->Bind();
 		}
 		ts->Render();
-
-				//cube->World = glm::scale(Identity, vec3(20,20,20));
-		//cube->World = glm::translate(cube->World, vec3(pl.position.x, pl.position.y, pl.position.z));
+		cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
+		cube->World = glm::scale(cube->World, vec3(500,500,500));
 
 		cube->Render();
 
