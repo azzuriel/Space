@@ -22,39 +22,62 @@ void Generate(int level, TreeSpherePart* node, Vector3 cam){
 		return;
 	}
 	node->NE = new TreeSpherePart();
-	float mo = (node->rect.z - node->rect.x)/3;
-	node->NE->rect = vec4((node->rect.x + node->rect.z)/2.0F, node->rect.y, node->rect.z, (node->rect.y + node->rect.w)/2.0F);
+	node->NE->start = vec3((node->start.x + node->end.x)/2.0F, node->start.y, node->start.z);
+	node->NE->end = vec3(node->end.x, node->end.y, (node->start.z + node->end.z)/2.0F);
+	node->NE->initialSize = node->initialSize;
 
 	node->NW = new TreeSpherePart();
-	node->NW->rect = vec4(node->rect.x, node->rect.y, (node->rect.x + node->rect.z)/2.0F, (node->rect.y + node->rect.w)/2.0F);
+	node->NW->start = vec3(node->start.x, node->start.y, node->start.z);
+	node->NW->end = vec3((node->start.x + node->end.x)/2.0F, node->end.y, (node->start.z + node->end.z)/2.0F);
+	node->NW->initialSize = node->initialSize;
 
 
 	node->SE = new TreeSpherePart();
-	node->SE->rect = node->rect/2.0F;
-	node->SE->rect = vec4((node->rect.x + node->rect.z)/2.0F, (node->rect.y + node->rect.w)/2.0F, node->rect.z, node->rect.w);
+	node->SE->start = vec3((node->start.x + node->end.x)/2.0F, node->start.y, (node->start.z + node->end.z)/2.0F);
+	node->SE->end = vec3(node->end.x, node->end.y, node->end.z);
+	node->SE->initialSize = node->initialSize;
 
 	node->SW = new TreeSpherePart();
-	node->SW->rect = node->rect/2.0F;
-	node->SW->rect = vec4(node->rect.x, (node->rect.y + node->rect.w)/2.0F, (node->rect.x + node->rect.z)/2.0F, node->rect.w);
-	float size =  glm::log(abs((float)node->rect.x - (float)node->rect.z))*25;	if( level > 1){
-		float d = Vector3::Distance(cam, Vector3((node->NE->rect.x + node->NE->rect.z)/2.0F,0,(node->NE->rect.y + node->NE->rect.w)/2.0F));
+	node->SW->start = vec3(node->start.x, node->start.y,  (node->start.z + node->end.z)/2.0F);
+	node->SW->end = vec3((node->start.x + node->end.x)/2.0F, node->end.y, node->end.z);
+	node->SW->initialSize = node->initialSize;
+	float size =  abs((float)node->start.x - (float)node->end.x)*10.0F;	float d = Vector3::Distance(cam, Vector3((node->start.x + node->end.x)/2.0F,(node->start.y + node->end.y)/2.0F,(node->start.z + node->end.z)/2.0F));	size /= d /50;	if( level > 1){
+		float d = Vector3::Distance(cam, Vector3((node->NE->start.x + node->NE->end.x)/2.0F,(node->NE->start.y + node->NE->end.y)/2.0F,(node->NE->start.z + node->NE->end.z)/2.0F));
 		int m = max(1, (int)(d/size));
 		Generate(level - m, node->NE, cam);
 		
-		d = Vector3::Distance(cam, Vector3((node->SE->rect.x + node->SE->rect.z)/2.0F,0,(node->SE->rect.y + node->SE->rect.w)/2.0F));
+		d = Vector3::Distance(cam, Vector3((node->SE->start.x + node->SE->end.x)/2.0F,(node->SE->start.y + node->SE->end.y)/2.0F,(node->SE->start.z + node->SE->end.z)/2.0F));
 		m = max(1, (int)(d/size));
 		Generate(level - m, node->SE, cam);
 		
-		d = Vector3::Distance(cam, Vector3((node->NW->rect.x + node->NW->rect.z)/2.0F,0,(node->NW->rect.y + node->NW->rect.w)/2.0F));
+		d = Vector3::Distance(cam, Vector3((node->NW->start.x + node->NW->end.x)/2.0F,(node->NW->start.y + node->NW->end.y)/2.0F,(node->NW->start.z + node->NW->end.z)/2.0F));
 		m = max(1, (int)(d/size));
 		Generate(level - m, node->NW, cam);
 		
-		d = Vector3::Distance(cam, Vector3((node->SW->rect.x + node->SW->rect.z)/2.0F,0,(node->SW->rect.y + node->SW->rect.w)/2.0F));
+		d = Vector3::Distance(cam, Vector3((node->SW->start.x + node->SW->end.x)/2.0F,(node->SW->start.y + node->SW->end.y)/2.0F,(node->SW->start.z + node->SW->end.z)/2.0F));
 		m = max(1, (int)(d/size));
 		Generate(level - m, node->SW, cam);
 	}
 }
 
+inline float Noise2D__(float x, float y) {
+	int n = (int) (x + y*57);
+	n = (n << 13) ^ n;
+	double value = (1.0f - ((n*(n*n*15731 + 789221) + 1376312589) & 0x7fffffff)/1073741824.0f);
+	return abs(value);
+}
+
+inline float Noise2D(float x, float y){
+	return Noise2D__(x,y);
+}
+
+inline float SmoothedNoise2D(float x, float y) {
+	float corners = (Noise2D(x - 1, y - 1) + Noise2D(x + 1, y - 1) + Noise2D(x - 1, y + 1) +
+		Noise2D(x + 1, y + 1))/16;
+	float sides = (Noise2D(x - 1, y) + Noise2D(x + 1, y) + Noise2D(x, y - 1) + Noise2D(x, y + 1))/8;
+	float center = Noise2D(x, y)/4;
+	return -4;//(corners + sides + center)*1000;
+}
 
 void BuildGeometry(TreeSpherePart* node){
 	if(node->NE){
@@ -64,21 +87,34 @@ void BuildGeometry(TreeSpherePart* node){
 		BuildGeometry(node->SW);
 	} else {
 		node->m = new Mesh();
+		node->start = glm::normalize(node->start);
+		node->start *= node->initialSize;
+		node->end = glm::normalize(node->end);
+		node->end *= node->initialSize;
 		auto mesh = node->m;
+		float size = node->initialSize;
 		VertexPositionNormalTexture a00;
-		a00.Position =Vector3(node->rect.x, -4, node->rect.y);
+		a00.Position = Vector3(node->start.x, node->start.y, node->start.z);
+		//a00.Position.Normalize();
+		//a00.Position *= size;
 		a00.Normal = Vector3(0,1,0);
 		a00.Uv = Vector2(0,0);
 		VertexPositionNormalTexture a01;
-		a01.Position = Vector3(node->rect.z, -4, node->rect.y);
+		a01.Position = Vector3(node->end.x,  node->start.y, node->start.z);
+		//a01.Position.Normalize();
+		//a01.Position *= size;
 		a01.Normal = Vector3(0,1,0);
 		a01.Uv = Vector2(0,1);
 		VertexPositionNormalTexture a10;
-		a10.Position = Vector3(node->rect.x, -4, node->rect.w);
+		a10.Position = Vector3(node->start.x,  node->start.y, node->end.z);
+		//a10.Position.Normalize();
+		//a10.Position *= size;
 		a10.Normal = Vector3(0,1,0);
 		a10.Uv = Vector2(1,0);
 		VertexPositionNormalTexture a11;
-		a11.Position = Vector3(node->rect.z, -4, node->rect.w);
+		a11.Position = Vector3(node->end.x,  node->start.y, node->end.z);
+		//a11.Position.Normalize();
+		//a11.Position *= size;
 		a11.Normal = Vector3(0,1,0);
 		a11.Uv = Vector2(1,1);
 		mesh->Verteces.push_back(a00);
@@ -107,11 +143,13 @@ void CollectGeometry(TreeSpherePart* node, Mesh* rootmesh){
 	}
 }
 
-void TreeSphere::GenerateFrom(vec4 cam)
+void TreeSphere::GenerateFrom(vec3 cam)
 {
 	if(!root){
 		root = new TreeSpherePart();
-		root->rect = vec4(-1500,-1500,1500,1500);
+		root->initialSize = 3000;
+		root->start = vec3(-1500,-1500,-1500);
+		root->end = vec3(1500,-1500,1500);
 		Generate(8, root, Vector3(cam.x,cam.y,cam.z));
 		root->m = new Mesh();
 		BuildGeometry(root);

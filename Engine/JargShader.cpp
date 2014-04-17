@@ -52,6 +52,7 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
 
 	std::stringstream ss;
 	std::string name;
+	ss << "#version 330 core" << std::endl;
 	if(type == GL_FRAGMENT_SHADER) {
 		name = "#define _FRAGMENT_";
 		ss << name << std::endl;

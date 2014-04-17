@@ -33,6 +33,15 @@ Mesh::~Mesh(void)
 	m_vbo = nullptr;
 }
 
+void computeNormal(VertexPositionNormalTexture v1, VertexPositionNormalTexture v2, VertexPositionNormalTexture v3)
+{
+// 	glm::vec3 const & a = v1.Position;
+// 	glm::vec3 const & b = v2.Position;
+// 	glm::vec3 const & c = v3.Position;
+// 	auto t = glm::normalize(glm::cross(c - a, b - a));
+// 	v1.Normal = v2.Normal = v3.Normal = t;
+} 
+
 void Mesh::Create(std::vector<VertexPositionNormalTexture> v, std::vector<GLuint> i)
 {
 	Verteces.assign(v.begin(), v.end());
@@ -113,7 +122,7 @@ bool Mesh::loadOBJ(std::string path)
 }
 
 void Mesh::Bind()
-{ 
+{
 	if(m_vbo) {
 		glBindVertexArray(0);
 		glDisableVertexAttribArray(BUFFER_TYPE_VERTEX);

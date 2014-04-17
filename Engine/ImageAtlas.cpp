@@ -1,5 +1,6 @@
 #include "ImageAtlas.h"
 #include <glog\logging.h>
+#include <math.h>
 
 
 ImageAtlas::ImageAtlas(void)
@@ -72,9 +73,9 @@ bool ImageAtlas::InsertImage()
 		//double d2 = sqrt(double((boxTmp->height - h1) * (boxTmp->height - h1)) + double(w1 * w1));
 		
 		// Правый нижний прямоугольник
-		double d1 = sqrt(double(boxTmp->height * boxTmp->height) + double((boxTmp->width - w1 - indent) * (boxTmp->width - w1 - indent)));
+		double d1 = std::sqrt(double(boxTmp->height * boxTmp->height) + double((boxTmp->width - w1 - indent) * (boxTmp->width - w1 - indent)));
 		// Левый верхний прямоугольник
-		double d2 = sqrt(double((boxTmp->height - h1 - indent) * (boxTmp->height - h1 - indent)) + double(boxTmp->width * boxTmp->width));
+		double d2 = std::sqrt(double((boxTmp->height - h1 - indent) * (boxTmp->height - h1 - indent)) + double(boxTmp->width * boxTmp->width));
 
 		if(d1 < d2)
 		{

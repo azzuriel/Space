@@ -1,4 +1,4 @@
-#version 330 core
+//version 330 inserted here by programm
 #define VERT_POSITION 0
 #define VERT_TEXCOORD 1
 #define VERT_NORMAL   2

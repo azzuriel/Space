@@ -11,6 +11,7 @@
 #include "..\Engine\Camera.h"
 #include "../Engine/SphereTesselator.h"
 #include "../Engine/MAterial.h"
+#include <glm.hpp>
 #ifdef LINUX
 #include <unistd.h>
 #endif
@@ -279,9 +280,11 @@ void Game::Run()
 	cube->Texture = &test;
 
 	Camera camera;
-	camera.SetWindowSize(width, height);
+	//camera.SetWindowSize(width, height);
 	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 MVP = camera.CalculateMatrix() * model;
+	glm::mat4 MVP = camera.VP() * model;
+	camera.SetPosition(vec3(500,500,500));
+	camera.SetLookAt(vec3(0,0,0));
 
 	//auto font = std::unique_ptr<Font>(new Font());
 	//font->Initialize();
@@ -291,9 +294,13 @@ void Game::Run()
 	float sec = 0;
 
 	auto ts = std::unique_ptr<TreeSphere>(new TreeSphere());
-	ts->GenerateFrom(glm::vec4(0.0,0.0,0.0,0.0));
+	ts->GenerateFrom(glm::vec3(0.0,0.0,0.0));
+	ts->m->World = Identity;
+	ts->m->Shader = BasicShader.get();
+	ts->m->Texture = &test;
 	ts->Bind();
 
+	Mouse::SetFixedPosState(true);
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -306,6 +313,19 @@ void Game::Run()
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(204/255.0F, 1.0f, 1.0f, 1.0f);
+
+		if(Keyboard::isKeyDown(GLFW_KEY_W)){
+			camera.Move(FORWARD);
+		}
+		if(Keyboard::isKeyDown(GLFW_KEY_S)){
+			camera.Move(BACK);
+		}
+		if(Keyboard::isKeyDown(GLFW_KEY_A)){
+			camera.Move(LEFT);
+		}
+		if(Keyboard::isKeyDown(GLFW_KEY_D)){
+			camera.Move(RIGHT);
+		}
 
 		if(Keyboard::isKeyPress(GLFW_KEY_F3)){
 			iters--;
@@ -357,18 +377,19 @@ void Game::Run()
 		camTest--;camTest--;camTest--;
 		}
 
-		glUniform1f(innerT, 1);
+		camera.move_camera = true;
+		camera.camera_scale = gt.elapsed*100;
+		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
+
 
 		auto mpos = Mouse::GetCursorPos();
-		pl.position = vec4(mpos.x*10.0-1000, 10, mpos.y*10.0-1000, 1.0);
-		camera.position = vec3(40,40,40);
-
 		PointLightSetup(BasicShader->program, pl);
 		MaterialSetup(BasicShader->program, mat);
 
 		BasicShader->BindProgram();
-		camera.view = glm::lookAt(vec3(5000+camTest,50000,40), vec3(40+camTest,30,30), vec3(0,1,0));
-		MVP = camera.CalculateMatrix() * model;
+
+		camera.Update();
+		MVP = camera.VP() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
 
@@ -378,8 +399,8 @@ void Game::Run()
 		glUniformMatrix4fv(mvpBasic, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(colorTextureLocation, 1);
 
-		//m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
-		//m->Render();
+		m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
+		m->Render();
 		//plane->Render();
 		sec += gt.elapsed;
 		if(sec > 0.1) {
@@ -388,14 +409,13 @@ void Game::Run()
 			ts->m->Indeces.clear();
 			ts->m->Verteces.clear();
 			ts->root = nullptr;
-			ts->GenerateFrom(pl.position);
+			ts->GenerateFrom(camera.position);
 			ts->Bind();
 		}
 		ts->Render();
-		cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
-		cube->World = glm::scale(cube->World, vec3(500,500,500));
-
-		cube->Render();
+		//cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
+		//cube->World = glm::scale(cube->World, vec3(500,500,500));
+		//cube->Render();
 
 		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
 		//sb->DrawString(Vector2(10,10), std::to_string((long double)fps.GetCount()), *font);
@@ -404,7 +424,7 @@ void Game::Run()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		mySleep(16);
+		//mySleep(16);
 	}
 
 	//delete m;

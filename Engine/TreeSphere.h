@@ -6,12 +6,14 @@
 #include <detail\type_vec.hpp>
 
 struct TreeSpherePart{
+public:
 	Mesh* m;
 	Vector3 pos;
 	TreeSpherePart *NE, *NW, *SE, *SW;
 	TreeSpherePart();
 	~TreeSpherePart();
-	vec4 rect;
+	vec3 start, end;
+	float initialSize;
 };
 
 class TreeSphere
@@ -19,7 +21,7 @@ class TreeSphere
 public:
 	TreeSphere(void);
 	~TreeSphere(void);
-	void GenerateFrom(glm::vec4 cam);
+	void GenerateFrom(glm::vec3 cam);
 	void Render();
 	void Bind();
 	Mesh* m;
