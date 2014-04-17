@@ -18,6 +18,9 @@ TreeSphere::~TreeSphere(void)
 }
 
 void Generate(int level, TreeSpherePart* node, Vector3 cam){
+	if(level < 1) {
+		return;
+	}
 	node->NE = new TreeSpherePart();
 	float mo = (node->rect.z - node->rect.x)/3;
 	node->NE->rect = vec4((node->rect.x + node->rect.z)/2.0F, node->rect.y, node->rect.z, (node->rect.y + node->rect.w)/2.0F);
@@ -33,21 +36,21 @@ void Generate(int level, TreeSpherePart* node, Vector3 cam){
 	node->SW = new TreeSpherePart();
 	node->SW->rect = node->rect/2.0F;
 	node->SW->rect = vec4(node->rect.x, (node->rect.y + node->rect.w)/2.0F, (node->rect.x + node->rect.z)/2.0F, node->rect.w);
-	if( level > 1){
+	float size = pow(abs((float)node->rect.x - (float)node->rect.z), 0.9F);	if( level > 1){
 		float d = Vector3::Distance(cam, Vector3((node->NE->rect.x + node->NE->rect.z)/2.0F,0,(node->NE->rect.y + node->NE->rect.w)/2.0F));
-		int m = max(1, (int)d/100);
+		int m = max(1, (int)(d/size));
 		Generate(level - m, node->NE, cam);
 		
 		d = Vector3::Distance(cam, Vector3((node->SE->rect.x + node->SE->rect.z)/2.0F,0,(node->SE->rect.y + node->SE->rect.w)/2.0F));
-		m = max(1, (int)d/100);
+		m = max(1, (int)(d/size));
 		Generate(level - m, node->SE, cam);
 		
 		d = Vector3::Distance(cam, Vector3((node->NW->rect.x + node->NW->rect.z)/2.0F,0,(node->NW->rect.y + node->NW->rect.w)/2.0F));
-		m = max(1, (int)d/100);
+		m = max(1, (int)(d/size));
 		Generate(level - m, node->NW, cam);
 		
 		d = Vector3::Distance(cam, Vector3((node->SW->rect.x + node->SW->rect.z)/2.0F,0,(node->SW->rect.y + node->SW->rect.w)/2.0F));
-		m = max(1, (int)d/100);
+		m = max(1, (int)(d/size));
 		Generate(level - m, node->SW, cam);
 	}
 }
@@ -108,8 +111,8 @@ void TreeSphere::GenerateFrom(vec4 cam)
 {
 	if(!root){
 		root = new TreeSpherePart();
-		root->rect = vec4(-50,-50,50,50);
-		Generate(5, root, Vector3(cam.x,cam.y,cam.z));
+		root->rect = vec4(-1500,-1500,1500,1500);
+		Generate(8, root, Vector3(cam.x,cam.y,cam.z));
 		root->m = new Mesh();
 		BuildGeometry(root);
 		CollectGeometry(root, m);

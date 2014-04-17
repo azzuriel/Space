@@ -360,14 +360,14 @@ void Game::Run()
 		glUniform1f(innerT, 1);
 
 		auto mpos = Mouse::GetCursorPos();
-		pl.position = vec4(mpos.x/10-10, 10, mpos.y/10-10, 1.0);
+		pl.position = vec4(mpos.x*10.0-1000, 10, mpos.y*10.0-1000, 1.0);
 		camera.position = vec3(40,40,40);
 
 		PointLightSetup(BasicShader->program, pl);
 		MaterialSetup(BasicShader->program, mat);
 
 		BasicShader->BindProgram();
-		camera.view = glm::lookAt(vec3(40+camTest,40,40), vec3(0,0,0), vec3(0,1,0));
+		camera.view = glm::lookAt(vec3(5000+camTest,500,40), vec3(40+camTest,30,30), vec3(0,1,0));
 		MVP = camera.CalculateMatrix() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
@@ -382,18 +382,20 @@ void Game::Run()
 		//m->Render();
 		//plane->Render();
 		sec += gt.elapsed;
-		if(sec > 0.5) {
+		if(sec > 0.1) {
 			sec = 0;
 			delete ts->root;
 			ts->m->Indeces.clear();
 			ts->m->Verteces.clear();
 			ts->root = nullptr;
-			ts->GenerateFrom(vec4(40+camTest,40.0,40.0,0.0));
+			ts->GenerateFrom(vec4(5000+camTest,500,40,1));
 			ts->Bind();
 		}
 		ts->Render();
 
-		cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
+				//cube->World = glm::scale(Identity, vec3(20,20,20));
+		//cube->World = glm::translate(cube->World, vec3(pl.position.x, pl.position.y, pl.position.z));
+
 		cube->Render();
 
 		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
