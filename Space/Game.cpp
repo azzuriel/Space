@@ -22,6 +22,7 @@
 #include "../Engine/TreeSphere.h"
 #include "ROAMgrid.h"
 #include <ClassicNoise.h>
+#include <ROAMSurface.h>
 
 
 
@@ -204,6 +205,7 @@ void CameraSetup(GLuint program, Camera &camera, const mat4 &model, const mat4 &
 void Game::Run()
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS); 
 
 	glEnable(GL_BLEND);
@@ -285,8 +287,8 @@ void Game::Run()
 	//camera.SetWindowSize(width, height);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 MVP = camera.VP() * model;
-	camera.SetPosition(vec3(2,2,2));
-	camera.SetLookAt(vec3(0,0,0));
+	camera.SetPosition(vec3(50,0,-200));
+	camera.SetLookAt(vec3(50,0,50));
 
 	//auto font = std::unique_ptr<Font>(new Font());
 	//font->Initialize();
@@ -302,25 +304,7 @@ void Game::Run()
 // 	ts->m->Texture = &test;
 // 	ts->Bind();
 
-	auto patch = std::unique_ptr<TerrainPatch>(new TerrainPatch());
-	patch->computeVariance();
-	patch->m->World = Identity;
-	patch->m->Shader = BasicShader.get();
-	patch->m->Texture = &test;
-	auto m_poolSize = patch->poolSize();
-	float *triPool = new float[m_poolSize*9];
-	float *colorPool = new float[m_poolSize*9];
-	float *normalTexelPool = new float[m_poolSize*6];
-	Heightmap *map = patch->getHeightmap();
-	GLuint normalTexture = -1;
-	glGenTextures(1, &normalTexture);
-	glBindTexture(GL_TEXTURE_2D, normalTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, map->width, map->height, 0, GL_RGB, GL_FLOAT, map->normal_map);
-	Texture* tempt = new Texture();
-	tempt->textureId = normalTexture;
-	patch->m->Texture = tempt;
+	auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
 
 	Mouse::SetFixedPosState(true);
@@ -392,8 +376,7 @@ void Game::Run()
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_F6)){
-			camTest++;
-	camTest++;camTest++;camTest++;
+			surf->Test();
 		}
 		if(Keyboard::isKeyDown(GLFW_KEY_F5)){
 			camera.SetLookAt(vec3(0,0,0.0F));
@@ -401,8 +384,13 @@ void Game::Run()
 
 		camera.move_camera = true;
 		camera.camera_scale = gt.elapsed/10.0F;
+		if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT)){
+			camera.camera_scale = gt.elapsed*10.0F;
+		}
+
 		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
+		pl.position = vec4(50.0f)*m->World;
 
 		auto mpos = Mouse::GetCursorPos();
 		PointLightSetup(BasicShader->program, pl);
@@ -417,18 +405,16 @@ void Game::Run()
 		sec += gt.elapsed;
 		if(sec > 0.1) {
 			sec = 0;
-			patch->reset();
-			patch->tessellate(camera.position, 0.004F);
-			patch->getTessellation(triPool, colorPool, normalTexelPool);
-			patch->Bind(triPool, colorPool, normalTexelPool);
+			surf->UpdateCells(camera.position/100.0F);
+			surf->Bind();
 		}
 
 // 		glActiveTexture(GL_TEXTURE0);
 // 		glBindTexture(GL_TEXTURE_2D, normalTexture);
 // 		glUniform1i(glGetUniformLocation(BasicShader->program, "normalMap"), 0);
-		patch->Render();
+		surf->Render(BasicShader.get());
 
-		//m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
+		m->World = glm::rotate(m->World, (float)gt.elapsed, normalize(vec3(2,1,3)));
 		//m->Render();
 
 		//plane->Render();

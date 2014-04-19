@@ -8,6 +8,8 @@
 #include <string.h>
 #include "ClassicNoise.h"
 
+#define tempres 256
+
 TerrainPatch::TerrainPatch(int offset_x, int offset_y)
 	: m_map(nullptr)
 	, m_worldX(offset_x)
@@ -25,18 +27,28 @@ TerrainPatch::TerrainPatch(int offset_x, int offset_y)
 {
 	//m_map = Heightmap_read(fn);
 	m_map = new Heightmap();
-	m_map->height = 64;
-	m_map->width = 64;
-	m_map->map = new float[64*64];
+	m_map->height = tempres;
+	m_map->width = tempres;
+	m_map->map = new float[tempres*tempres];
 	auto map = m_map->map;
-	for (int i =0; i<64;i++)
+	for (int i =0; i<tempres;i++)
 	{
-		for (int j =0; j<64;j++)
+		for (int j =0; j<tempres;j++)
 		{
-			float t = noise(i/64.0F,j/64.0F,j/64.0F)*(1+rand()%2/100.0F);
+			float t = simplexnoise(offset_x + i/(tempres/2.0F), offset_y + j/(tempres/2.0F)) + simplexnoise(offset_x + i/(tempres/4.0F), offset_y + j/(tempres/4.0F))/2.0F + simplexnoise(offset_x + i/(tempres/8.0F), offset_y + j/(tempres/8.0F))/4.0F;
 			if(t < 0) {
 				t = -t;
-			}
+				t /= 15.0F;
+			} else
+				if(t > .4) {
+					t /= 4.0F;
+					t += .4;
+				} else
+			if(t > .6) {
+				t /= 10.0F;
+				t += .6;
+			} 
+
 			*map = t;
 			m_map->maxZ = glm::max(t, m_map->maxZ);
 			m_map->minZ = glm::min(t, m_map->minZ);
@@ -222,10 +234,13 @@ void TerrainPatch::tessellateRecursive(
 	float center_y = (left_y + right_y) * 0.5f;
 
 	if (variance_idx < m_varianceSize) {
-		float a = center_x/m_map->width - view.x;
-		float b = center_y/m_map->height - view.y;
+		float a = center_x/m_map->width - view.x/1.5F;
+		float b = center_y/m_map->height - view.y/1.5F;
 		float distance = 1 + ((a*a + b*b)*m_map->width/128.0f);
 		float variance = variance_tree[variance_idx]/distance;
+		if(view.z > 1) {
+			variance /= view.z;
+		}
 
 		if (variance > errorMargin) {
 			split(node);

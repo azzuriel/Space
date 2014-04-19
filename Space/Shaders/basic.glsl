@@ -84,7 +84,7 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 void main(void)
 {
         //vec3 normal   = normalize(Vert.normal);
-        //vec3 lightDir = normalize(Vert.lightDir);
+        vec3 lightDir = normalize(Vert.lightDir);
         //vec3 viewDir  = normalize(Vert.viewDir);
 
         //float attenuation = 1.0 / (light.attenuation[0] +
@@ -100,7 +100,11 @@ void main(void)
         //color += material.specular * light.specular * RdotVpow * attenuation;
         //color = texture(material.texture, Vert.texcoord);
 		vec3 normal = texture(material.texture, Vert.texcoord).xyz;
-		float diffuse = max(0.0, dot(normal, vec3(0, 0, 1)));
+		vec3 mininormal = texture(material.texture, Vert.texcoord*10.0).xyz;
+		vec3 mininormal2 = texture(material.texture, Vert.texcoord*5.0).xyz;
+		
+		float diffuse = max(0.0, dot(normal + mininormal/20.0 + mininormal/10.0, lightDir));
+		//float diffuse = max(0.0, dot(normal, lightDir)); //+ mininormal/20.0 + mininormal/10.0;
 		color = vec4(1,0.5,0.5,1) * vec4(diffuse, diffuse, diffuse, 1.0);
 }
 #endif
