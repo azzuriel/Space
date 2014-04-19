@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <png.h>
+#include "Heightmap.h"
 
 
 unsigned int GetChannelCount(unsigned int format)
@@ -153,6 +154,8 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 
 	return true; 
 }
+
+
 
 static bool SaveBMP(Bitmap &bitmap, FILE *file)
 {

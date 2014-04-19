@@ -3,6 +3,7 @@
 #define VertexPositionTexture_h__
 
 #include "Vector.h"
+#include <glm.hpp>
 
 enum BufferType
 {
@@ -14,9 +15,9 @@ enum BufferType
 
 struct VertexPositionTexture{
 public:
-	Vector3 Position;
-	Vector2 Uv;
-	VertexPositionTexture(Vector3 v, Vector3 p , Vector2 u);
+	glm::vec3 Position;
+	glm::vec2 Uv;
+	VertexPositionTexture(glm::vec3 v, glm::vec3 p , glm::vec2 u);
 	VertexPositionTexture();
 	~VertexPositionTexture();
 
@@ -26,10 +27,10 @@ public:
 
 struct VertexPositionNormalTexture{
 public:
-	Vector3 Position;
-	Vector2 Uv;
-	Vector3 Normal;
-	VertexPositionNormalTexture(Vector3 norm, Vector3 pos, Vector2 uv);
+	glm::vec3 Position;
+	glm::vec2 Uv;
+	glm::vec3 Normal;
+	VertexPositionNormalTexture(glm::vec3 norm, glm::vec3, glm::vec2 uv);
 	VertexPositionNormalTexture();
 	~VertexPositionNormalTexture();
 
@@ -39,7 +40,7 @@ public:
 
 struct VertexPositionColor{
 public:
-	Vector3 pos;
+	glm::vec3 pos;
 	Color4 col;
 };
 #endif // VertexPositionTexture_h__

@@ -83,22 +83,24 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 
 void main(void)
 {
-        vec3 normal   = normalize(Vert.normal);
-        vec3 lightDir = normalize(Vert.lightDir);
-        vec3 viewDir  = normalize(Vert.viewDir);
+        //vec3 normal   = normalize(Vert.normal);
+        //vec3 lightDir = normalize(Vert.lightDir);
+        //vec3 viewDir  = normalize(Vert.viewDir);
 
-        float attenuation = 1.0 / (light.attenuation[0] +
-                light.attenuation[1] * Vert.distance +
-                light.attenuation[2] * Vert.distance * Vert.distance);
+        //float attenuation = 1.0 / (light.attenuation[0] +
+        //        light.attenuation[1] * Vert.distance +
+        //        light.attenuation[2] * Vert.distance * Vert.distance);
 		//attenuation = min(attenuation, 2.0);
-        color = material.emission*100;
-        color += material.ambient * light.ambient * attenuation;
+        //color = material.emission*100;
+        //color += material.ambient * light.ambient * attenuation;
 		//vec4 hc = texture(material.normal, Vert.texcoord);
-        float NdotL = max(dot(normal, lightDir) * 2.0 - 1.0, 0.0);
-        color += material.diffuse * light.diffuse * NdotL * attenuation;
-        float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
-        color += material.specular * light.specular * RdotVpow * attenuation;
-        color = texture(material.texture, Vert.texcoord);
-		//color = vec4(0.0,0.0,0.0,1.0);
+        //float NdotL = max(dot(normal, lightDir) * 2.0 - 1.0, 0.0);
+        //color += material.diffuse * light.diffuse * NdotL * attenuation;
+        //float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
+        //color += material.specular * light.specular * RdotVpow * attenuation;
+        //color = texture(material.texture, Vert.texcoord);
+		vec3 normal = texture(material.texture, Vert.texcoord).xyz;
+		float diffuse = max(0.0, dot(normal, vec3(0, 0, 1)));
+		color = vec4(1,0.5,0.5,1) * vec4(diffuse, diffuse, diffuse, 1.0);
 }
 #endif

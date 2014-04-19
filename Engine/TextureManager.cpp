@@ -2,6 +2,7 @@
 #include <glew.h>
 #include <glfw3.h>
 #include <fstream>
+#include "Heightmap.h"
 
 //#define OPENGL_CHECK_ERRORS()							\
 //	while( unsigned int openGLError = glGetError() )	\

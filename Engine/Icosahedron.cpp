@@ -43,13 +43,13 @@ Mesh Icosahedron::getMesh()
 	float segmentAngle = M_PI * 72 / 180;
 	float currentAngle = 0;
 
-	Vector3 v[VERTEXCOUNT];
-	v[0] = Vector3(0, 0.5, 0);
-	v[11] = Vector3(0, -0.5, 0);
+	glm::vec3 v[VERTEXCOUNT];
+	v[0] = glm::vec3(0, 0.5, 0);
+	v[11] = glm::vec3(0, -0.5, 0);
 
 	for (int i=1; i<6; i++)
 	{
-		v[i] = Vector3(0.5 * sin(currentAngle) * cos(magicAngle),
+		v[i] = glm::vec3(0.5 * sin(currentAngle) * cos(magicAngle),
 			0.5 * sin(magicAngle),
 			0.5 * cos(currentAngle) * cos(magicAngle));
 		currentAngle += segmentAngle;
@@ -57,7 +57,7 @@ Mesh Icosahedron::getMesh()
 	currentAngle = M_PI * 36 / 180;
 	for (int i=6; i<11; i++)
 	{
-		v[i] = Vector3(0.5 * sin(currentAngle) * cos(-magicAngle),
+		v[i] = glm::vec3(0.5 * sin(currentAngle) * cos(-magicAngle),
 			0.5 * sin(-magicAngle),
 			0.5 * cos(currentAngle) * cos(-magicAngle));
 		currentAngle += segmentAngle;
@@ -69,7 +69,7 @@ Mesh Icosahedron::getMesh()
 	for (int i=0; i < VERTEXCOUNT; i++)
 	{
 		m->Verteces[i].Position = v[i];
-		m->Verteces[i].Uv =  Vector2(rand()%100/100.0,rand()%100/100.0);
+		m->Verteces[i].Uv =  glm::vec2(rand()%100/100.0,rand()%100/100.0);
 	}
 
 	for (int i=0; i < INDEXCOUNT; i++)

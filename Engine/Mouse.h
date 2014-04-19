@@ -3,7 +3,7 @@
 #define Mouse_h__
 
 #include <glfw3.h>
-#include "Vector.h"
+#include <glm.hpp>
 
 class Mouse
 {
@@ -49,9 +49,9 @@ public:
 	static void SetWindowSize(unsigned int width, unsigned int height);
 
 	static void GetCursorPos(double &xpos, double &ypos);
-	static Vector2 GetCursorPos();
-	static Vector2 GetCursorLastPos();
-	static Vector2 GetCursorDelta();
+	static glm::vec2 GetCursorPos();
+	static glm::vec2 GetCursorLastPos();
+	static glm::vec2 GetCursorDelta();
 
 	static double IsMoveCursorX();
 	static double IsMoveCursorY();

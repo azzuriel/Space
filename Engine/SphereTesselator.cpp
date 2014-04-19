@@ -1,8 +1,6 @@
 #include "SphereTesselator.h"
 #include "Mesh.h"
 
-#define sqr(x)(x)*(x);
-
 Mesh* Tesselator::Tesselate(int iters, const Mesh& mesh)
 {
 	Mesh* m = new Mesh(mesh);
@@ -63,30 +61,30 @@ Mesh* Tesselator::SphereSubTesselate(const Mesh& mesh)
 		VertexPositionNormalTexture v2 = mesh.Verteces[mesh.Indeces[i+2]];
 
 		t = v0;
-		t.Position.Normalize();
+		t.Position = glm::normalize(t.Position);
 	//	t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 		t = v1;
-		t.Position.Normalize();
+		t.Position = glm::normalize(t.Position);
 	//	t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 		t = v2;
-		t.Position.Normalize();
+		t.Position = glm::normalize(t.Position);
 		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		t = (v0 + v1)/2;
-		t.Position.Normalize();
+		t.Position = glm::normalize(t.Position);
 		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		t = (v0 + v2)/2;
-		t.Position.Normalize();
+		t.Position = glm::normalize(t.Position);
 		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 
 		t = (v1 + v2)/2;
-		t.Position.Normalize();
+		t.Position = glm::normalize(t.Position);
 		//t.Position *= SmoothedNoise2D(t.Position.x, t.Position.y + t.Position.z);
 		m->Verteces.push_back(t);
 

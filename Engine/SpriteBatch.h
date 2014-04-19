@@ -10,12 +10,12 @@
 class Batched{
 private:
 	GLuint m_vertexBuffer, m_textureBuffer, m_indecesBuffer, vao;
-	Vector2* uv;
-	Vector3* vertex;
+	glm::vec2* uv;
+	glm::vec3* vertex;
 	GLuint* index;
 
 	GLuint l_vertexBuffer, l_colorBuffer, l_indecesBuffer, lvao;
-	Vector3* lvertex;
+	glm::vec3* lvertex;
 	Color4* lcolor;
 	GLuint* lindex;
 
@@ -38,19 +38,19 @@ public:
 
 	Texture* atlasTex;
 
-	void DrawString(Vector2 pos, std::string text, Font& font);
+	void DrawString(glm::vec2 pos, std::string text, Font& font);
 	void Initialize(JargShader* tex, JargShader* col);
-	void DrawQuad(Vector2 pos, Vector2 size, float rotation, Texture& tex, Rect sub);
-	void DrawQuad(Vector2 pos, Vector2 size, float rotation, Texture& tex, int atl);
-	void DrawQuad(Vector2 pos, Vector2 size, float rotation, Texture& tex);
-	void DrawQuad(Vector2 pos, Vector2 size, Texture& tex);
+	void DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex, Rect sub);
+	void DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex, int atl);
+	void DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex);
+	void DrawQuad(glm::vec2 pos, glm::vec2 size, Texture& tex);
 	int RenderFinally();
-	void DrawLine(Vector2 from, Vector2 to, float w, Color4 col);
-	void DrawRectangle(Vector2 from, Vector2 to, Color4 col);
-	void DrawLine3d(Vector3 from, Vector3 to, Color4 col);
+	void DrawLine(glm::vec2 from, glm::vec2 to, float w, Color4 col);
+	void DrawRectangle(glm::vec2 from, glm::vec2 to, Color4 col);
+	void DrawLine3d(glm::vec3 from, glm::vec3 to, Color4 col);
 		int RenderFinallyWorld();
 private:
-	inline void innerDraw(Vector2 pos, Vector2 size, float rotation, Texture& tex, Rect sub);
+	inline void innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex, Rect sub);
 	void LRender();
 	void Render();
 	void DRender();

@@ -20,6 +20,8 @@
 #endif
 #include <math.h>
 #include "../Engine/TreeSphere.h"
+#include "ROAMgrid.h"
+#include <ClassicNoise.h>
 
 
 
@@ -171,9 +173,9 @@ void MaterialSetup(GLuint program, const Material &material)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, material.normal);
 	glUniform1i(glGetUniformLocation(program, "material.texture"), 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, material.normal);
-	glUniform1i(glGetUniformLocation(program, "material.normal"), 0);
+	//glActiveTexture(GL_TEXTURE1);
+	//glBindTexture(GL_TEXTURE_2D, material.normal);
+	//glUniform1i(glGetUniformLocation(program, "material.normal"), 0);
 
 	// установка параметров
 	glUniform4fv(glGetUniformLocation(program, "material.ambient"),  1, &material.ambient[0]);
@@ -283,7 +285,7 @@ void Game::Run()
 	//camera.SetWindowSize(width, height);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 MVP = camera.VP() * model;
-	camera.SetPosition(vec3(500,500,500));
+	camera.SetPosition(vec3(2,2,2));
 	camera.SetLookAt(vec3(0,0,0));
 
 	//auto font = std::unique_ptr<Font>(new Font());
@@ -293,12 +295,33 @@ void Game::Run()
     int iters = 0;
 	float sec = 0;
 
-	auto ts = std::unique_ptr<TreeSphere>(new TreeSphere());
-	ts->GenerateFrom(glm::vec3(0.0,0.0,0.0));
-	ts->m->World = Identity;
-	ts->m->Shader = BasicShader.get();
-	ts->m->Texture = &test;
-	ts->Bind();
+// 	auto ts = std::unique_ptr<QuadLod>(new QuadLod());
+// 	ts->GenerateFrom(glm::vec3(0.0,0.0,0.0));
+// 	ts->m->World = Identity;
+// 	ts->m->Shader = BasicShader.get();
+// 	ts->m->Texture = &test;
+// 	ts->Bind();
+
+	auto patch = std::unique_ptr<TerrainPatch>(new TerrainPatch());
+	patch->computeVariance();
+	patch->m->World = Identity;
+	patch->m->Shader = BasicShader.get();
+	patch->m->Texture = &test;
+	auto m_poolSize = patch->poolSize();
+	float *triPool = new float[m_poolSize*9];
+	float *colorPool = new float[m_poolSize*9];
+	float *normalTexelPool = new float[m_poolSize*6];
+	Heightmap *map = patch->getHeightmap();
+	GLuint normalTexture = -1;
+	glGenTextures(1, &normalTexture);
+	glBindTexture(GL_TEXTURE_2D, normalTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, map->width, map->height, 0, GL_RGB, GL_FLOAT, map->normal_map);
+	Texture* tempt = new Texture();
+	tempt->textureId = normalTexture;
+	patch->m->Texture = tempt;
+
 
 	Mouse::SetFixedPosState(true);
 	while(Running && !glfwWindowShouldClose(window)) 
@@ -373,12 +396,11 @@ void Game::Run()
 	camTest++;camTest++;camTest++;
 		}
 		if(Keyboard::isKeyDown(GLFW_KEY_F5)){
-			camTest--;
-		camTest--;camTest--;camTest--;
+			camera.SetLookAt(vec3(0,0,0.0F));
 		}
 
 		camera.move_camera = true;
-		camera.camera_scale = gt.elapsed*100;
+		camera.camera_scale = gt.elapsed/10.0F;
 		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
 
@@ -392,32 +414,40 @@ void Game::Run()
 		MVP = camera.VP() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
-
-
-		// Use our shader
-		
-		glUniformMatrix4fv(mvpBasic, 1, GL_FALSE, &MVP[0][0]);
-		glUniform1i(colorTextureLocation, 1);
-
-		m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
-		m->Render();
-		//plane->Render();
 		sec += gt.elapsed;
 		if(sec > 0.1) {
 			sec = 0;
-			delete ts->root;
-			ts->m->Indeces.clear();
-			ts->m->Verteces.clear();
-			ts->root = nullptr;
-			ts->GenerateFrom(camera.position);
-			ts->Bind();
+			patch->reset();
+			patch->tessellate(camera.position, 0.004F);
+			patch->getTessellation(triPool, colorPool, normalTexelPool);
+			patch->Bind(triPool, colorPool, normalTexelPool);
 		}
-		ts->Render();
+
+// 		glActiveTexture(GL_TEXTURE0);
+// 		glBindTexture(GL_TEXTURE_2D, normalTexture);
+// 		glUniform1i(glGetUniformLocation(BasicShader->program, "normalMap"), 0);
+		patch->Render();
+
+		//m->World = glm::rotate(m->World, (float)gt.elapsed, vec3(1,0,1));
+		//m->Render();
+
+		//plane->Render();
+// 		sec += gt.elapsed;
+// 		if(sec > 0.1) {
+// 			sec = 0;
+// 			delete ts->root;
+// 			ts->m->Indeces.clear();
+// 			ts->m->Verteces.clear();
+// 			ts->root = nullptr;
+// 			ts->GenerateFrom(vec3(pl.position));
+// 			ts->Bind();
+// 		}
+// 		ts->Render();
 		//cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
 		//cube->World = glm::scale(cube->World, vec3(500,500,500));
 		//cube->Render();
 
-		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).c_str());
+		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).append(" ").append(std::to_string((long double)(glm::length(camera.position/750.0F)))).c_str());
 		//sb->DrawString(Vector2(10,10), std::to_string((long double)fps.GetCount()), *font);
 
 		Mouse::Update();

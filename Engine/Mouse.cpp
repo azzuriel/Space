@@ -1,5 +1,5 @@
 #include "Mouse.h"
-
+#include <glm.hpp>
 
 GLFWwindow *Mouse::sm_window;
 
@@ -90,9 +90,9 @@ void Mouse::GetCursorPos( double &x, double &y )
 	y = sm_ypos;
 }
 
-Vector2 Mouse::GetCursorPos()
+glm::vec2 Mouse::GetCursorPos()
 {
-	return Vector2(sm_xpos, sm_ypos);
+	return glm::vec2(sm_xpos, sm_ypos);
 }
 
 void Mouse::SetFixedPosState( bool state )
@@ -155,14 +155,14 @@ bool Mouse::IsLeftPressed()
 	return sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS;
 }
 
-Vector2 Mouse::GetCursorDelta()
+glm::vec2 Mouse::GetCursorDelta()
 {
-	return Vector2(sm_deltaxpos, sm_deltaypos);
+	return glm::vec2(sm_deltaxpos, sm_deltaypos);
 }
 
-Vector2 Mouse::GetCursorLastPos()
+glm::vec2 Mouse::GetCursorLastPos()
 {
-	return Vector2(sm_lastxpos, sm_lastypos);
+	return glm::vec2(sm_lastxpos, sm_lastypos);
 }
 
 double Mouse::sm_lastypos;

@@ -6,14 +6,14 @@
 #define VERTEXCOUNT 24
 #define INDEXCOUNT 36
 
-static const Vector3 __vertexPositions[VERTEXCOUNT] =
+static const glm::vec3 __vertexPositions[VERTEXCOUNT] =
 {	
-	Vector3(-0.5, -0.5, -0.5), Vector3(-0.5, 0.5, -0.5), Vector3(0.5, 0.5, -0.5), Vector3(0.5, -0.5, -0.5), // front
-	Vector3(0.5, -0.5,0.5), Vector3(0.5, 0.5,0.5), Vector3(-0.5, 0.5,0.5), Vector3(-0.5, -0.5,0.5), // back
-	Vector3(-0.5, 0.5, -0.5), Vector3(-0.5, 0.5,0.5), Vector3(0.5, 0.5,0.5), Vector3(0.5, 0.5, -0.5), // top
-	Vector3(-0.5, -0.5,0.5), Vector3(-0.5, -0.5, -0.5), Vector3(0.5, -0.5, -0.5), Vector3(0.5, -0.5,0.5), // bottom
-	Vector3(-0.5, -0.5,0.5), Vector3(-0.5, 0.5,0.5), Vector3(-0.5, 0.5, -0.5), Vector3(-0.5, -0.5, -0.5), // left
-	Vector3(0.5, -0.5, -0.5), Vector3(0.5, 0.5, -0.5), Vector3(0.5, 0.5,0.5), Vector3(0.5, -0.5,0.5) // right
+	glm::vec3(-0.5, -0.5, -0.5), glm::vec3(-0.5, 0.5, -0.5), glm::vec3(0.5, 0.5, -0.5), glm::vec3(0.5, -0.5, -0.5), // front
+	glm::vec3(0.5, -0.5,0.5), glm::vec3(0.5, 0.5,0.5), glm::vec3(-0.5, 0.5,0.5), glm::vec3(-0.5, -0.5,0.5), // back
+	glm::vec3(-0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5,0.5), glm::vec3(0.5, 0.5,0.5), glm::vec3(0.5, 0.5, -0.5), // top
+	glm::vec3(-0.5, -0.5,0.5), glm::vec3(-0.5, -0.5, -0.5), glm::vec3(0.5, -0.5, -0.5), glm::vec3(0.5, -0.5,0.5), // bottom
+	glm::vec3(-0.5, -0.5,0.5), glm::vec3(-0.5, 0.5,0.5), glm::vec3(-0.5, 0.5, -0.5), glm::vec3(-0.5, -0.5, -0.5), // left
+	glm::vec3(0.5, -0.5, -0.5), glm::vec3(0.5, 0.5, -0.5), glm::vec3(0.5, 0.5,0.5), glm::vec3(0.5, -0.5,0.5) // right
 };
 
 static const GLuint __vertexIndex[INDEXCOUNT] =
@@ -38,16 +38,16 @@ Mesh Cube::getMesh()
 	for(unsigned int i = 0; i < 6; i++)
 	{
 		m->Verteces[i*4].Position = __vertexPositions[i * 4 + 0];
-		m->Verteces[i*4].Uv = Vector2(1,1);
+		m->Verteces[i*4].Uv = glm::vec2(1,1);
 
 		m->Verteces[i*4 + 1].Position = __vertexPositions[i * 4 + 1];
-		m->Verteces[i*4 + 1].Uv = Vector2(1,0);
+		m->Verteces[i*4 + 1].Uv = glm::vec2(1,0);
 
 		m->Verteces[i*4 + 2].Position = __vertexPositions[i * 4 + 2];
-		m->Verteces[i*4 + 2].Uv = Vector2(0,0);
+		m->Verteces[i*4 + 2].Uv = glm::vec2(0,0);
 
 		m->Verteces[i*4 + 3].Position = __vertexPositions[i * 4 + 3];
-		m->Verteces[i*4 + 3].Uv = Vector2(0,1);
+		m->Verteces[i*4 + 3].Uv = glm::vec2(0,1);
 	}
 
 	for (int i =0; i< INDEXCOUNT; i++)

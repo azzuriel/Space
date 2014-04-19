@@ -5,26 +5,26 @@
 #include "Mesh.h"
 #include <detail\type_vec.hpp>
 
-struct TreeSpherePart{
+struct QuadLodPart{
 public:
 	Mesh* m;
-	Vector3 pos;
-	TreeSpherePart *NE, *NW, *SE, *SW;
-	TreeSpherePart();
-	~TreeSpherePart();
+	glm::vec3 pos;
+	QuadLodPart *NE, *NW, *SE, *SW;
+	QuadLodPart();
+	~QuadLodPart();
 	vec3 start, end;
 	float initialSize;
 };
 
-class TreeSphere
+class QuadLod
 {
 public:
-	TreeSphere(void);
-	~TreeSphere(void);
+	QuadLod(void);
+	~QuadLod(void);
 	void GenerateFrom(glm::vec3 cam);
 	void Render();
 	void Bind();
 	Mesh* m;
-	TreeSpherePart* root;
+	QuadLodPart* root;
 	
 };

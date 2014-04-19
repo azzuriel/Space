@@ -2,14 +2,14 @@
 #include "Cube.h"
 
 
-TreeSphere::TreeSphere(void)
+QuadLod::QuadLod(void)
 {
 	m = new Mesh();
 	root = nullptr;
 }
 
 
-TreeSphere::~TreeSphere(void)
+QuadLod::~QuadLod(void)
 {
 	delete m;
 	if(root){
@@ -17,44 +17,49 @@ TreeSphere::~TreeSphere(void)
 	}
 }
 
-void Generate(int level, TreeSpherePart* node, Vector3 cam){
+void Generate(int level, QuadLodPart* node, glm::vec3 cam){
 	if(level < 1) {
 		return;
 	}
-	node->NE = new TreeSpherePart();
+	node->NE = new QuadLodPart();
 	node->NE->start = vec3((node->start.x + node->end.x)/2.0F, node->start.y, node->start.z);
 	node->NE->end = vec3(node->end.x, node->end.y, (node->start.z + node->end.z)/2.0F);
 	node->NE->initialSize = node->initialSize;
 
-	node->NW = new TreeSpherePart();
+	node->NW = new QuadLodPart();
 	node->NW->start = vec3(node->start.x, node->start.y, node->start.z);
 	node->NW->end = vec3((node->start.x + node->end.x)/2.0F, node->end.y, (node->start.z + node->end.z)/2.0F);
 	node->NW->initialSize = node->initialSize;
 
 
-	node->SE = new TreeSpherePart();
+	node->SE = new QuadLodPart();
 	node->SE->start = vec3((node->start.x + node->end.x)/2.0F, node->start.y, (node->start.z + node->end.z)/2.0F);
 	node->SE->end = vec3(node->end.x, node->end.y, node->end.z);
 	node->SE->initialSize = node->initialSize;
 
-	node->SW = new TreeSpherePart();
+	node->SW = new QuadLodPart();
 	node->SW->start = vec3(node->start.x, node->start.y,  (node->start.z + node->end.z)/2.0F);
 	node->SW->end = vec3((node->start.x + node->end.x)/2.0F, node->end.y, node->end.z);
 	node->SW->initialSize = node->initialSize;
-	float size =  abs((float)node->start.x - (float)node->end.x)*10.0F;	float d = Vector3::Distance(cam, Vector3((node->start.x + node->end.x)/2.0F,(node->start.y + node->end.y)/2.0F,(node->start.z + node->end.z)/2.0F));	size /= d /50;	if( level > 1){
-		float d = Vector3::Distance(cam, Vector3((node->NE->start.x + node->NE->end.x)/2.0F,(node->NE->start.y + node->NE->end.y)/2.0F,(node->NE->start.z + node->NE->end.z)/2.0F));
+
+	float size =  abs((float)node->start.x - (float)node->end.x)*10.0F;
+	float d = glm::distance(cam, glm::vec3((node->start.x + node->end.x)/2.0F,(node->start.y + node->end.y)/2.0F,(node->start.z + node->end.z)/2.0F));
+	size /= d /50;
+
+	if( level > 1){
+		float d = glm::distance(cam, glm::vec3((node->NE->start.x + node->NE->end.x)/2.0F,(node->NE->start.y + node->NE->end.y)/2.0F,(node->NE->start.z + node->NE->end.z)/2.0F));
 		int m = max(1, (int)(d/size));
 		Generate(level - m, node->NE, cam);
 		
-		d = Vector3::Distance(cam, Vector3((node->SE->start.x + node->SE->end.x)/2.0F,(node->SE->start.y + node->SE->end.y)/2.0F,(node->SE->start.z + node->SE->end.z)/2.0F));
+		d = glm::distance(cam, glm::vec3((node->SE->start.x + node->SE->end.x)/2.0F,(node->SE->start.y + node->SE->end.y)/2.0F,(node->SE->start.z + node->SE->end.z)/2.0F));
 		m = max(1, (int)(d/size));
 		Generate(level - m, node->SE, cam);
 		
-		d = Vector3::Distance(cam, Vector3((node->NW->start.x + node->NW->end.x)/2.0F,(node->NW->start.y + node->NW->end.y)/2.0F,(node->NW->start.z + node->NW->end.z)/2.0F));
+		d = glm::distance(cam, glm::vec3((node->NW->start.x + node->NW->end.x)/2.0F,(node->NW->start.y + node->NW->end.y)/2.0F,(node->NW->start.z + node->NW->end.z)/2.0F));
 		m = max(1, (int)(d/size));
 		Generate(level - m, node->NW, cam);
 		
-		d = Vector3::Distance(cam, Vector3((node->SW->start.x + node->SW->end.x)/2.0F,(node->SW->start.y + node->SW->end.y)/2.0F,(node->SW->start.z + node->SW->end.z)/2.0F));
+		d = glm::distance(cam, glm::vec3((node->SW->start.x + node->SW->end.x)/2.0F,(node->SW->start.y + node->SW->end.y)/2.0F,(node->SW->start.z + node->SW->end.z)/2.0F));
 		m = max(1, (int)(d/size));
 		Generate(level - m, node->SW, cam);
 	}
@@ -79,7 +84,7 @@ inline float SmoothedNoise2D(float x, float y) {
 	return -4;//(corners + sides + center)*1000;
 }
 
-void BuildGeometry(TreeSpherePart* node){
+void BuildGeometry(QuadLodPart* node){
 	if(node->NE){
 		BuildGeometry(node->NE);
 		BuildGeometry(node->NW);
@@ -87,36 +92,36 @@ void BuildGeometry(TreeSpherePart* node){
 		BuildGeometry(node->SW);
 	} else {
 		node->m = new Mesh();
-		node->start = glm::normalize(node->start);
-		node->start *= node->initialSize;
-		node->end = glm::normalize(node->end);
-		node->end *= node->initialSize;
+		//node->start = glm::normalize(node->start);
+		//node->start *= node->initialSize;
+		//node->end = glm::normalize(node->end);
+		//node->end *= node->initialSize;
 		auto mesh = node->m;
 		float size = node->initialSize;
 		VertexPositionNormalTexture a00;
-		a00.Position = Vector3(node->start.x, node->start.y, node->start.z);
+		a00.Position = glm::vec3(node->start.x, node->start.y, node->start.z);
 		//a00.Position.Normalize();
 		//a00.Position *= size;
-		a00.Normal = Vector3(0,1,0);
-		a00.Uv = Vector2(0,0);
+		a00.Normal = glm::vec3(0,1,0);
+		a00.Uv = glm::vec2(0,0);
 		VertexPositionNormalTexture a01;
-		a01.Position = Vector3(node->end.x,  node->start.y, node->start.z);
+		a01.Position = glm::vec3(node->end.x,  node->start.y, node->start.z);
 		//a01.Position.Normalize();
 		//a01.Position *= size;
-		a01.Normal = Vector3(0,1,0);
-		a01.Uv = Vector2(0,1);
+		a01.Normal = glm::vec3(0,1,0);
+		a01.Uv = glm::vec2(0,1);
 		VertexPositionNormalTexture a10;
-		a10.Position = Vector3(node->start.x,  node->start.y, node->end.z);
+		a10.Position = glm::vec3(node->start.x,  node->start.y, node->end.z);
 		//a10.Position.Normalize();
 		//a10.Position *= size;
-		a10.Normal = Vector3(0,1,0);
-		a10.Uv = Vector2(1,0);
+		a10.Normal = glm::vec3(0,1,0);
+		a10.Uv = glm::vec2(1,0);
 		VertexPositionNormalTexture a11;
-		a11.Position = Vector3(node->end.x,  node->start.y, node->end.z);
+		a11.Position = glm::vec3(node->end.x,  node->start.y, node->end.z);
 		//a11.Position.Normalize();
 		//a11.Position *= size;
-		a11.Normal = Vector3(0,1,0);
-		a11.Uv = Vector2(1,1);
+		a11.Normal = glm::vec3(0,1,0);
+		a11.Uv = glm::vec2(1,1);
 		mesh->Verteces.push_back(a00);
 		mesh->Verteces.push_back(a01);
 		mesh->Verteces.push_back(a10);
@@ -131,7 +136,7 @@ void BuildGeometry(TreeSpherePart* node){
 	}
 }
 
-void CollectGeometry(TreeSpherePart* node, Mesh* rootmesh){
+void CollectGeometry(QuadLodPart* node, Mesh* rootmesh){
 	if(node->NE){
 		CollectGeometry(node->NE, rootmesh);
 		CollectGeometry(node->NW, rootmesh);
@@ -143,14 +148,14 @@ void CollectGeometry(TreeSpherePart* node, Mesh* rootmesh){
 	}
 }
 
-void TreeSphere::GenerateFrom(vec3 cam)
+void QuadLod::GenerateFrom(vec3 cam)
 {
 	if(!root){
-		root = new TreeSpherePart();
+		root = new QuadLodPart();
 		root->initialSize = 3000;
-		root->start = vec3(-1500,-1500,-1500);
-		root->end = vec3(1500,-1500,1500);
-		Generate(8, root, Vector3(cam.x,cam.y,cam.z));
+		root->start = vec3(-1500,0,-1500);
+		root->end = vec3(1500,0,1500);
+		Generate(8, root, glm::vec3(cam.x,cam.y,cam.z));
 		root->m = new Mesh();
 		BuildGeometry(root);
 		CollectGeometry(root, m);
@@ -159,23 +164,23 @@ void TreeSphere::GenerateFrom(vec3 cam)
 	
 }
 
-void TreeSphere::Bind()
+void QuadLod::Bind()
 {
 	m->Bind();
 }
 
-void TreeSphere::Render()
+void QuadLod::Render()
 {
 	m->Render();
 }
 
-TreeSpherePart::TreeSpherePart()
+QuadLodPart::QuadLodPart()
 {
 		SW = SE = NE = NW = nullptr;
 		m = nullptr;
 }
 
-TreeSpherePart::~TreeSpherePart()
+QuadLodPart::~QuadLodPart()
 {
 	if(m){
 		delete m;

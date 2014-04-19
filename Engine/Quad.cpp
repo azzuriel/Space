@@ -13,18 +13,18 @@ Mesh Quad::GetMesh()
 	m->Indeces.resize(6);
 
 	float s2 = 0.5;
-	m->Verteces[0].Position = Vector3(-s2,-s2,0);
-	m->Verteces[1].Position = Vector3(s2,-s2,0);
-	m->Verteces[2].Position = Vector3(-s2,s2,0);
-	m->Verteces[3].Position = Vector3(s2,s2,0);
-	m->Verteces[0].Uv = Vector2(0,0);
-	m->Verteces[1].Uv = Vector2(1,0);
-	m->Verteces[2].Uv = Vector2(0,1);
-	m->Verteces[3].Uv = Vector2(1,1);
-	m->Verteces[0].Normal = Vector3(0,0,1);
-	m->Verteces[1].Normal = Vector3(0,0,1);
-	m->Verteces[2].Normal = Vector3(0,0,1);
-	m->Verteces[3].Normal = Vector3(0,0,1);
+	m->Verteces[0].Position = glm::vec3(-s2,-s2,0);
+	m->Verteces[1].Position = glm::vec3(s2,-s2,0);
+	m->Verteces[2].Position = glm::vec3(-s2,s2,0);
+	m->Verteces[3].Position = glm::vec3(s2,s2,0);
+	m->Verteces[0].Uv = glm::vec2(0,0);
+	m->Verteces[1].Uv = glm::vec2(1,0);
+	m->Verteces[2].Uv = glm::vec2(0,1);
+	m->Verteces[3].Uv = glm::vec2(1,1);
+	m->Verteces[0].Normal = glm::vec3(0,0,1);
+	m->Verteces[1].Normal = glm::vec3(0,0,1);
+	m->Verteces[2].Normal = glm::vec3(0,0,1);
+	m->Verteces[3].Normal = glm::vec3(0,0,1);
 
 	m->Indeces[0] = 0;
 	m->Indeces[1] = 1;
