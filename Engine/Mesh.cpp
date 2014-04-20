@@ -7,7 +7,7 @@
 #define OPENGL_CHECK_ERRORS() \
 	while( unsigned int openGLError = glGetError()) \
 { \
-	LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError); \
+	/*LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError);*/ \
 };
 
 Mesh::Mesh(void)

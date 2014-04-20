@@ -91,7 +91,7 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
 	GLuint id = glCreateShader(type);
 	glShaderSource(id, 1, (const char **)&data, &length);
 	glCompileShader(id);
-	LOG(INFO) << source << " file " << name << "PART";
+	//LOG(INFO) << source << " file " << name << "PART";
 	printLog(id);
 	glAttachShader(program, id);
 	shaders_.push_back(id);
@@ -99,7 +99,7 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
 
 bool JargShader::link() {
 	glLinkProgram(program);
-	LOG(INFO) << "Program " << program << " linking";
+	//LOG(INFO) << "Program " << program << " linking";
 	printLog(program);
 	return true;
 }

@@ -4,9 +4,10 @@
 #include <vector>
 #include "GameMath.h"
 #include <bitset>
+#include <glew.h>
 
 typedef std::vector<float>	VertexBuffer;
-typedef std::vector<uint32_t>	IndexBuffer;
+typedef std::vector<GLuint>	IndexBuffer;
 
 class BufferArray
 {

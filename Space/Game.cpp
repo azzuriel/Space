@@ -23,18 +23,8 @@
 #include "ROAMgrid.h"
 #include <ClassicNoise.h>
 #include <ROAMSurface.h>
-
-
-
-void mySleep(int sleepMs)
-{
-#ifdef LINUX
-	usleep(sleepMs * 1000);
-#endif
-#ifdef _WIN32
-	Sleep(sleepMs);
-#endif
-}
+#include <chrono>
+#include <thread>
 
 void KeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
@@ -124,7 +114,7 @@ int Game::Initialize()
 	int glVersion[2] = {-1, -1};
 	glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
 	glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
-	LOG(INFO) <<"OpenGL: "<<glVersion[0]<<"."<<glVersion[1]<<" glfw: " << glfwGetVersionString();
+	//LOG(INFO) <<"OpenGL: "<<glVersion[0]<<"."<<glVersion[1]<<" glfw: " << glfwGetVersionString();
 
 
 	render = std::unique_ptr<Render>(new Render());
@@ -440,7 +430,8 @@ void Game::Run()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		//mySleep(16);
+		
+		std::this_thread::sleep_for(std::chrono::milliseconds(15));
 	}
 
 	//delete m;
