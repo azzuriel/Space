@@ -253,7 +253,7 @@ void Game::Run()
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
-	auto m = Tesselator::SphereTesselate(5, Cube::getMesh());
+	auto m = Tesselator::SphereTesselate(2, Cube::getMesh());
 	//m->loadOBJ("Data\\untitled.obj");
 	m->Bind();
 	m->Shader = BasicShader.get();
@@ -274,7 +274,7 @@ void Game::Run()
 	cube->Texture = &test;
 
 	Camera camera;
-	//camera.SetWindowSize(width, height);
+	camera.SetWindowSize(width, height);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 MVP = camera.VP() * model;
 	camera.SetPosition(vec3(50,0,-200));
@@ -294,7 +294,7 @@ void Game::Run()
 // 	ts->m->Texture = &test;
 // 	ts->Bind();
 
-	auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
+	//auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
 
 	Mouse::SetFixedPosState(true);
@@ -366,7 +366,7 @@ void Game::Run()
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_F6)){
-			surf->Test();
+			//surf->Test();
 		}
 		if(Keyboard::isKeyDown(GLFW_KEY_F5)){
 			camera.SetLookAt(vec3(0,0,0.0F));
@@ -395,19 +395,19 @@ void Game::Run()
 		sec += gt.elapsed;
 		if(sec > 0.1) {
 			sec = 0;
-			surf->UpdateCells(camera.position/100.0F);
-			surf->Bind();
+			//surf->UpdateCells(camera.position/100.0F);
+			//surf->Bind();
 		}
 
 // 		glActiveTexture(GL_TEXTURE0);
 // 		glBindTexture(GL_TEXTURE_2D, normalTexture);
 // 		glUniform1i(glGetUniformLocation(BasicShader->program, "normalMap"), 0);
-		surf->Render(BasicShader.get());
+		//surf->Render(BasicShader.get());
 
 		m->World = glm::rotate(m->World, (float)gt.elapsed, normalize(vec3(2,1,3)));
-		//m->Render();
+		m->Render();
 
-		//plane->Render();
+		plane->Render();
 // 		sec += gt.elapsed;
 // 		if(sec > 0.1) {
 // 			sec = 0;
@@ -424,7 +424,7 @@ void Game::Run()
 		//cube->Render();
 
 		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).append(" ").append(std::to_string((long double)(glm::length(camera.position/750.0F)))).c_str());
-		//sb->DrawString(Vector2(10,10), std::to_string((long double)fps.GetCount()), *font);
+		//sb->DrawString(vec2(10,10), std::to_string((long double)fps.GetCount()), *font);
 
 		Mouse::Update();
 

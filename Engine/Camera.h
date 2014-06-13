@@ -59,6 +59,7 @@ public:
 	void GetViewport(int &loc_x, int &loc_y, int &width, int &height);
 	void GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M);
 	mat4 VP();
+	void SetWindowSize(int width, int height);
 	CameraType camera_mode;
 
 	int viewport_x;

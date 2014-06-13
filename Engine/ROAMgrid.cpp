@@ -35,7 +35,7 @@ TerrainPatch::TerrainPatch(int offset_x, int offset_y)
 	{
 		for (int j =0; j<tempres;j++)
 		{
-			float t = simplexnoise(offset_x + i/(tempres/2.0F), offset_y + j/(tempres/2.0F)) + simplexnoise(offset_x + i/(tempres/4.0F), offset_y + j/(tempres/4.0F))/2.0F + simplexnoise(offset_x + i/(tempres/8.0F), offset_y + j/(tempres/8.0F))/4.0F;
+			float t = simplexnoise(offset_x + i/(tempres/20.0F), offset_y + j/(tempres/20.0F)) + simplexnoise(offset_x + i/(tempres/4.0F), offset_y + j/(tempres/4.0F))/2.0F + simplexnoise(offset_x + i/(tempres/8.0F), offset_y + j/(tempres/8.0F))/4.0F;
 			if(t < 0) {
 				t = -t;
 				t /= 15.0F;
@@ -234,24 +234,24 @@ void TerrainPatch::tessellateRecursive(
 	float center_y = (left_y + right_y) * 0.5f;
 
 	if (variance_idx < m_varianceSize) {
-		float a = center_x/m_map->width - view.x/1.5F;
-		float b = center_y/m_map->height - view.y/1.5F;
+		float a = center_x/m_map->width - view.x / 1.5f;
+		float b = center_y/m_map->height - view.y / 1.5f;
 		float distance = 1 + ((a*a + b*b)*m_map->width/128.0f);
 		float variance = variance_tree[variance_idx]/distance;
-		if(view.z > 1) {
-			variance /= view.z;
-		}
+		//if(view.z > 1) {
+		//	variance /= view.z;
+		//}
 
-		if (variance > errorMargin) {
+		if (variance > errorMargin || variance_idx < 32) {
 			split(node);
 			if (node->left_child && ((abs(left_x - right_x) >= 3) || (abs(left_y - right_y) >= 3)))
 			{
 				tessellateRecursive(
-					node->left_child, view, errorMargin,
+					node->left_child, view, errorMargin*distance,
 					apex_x, apex_y, left_x, left_y, center_x, center_y,
 					variance_tree, (variance_idx<<1));
 				tessellateRecursive(
-					node->right_child, view, errorMargin,
+					node->right_child, view, errorMargin*distance,
 					right_x, right_y, apex_x, apex_y, center_x, center_y,
 					variance_tree, (variance_idx<<1)+1);
 			}

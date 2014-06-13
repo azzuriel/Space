@@ -204,3 +204,10 @@ mat4 Camera::VP()
 {
 	return MVP;
 }
+
+void Camera::SetWindowSize(int l_width, int l_height)
+{
+	window_height = l_height;
+	window_width = l_width;
+	aspect = double(l_width) / double(l_height);
+}
