@@ -3,7 +3,6 @@
 
 #include "GameMath.h"
 #include "TextureManager.h"
-#include "Render.h"
 #include "BufferArray.h"
 
 class JRectangle

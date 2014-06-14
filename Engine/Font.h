@@ -15,7 +15,6 @@
 #include <list>
 #include <vector>
 #include <string>
-#include "Render.h"
 
 struct FontTexture
 {
@@ -74,7 +73,7 @@ public:
 	bool Create(std::string configFileName);
 	void Remove();
 
-	FontTexture GetGlyphTexture(unsigned int utf32glyph);
+	const FontTexture GetGlyphTexture(unsigned int utf32glyph) const;
 	std::map<unsigned int, FontTexture> glyphsTextureMap;
 };
 

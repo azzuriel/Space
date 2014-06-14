@@ -8,24 +8,38 @@
 #include <string.h>
 #include <sstream>
 #include <fstream>
+#include <string>
+
+#define printLog(obj){int infologLength = 0; \
+	char infoLog[1024]; \
+	if (glIsShader(obj)) \
+	glGetShaderInfoLog(obj, 1024, &infologLength, infoLog); \
+else \
+	glGetProgramInfoLog(obj, 1024, &infologLength, infoLog); \
+	if (infologLength > 0) { \
+	LOG(INFO) << infoLog; \
+	} else { \
+	LOG(INFO) << "     no errors"; \
+	} }
 
 JargShader::JargShader()
 {
-	 program =  glCreateProgram();
+	 program = glCreateProgram();
 }
 
 JargShader::~JargShader(void)
 {
 	while(!shaders_.empty()) {
 		glDeleteShader(shaders_.back());
+		LOG(INFO) << "Deleting shader " << std::to_string(shaders_.back());
 		shaders_.pop_back();
 	}
 	glDeleteProgram(program);
+	LOG(INFO) << "Deleting program " << std::to_string(program);
 }
 
-void JargShader::BindProgram()
+void JargShader::BindProgram() const
 {
-
 	glUseProgram(program);
 }
 
@@ -35,18 +49,6 @@ GLint JargShader::LocateVars(std::string s)
 	vars.push_back(a);
 	return a;
 }
-
-#define printLog(obj){int infologLength = 0; \
-char infoLog[1024]; \
-if (glIsShader(obj)) \
-	glGetShaderInfoLog(obj, 1024, &infologLength, infoLog); \
-else \
-	glGetProgramInfoLog(obj, 1024, &infologLength, infoLog); \
-if (infologLength > 0) { \
-	LOG(INFO) << infoLog; \
-} else { \
-LOG(INFO) << "     no errors"; \
-} }
 
 void JargShader::loadShaderFromSource(GLenum type, std::string source) {
 
@@ -91,16 +93,17 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
 	GLuint id = glCreateShader(type);
 	glShaderSource(id, 1, (const char **)&data, &length);
 	glCompileShader(id);
-	//LOG(INFO) << source << " file " << name << "PART";
+    LOG(INFO) << source << " file " << name << "PART";
 	printLog(id);
 	glAttachShader(program, id);
 	shaders_.push_back(id);
 }
 
-bool JargShader::link() {
+bool JargShader::Link() {
 	glLinkProgram(program);
-	//LOG(INFO) << "Program " << program << " linking";
+	LOG(INFO) << "Program " << std::to_string(program) << " linking";
 	printLog(program);
+	LOG(INFO) << "--------------------";
 	return true;
 }
 

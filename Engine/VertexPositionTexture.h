@@ -2,7 +2,7 @@
 #ifndef VertexPositionTexture_h__
 #define VertexPositionTexture_h__
 
-#include "Vector.h"
+#include "ColorExtender.h"
 #include <glm.hpp>
 
 enum BufferType
@@ -41,6 +41,6 @@ public:
 struct VertexPositionColor{
 public:
 	glm::vec3 pos;
-	Color4 col;
+	glm::vec4 col;
 };
 #endif // VertexPositionTexture_h__

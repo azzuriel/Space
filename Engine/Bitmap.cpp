@@ -157,7 +157,7 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 
 
 
-static bool SaveBMP(Bitmap &bitmap, FILE *file)
+static bool SaveBMP(const Bitmap &bitmap, FILE *file)
 {
 	png_struct* png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
@@ -308,7 +308,7 @@ bool Bitmap::Load( std::string fileName )
 	return false;
 }
 
-bool Bitmap::Save( std::string fileName )
+bool Bitmap::Save( std::string fileName ) const
 {
 	FILE *file = fopen(fileName.c_str(), "wb");
 	if (!file) 

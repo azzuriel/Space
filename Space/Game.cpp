@@ -10,7 +10,7 @@
 #include "..\Engine\Font.h"
 #include "..\Engine\Camera.h"
 #include "../Engine/SphereTesselator.h"
-#include "../Engine/MAterial.h"
+#include "../Engine/Material.h"
 #include <glm.hpp>
 #ifdef LINUX
 #include <unistd.h>
@@ -76,8 +76,8 @@ Game::~Game(void)
 int Game::Initialize()
 {
 	google::InitGoogleLogging("Jarg.exe");
-	google::SetLogFilenameExtension(".txt");
-	google::SetLogDestination(google::INFO, "logs/");
+	google::SetLogFilenameExtension(".log.");
+	google::SetLogDestination(google::INFO, "logs/space");
 	LOG(INFO) << "Jarg initialization start";
 	glfwSetErrorCallback(errorCallbackGLFW3);
 
@@ -88,9 +88,9 @@ int Game::Initialize()
 		return glfwErrorCode;
 	}
 
-	//glfwWindowHint(GLFW_SAMPLES, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Game::MAJOR_GL);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Game::MINOR_Gl);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWmonitor *monitor = nullptr;
@@ -111,15 +111,20 @@ int Game::Initialize()
 
 	glfwSwapInterval(0);
 
+	glewExperimental=true;
+
+	if (glewInit() != GLEW_OK) 
+	{
+		LOG(ERROR) << "GLEW не инициализирован.";
+		return false;
+	}
+
 	int glVersion[2] = {-1, -1};
 	glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
 	glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
-	//LOG(INFO) <<"OpenGL: "<<glVersion[0]<<"."<<glVersion[1]<<" glfw: " << glfwGetVersionString();
-
-
-	render = std::unique_ptr<Render>(new Render());
-	render->Initialize();
-	render->SetWindowSize(width, height);
+	LOG(INFO) << "OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
+	LOG(INFO) << "glfw: " << glfwGetVersionString();
+	
 
 	Keyboard::Initialize();
 	glfwSetKeyCallback(window, KeyCallbackGLFW3);
@@ -162,11 +167,11 @@ void MaterialSetup(GLuint program, const Material &material)
 {
 	// установка текстуры
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material.normal);
+	glBindTexture(GL_TEXTURE_2D, material.texture);
 	glUniform1i(glGetUniformLocation(program, "material.texture"), 0);
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, material.normal);
-	//glUniform1i(glGetUniformLocation(program, "material.normal"), 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, material.normal);
+	glUniform1i(glGetUniformLocation(program, "material.normal"), 1);
 
 	// установка параметров
 	glUniform4fv(glGetUniformLocation(program, "material.ambient"),  1, &material.ambient[0]);
@@ -207,9 +212,7 @@ void Game::Run()
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
 	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
 	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
-	//BasicShader->loadShaderFromSource(GL_TESS_CONTROL_SHADER, "Shaders/basic.glsl");
-	//BasicShader->loadShaderFromSource(GL_TESS_EVALUATION_SHADER, "Shaders/basic.glsl");
-	BasicShader->link();
+	BasicShader->Link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
 	auto worldID = BasicShader->LocateVars("transform.model");
 	auto innerT = BasicShader->LocateVars("InnerLevel"); int camTest = 2;
@@ -245,11 +248,19 @@ void Game::Run()
 	PointLightSetup(BasicShader->program, pl);
 
 	auto LinesShader = std::shared_ptr<JargShader>(new JargShader());
-	LinesShader->LoadFromFile("Shaders/lines.fs", "Shaders/lines.vs");
+	LinesShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/colored.glsl");
+	LinesShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/colored.glsl");
+	LinesShader->Link();
 	auto mvpLine = LinesShader->LocateVars("MVP");
 
+	auto TextureShader = std::shared_ptr<JargShader>(new JargShader());
+	TextureShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/textured.glsl");
+	TextureShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/textured.glsl");
+	TextureShader->Link();
+	auto mvpTex = TextureShader->LocateVars("MVP");
+
 	auto sb = std::unique_ptr<Batched>(new Batched());
-	sb->Initialize(BasicShader.get(), LinesShader.get());
+	sb->Initialize(TextureShader.get(), LinesShader.get());
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
@@ -275,14 +286,18 @@ void Game::Run()
 
 	Camera camera;
 	camera.SetWindowSize(width, height);
+
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 MVP = camera.VP() * model;
 	camera.SetPosition(vec3(50,0,-200));
 	camera.SetLookAt(vec3(50,0,50));
 
-	//auto font = std::unique_ptr<Font>(new Font());
-	//font->Initialize();
-	//font->Create("font.json");
+	auto font = std::unique_ptr<Font>(new Font());
+	font->Initialize();
+	if(!font->Create("font.json")){
+		LOG(ERROR) << "failed to load\process font.json";
+	}
+	
 
     int iters = 0;
 	float sec = 0;
@@ -380,7 +395,7 @@ void Game::Run()
 
 		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
-		pl.position = vec4(50.0f)*m->World;
+		pl.position = vec4(50.0f,50.0f,50.0f,1.0f)*m->World;
 
 		auto mpos = Mouse::GetCursorPos();
 		PointLightSetup(BasicShader->program, pl);
@@ -418,23 +433,40 @@ void Game::Run()
 // 			ts->GenerateFrom(vec3(pl.position));
 // 			ts->Bind();
 // 		}
-// 		ts->Render();
+//		ts->Render();
 		//cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
 		//cube->World = glm::scale(cube->World, vec3(500,500,500));
 		//cube->Render();
 
-		glfwSetWindowTitle(window, std::to_string((long double)fps.GetCount()).append(" ").append(std::to_string((long double)(glm::length(camera.position/750.0F)))).c_str());
-		//sb->DrawString(vec2(10,10), std::to_string((long double)fps.GetCount()), *font);
+		
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		MVP = camera.GetOrthoProjection();
+		TextureShader->BindProgram();
+		glUniformMatrix4fv(mvpTex, 1, GL_FALSE, &MVP[0][0]);
+		LinesShader->BindProgram();
+		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
+
+		glfwSetWindowTitle(window, std::to_string(fps.GetCount()).append(" ").append(std::to_string(glm::length(camera.position/750.0F))).c_str());
+		sb->DrawQuad(vec2(100,100),vec2(100,100), *font->tex);
+		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), *font);		
+		sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
+
+		sb->RenderFinallyWorld();
+		sb->RenderFinally();
+
 
 		Mouse::Update();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		
-		std::this_thread::sleep_for(std::chrono::milliseconds(15));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(15));
 	}
 
-	//delete m;
-	//glfwDestroyWindow(window);
-	//glfwTerminate();
+	delete m;
+	delete plane;
+	delete cube;
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }

@@ -5,7 +5,6 @@
 #include <glfw3.h>
 #include <memory>
 #include "..\Engine\GameTimer.h"
-#include "..\Engine\Render.h"
 #include "..\Engine\FPSCounter.h"
 
 class Game
@@ -23,6 +22,7 @@ public:
 	GameTimer gt;
 	FPSCounter fps;
 
-	std::unique_ptr<Render> render;
 	bool wire;
+
+	static const int MAJOR_GL = 3, MINOR_Gl = 3;
 };

@@ -112,9 +112,21 @@ TextureManager::~TextureManager(void)
 {
 }
 
-Texture::Texture()
+Texture::Texture() :
+	textureId(-1),
+	name("empty"),
+	height(0),
+	width(0)
 {
-	textureId = -1;
+}
+
+Texture::Texture(GLuint id) :
+	textureId(id),
+	height(0),
+	width(0)
+{
+	std::string s = "fromID ";
+	name = s.append(std::to_string(id));
 }
 
 Texture::~Texture()

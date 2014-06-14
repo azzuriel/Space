@@ -1,7 +1,7 @@
 #include "Cube.h"
 #include <glew.h>
 #include "Mesh.h"
-#include "Vector.h"
+#include "ColorExtender.h"
 
 #define VERTEXCOUNT 24
 #define INDEXCOUNT 36

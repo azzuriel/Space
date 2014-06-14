@@ -60,6 +60,7 @@ public:
 	void GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M);
 	mat4 VP();
 	void SetWindowSize(int width, int height);
+	glm::mat4 GetOrthoProjection();
 	CameraType camera_mode;
 
 	int viewport_x;

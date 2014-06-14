@@ -8,10 +8,9 @@
 #include "Quad.h"
 #include "Icosahedron.h"
 #include "Cube.h"
-#include "Vector.h"
+#include "ColorExtender.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "Render.h"
 #include "FPSCounter.h"
 #include "GameTimer.h"
 

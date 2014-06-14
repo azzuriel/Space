@@ -1,13 +1,14 @@
-//version 330 inserted here by programm
+//version inserted here by programm
 #define VERT_POSITION 0
 #define VERT_TEXCOORD 1
-#define VERT_NORMAL   2
+#define VERT_NORMAL 2
+#define VERT_COLOR 3
 
 #ifdef _VERTEX_
 
 layout(location = VERT_POSITION) in vec3 position;
 layout(location = VERT_TEXCOORD) in vec2 texcoord;
-layout(location = VERT_NORMAL)   in vec3 normal;
+layout(location = VERT_NORMAL) in vec3 normal;
 
 uniform struct Transform
 {
@@ -83,27 +84,27 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 
 void main(void)
 {
-        //vec3 normal   = normalize(Vert.normal);
+        vec3 normal   = normalize(Vert.normal);
         vec3 lightDir = normalize(Vert.lightDir);
-        //vec3 viewDir  = normalize(Vert.viewDir);
-
-        //float attenuation = 1.0 / (light.attenuation[0] +
-        //        light.attenuation[1] * Vert.distance +
-        //        light.attenuation[2] * Vert.distance * Vert.distance);
-		//attenuation = min(attenuation, 2.0);
-        //color = material.emission*100;
-        //color += material.ambient * light.ambient * attenuation;
-		//vec4 hc = texture(material.normal, Vert.texcoord);
-        //float NdotL = max(dot(normal, lightDir) * 2.0 - 1.0, 0.0);
-        //color += material.diffuse * light.diffuse * NdotL * attenuation;
-        //float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
-        //color += material.specular * light.specular * RdotVpow * attenuation;
-        //color = texture(material.texture, Vert.texcoord);
-		vec3 normal = texture(material.texture, Vert.texcoord).xyz;
-		vec3 mininormal = texture(material.texture, Vert.texcoord*10.0).xyz;
-		vec3 mininormal2 = texture(material.texture, Vert.texcoord*5.0).xyz;
+        vec3 viewDir  = normalize(Vert.viewDir);
+        
+        float attenuation = 1.0 / (light.attenuation[0] +
+                light.attenuation[1] * Vert.distance +
+                light.attenuation[2] * Vert.distance * Vert.distance);
+		attenuation = min(attenuation, 2.0);
+        color = material.emission*100;
+        color += material.ambient * light.ambient * attenuation;
+		vec4 hc = texture(material.normal, Vert.texcoord);
+        float NdotL = max(dot(normal, lightDir) * 2.0 - 1.0, 0.0);
+        color += material.diffuse * light.diffuse * NdotL * attenuation;
+        float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
+        color += material.specular * light.specular * RdotVpow * attenuation;
+        color = texture(material.texture, Vert.texcoord);
+		vec3 normal2 = texture(material.normal, Vert.texcoord).xyz;
+		//vec3 mininormal = texture(material.texture, Vert.texcoord*10.0).xyz;
+		//vec3 mininormal2 = texture(material.texture, Vert.texcoord*5.0).xyz;
 		
-		float diffuse = max(0.0, dot(normal + mininormal/20.0 + mininormal/10.0, lightDir));
+		float diffuse = max(0.0, dot(normal + normal2, lightDir));
 		//float diffuse = max(0.0, dot(normal, lightDir)); //+ mininormal/20.0 + mininormal/10.0;
 		color = vec4(1,0.5,0.5,1) * vec4(diffuse, diffuse, diffuse, 1.0);
 }

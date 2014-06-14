@@ -1,11 +1,10 @@
 #include "Font.h"
-#include <json/writer.h>
-#include <json/reader.h>
+//#include <json/writer.h>
+//#include <json/reader.h>
 #include <fstream>
 #include <utf8.h>
 #include <math.h>
 #include <algorithm>
-#include "Render.h"
 #include "JRectangle.h"
 #include <glog/logging.h>
 
@@ -18,24 +17,21 @@ Font::Font()
 
 Font::~Font()
 {
-	if(library)
-	{
-		FT_Done_FreeType(library);
-		library = nullptr;
+	if(tex) {
+		delete tex;
 	}
-	delete tex;
 }
 
 bool Font::Initialize()
 {
 	if (FT_Init_FreeType( &library ))
 	{
-		//LOG_ERROR("
-		return false;
+		LOG(ERROR) << "FT_Init_FreeType ERROR";
+	    return false;
 	}
 	if(!GenerateEmptyGlyph())
 	{
-		//LOG_ERROR("
+		LOG(ERROR) << "GenerateEmptyGlyph ERROR";
 		return false;
 	}
 
@@ -53,6 +49,12 @@ bool Font::Create(std::string configFileName)
 	if(!GenerateOpenglGlyphs(configFileName))
 	{
 		processing = false;
+	}
+
+	if(library)
+	{
+		FT_Done_FreeType(library);
+		library = nullptr;
 	}
 
 	return processing;
@@ -98,57 +100,69 @@ bool Font::GenerateEmptyGlyph()
 
 bool Font::CreateFromConfig( std::string configFileName )
 {
-	std::ifstream configFile(configFileName);
-	name = configFileName;
+// 	std::ifstream configFile(configFileName);
+// 	name = configFileName;
+// 
+// 	if (!configFile.is_open())
+// 	{
+// 		//LOG_WARNING("
+// 		return false;
+// 	}
+// 
+// 
+// 	Json::Value root;
+// 	Json::Reader reader;
+// 
+// 	bool parsingSuccessful = reader.parse( configFile, root );
+// 	if ( !parsingSuccessful )
+// 	{
+// 		configFile.close();
+// 		//LOG(FATAL) << configFile << " font config file corrupted.";
+// 		return false;
+// 	}
+// 
+// 	const Json::Value fontList = root["FontList"];
+// 	for ( unsigned int i = 0; i < fontList.size(); i++ )
+// 	{
+// 		std::string fontFileName = fontList[i].get("FileName", "").asString();
+// 		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
+// 		const Json::Value glyphs = fontList[i]["Glyphs"];
+// 
+// 		if (FT_New_Face( library, fontFileName.c_str(), 0, &face ))
+// 		{
+// 			configFile.close();
+// 			//LOG(FATAL) << fontFileName << " not opened. Font cant be build.";
+// 			return false;
+// 		}
+// 
+// 		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
+// 
+// 		for ( unsigned int j = 0; j < glyphs.size(); j++ )
+// 		{
+// 			std::string glyphList = glyphs[j].asString();
+// 			GenerateGlyphsList(glyphList);
+// 		}
+// 
+// 		if(face)
+// 		{
+// 			FT_Done_Face(face);
+// 			face = nullptr;
+// 		}
+// 	}
+// 
+// 	configFile.close();
 
-	if (!configFile.is_open())
+	FT_New_Face( library, "fonts\\arial.ttf", 0, &face);
+	FT_Set_Char_Size( face, 14 << 6, 14 << 6, 96, 96);
+
+	std::string glyphList = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890 ";
+	GenerateGlyphsList(glyphList);
+
+	if(face)
 	{
-		//LOG_WARNING("
-		return false;
+		FT_Done_Face(face);
+		face = nullptr;
 	}
-
-
-	Json::Value root;
-	Json::Reader reader;
-
-	bool parsingSuccessful = reader.parse( configFile, root );
-	if ( !parsingSuccessful )
-	{
-		configFile.close();
-		//LOG(FATAL) << configFile << " font config file corrupted.";
-		return false;
-	}
-
-	const Json::Value fontList = root["FontList"];
-	for ( unsigned int i = 0; i < fontList.size(); i++ )
-	{
-		std::string fontFileName = fontList[i].get("FileName", "").asString();
-		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
-		const Json::Value glyphs = fontList[i]["Glyphs"];
-
-		if (FT_New_Face( library, fontFileName.c_str(), 0, &face ))
-		{
-			configFile.close();
-			//LOG(FATAL) << fontFileName << " not opened. Font cant be build.";
-			return false;
-		}
-
-		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
-
-		for ( unsigned int j = 0; j < glyphs.size(); j++ )
-		{
-			std::string glyphList = glyphs[j].asString();
-			GenerateGlyphsList(glyphList);
-		}
-
-		if(face)
-		{
-			FT_Done_Face(face);
-			face = nullptr;
-		}
-	}
-
-	configFile.close();
 
 	return true;
 }
@@ -305,11 +319,11 @@ bool Font::GenerateOpenglGlyphs( std::string configFileName)
 	return true;
 }
 
-FontTexture Font::GetGlyphTexture( unsigned int utf32glyph )
+const FontTexture Font::GetGlyphTexture( unsigned int utf32glyph ) const
 {
 	if(glyphsTextureMap.count(utf32glyph) == 0)
 	{
-		return glyphsTextureMap[0];
-	}
-	return glyphsTextureMap[utf32glyph];
+		return glyphsTextureMap.at(0);
+	} 
+	return glyphsTextureMap.at(utf32glyph);
 }

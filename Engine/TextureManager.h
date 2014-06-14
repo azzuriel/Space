@@ -3,6 +3,7 @@
 
 #include "Bitmap.h"
 #include <glew.h>
+#include <GL\gl.h>
 
 struct TextureOld
 {
@@ -19,6 +20,7 @@ struct Texture {
 	unsigned int height;
 	unsigned int width;
 	Texture();
+	Texture(GLuint id);
 	~Texture();
 
 	void Load(std::string a);

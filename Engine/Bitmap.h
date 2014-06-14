@@ -32,19 +32,19 @@ public:
 	Bitmap(void);
 	~Bitmap(void);
 
-	byte *GetData()
+	byte *GetData() const
 	{
 		return data;
 	}
-	unsigned int GetWidth()
+	unsigned int GetWidth() const
 	{
 		return width;
 	}
-	unsigned int GetHeight()
+	unsigned int GetHeight() const
 	{
 		return height;
 	}
-	unsigned int GetFormat()
+	unsigned int GetFormat() const
 	{
 		return format;
 	}
@@ -60,7 +60,7 @@ public:
 	void Generate(unsigned int format, unsigned int width, unsigned int height, unsigned int color);
 
 	bool Load(std::string fileName);
-	bool Save(std::string fileName);
+	bool Save(std::string fileName) const;
 };
 
 

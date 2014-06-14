@@ -92,6 +92,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ClassicNoise.cpp" />
     <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="Heightmap.cpp" />
@@ -101,18 +102,17 @@
     <ClCompile Include="JargShader.cpp" />
     <ClCompile Include="JRectangle.cpp" />
     <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="MAterial.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Quad.cpp" />
-    <ClCompile Include="Render.cpp" />
     <ClCompile Include="ROAMgrid.cpp" />
     <ClCompile Include="ROAMSurface.cpp" />
     <ClCompile Include="SphereTesselator.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TreeSphere.cpp" />
-    <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="ColorExtender.cpp" />
     <ClCompile Include="VertexPositionTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +122,7 @@
     <ClInclude Include="ClassicNoise.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="GameMath.h" />
     <ClInclude Include="GameTimer.h" />
@@ -132,18 +133,18 @@
     <ClInclude Include="JargShader.h" />
     <ClInclude Include="JRectangle.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="MAterial.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Quad.h" />
-    <ClInclude Include="Render.h" />
     <ClInclude Include="ROAMgrid.h" />
     <ClInclude Include="ROAMSurface.h" />
     <ClInclude Include="SphereTesselator.h" />
     <ClInclude Include="SpriteBatch.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TreeSphere.h" />
-    <ClInclude Include="Vector.h" />
+    <ClInclude Include="ColorExtender.h" />
     <ClInclude Include="VertexPositionTexture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

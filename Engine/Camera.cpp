@@ -205,6 +205,12 @@ mat4 Camera::VP()
 	return MVP;
 }
 
+glm::mat4 Camera::GetOrthoProjection()
+{
+	auto orthoProjection = glm::ortho(0.0f, (float)window_width, (float)window_height, 0.0f, 0.1f, 100.0f);
+	return orthoProjection;
+}
+
 void Camera::SetWindowSize(int l_width, int l_height)
 {
 	window_height = l_height;

@@ -1,6 +1,6 @@
 #include "SpriteBatch.h"
 #include "JRectangle.h"
-#include "Vector.h"
+#include "ColorExtender.h"
 #include "TextureManager.h"
 #include "Font.h"
 #include <utf8\unchecked.h>
@@ -12,20 +12,20 @@ Batched::Batched()
 	vertex = new glm::vec3[1000*4];
 	index = new GLuint[1000*6];
 
-	lvertex = new glm::vec3[1000*4];
-	lindex = new GLuint[1000*6];
-	lcolor = new Color4[1000*4];
-	m_textureBuffer = m_vertexBuffer = m_indecesBuffer = l_colorBuffer = l_vertexBuffer = lvao = vao = curn = lcurn = 0;
+	m_lineVertex = new glm::vec3[1000*4];
+	m_lineIndex = new GLuint[1000*6];
+	m_lineColor = new glm::vec4[1000*4];
+	m_textureBuffer = m_vertexBuffer = m_indecesBuffer = m_lineColorBuffer = m_lineVertexBuffer = m_lvao = m_vao = curn = lcurn = 0;
 	dcurn = 0;
 	dvao = 0; dvbo = nullptr;
 	dvertex = new VertexPositionColor[1000*4];
 	dindex = new GLuint[1000*4];
 
 	curz = -1;
-	blankTex = new Texture();
-	blankTex->name = "blank";
-	blankTex->textureId = 0;
-	currentTex = blankTex;
+	m_blankTex = new Texture();
+	m_blankTex->name = "blank";
+	m_blankTex->textureId = 0;
+	m_currentTex = m_blankTex;
 }
 
 Batched::~Batched()
@@ -34,48 +34,48 @@ Batched::~Batched()
 	delete[] vertex;
 	delete[] index;
 
-	delete[] lcolor;
-	delete[] lvertex;
-	delete[] lindex;
+	delete[] m_lineColor;
+	delete[] m_lineVertex;
+	delete[] m_lineIndex;
 
 	delete[] dindex;
 	delete[] dvertex;
 
-	delete blankTex;
+	delete m_blankTex;
 
 	glDeleteBuffers(1, &m_indecesBuffer);
 	glDeleteBuffers(1, &m_vertexBuffer);
 	glDeleteBuffers(1, &m_textureBuffer);
 	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &vao);
+	glDeleteVertexArrays(1, &m_vao);
 
-	glDeleteBuffers(1, &l_vertexBuffer);
-	glDeleteBuffers(1, &l_indecesBuffer);
-	glDeleteBuffers(1, &l_colorBuffer);
+	glDeleteBuffers(1, &m_lineVertexBuffer);
+	glDeleteBuffers(1, &m_lineIndecesBuffer);
+	glDeleteBuffers(1, &m_lineColorBuffer);
 	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &lvao);
+	glDeleteVertexArrays(1, &m_lvao);
 
 	glDeleteBuffers(2, dvbo);
 	glBindVertexArray(dvao);
 	glDeleteVertexArrays(1, &dvao);
 }
 
-void Batched::Initialize(JargShader* tex, JargShader* col){
-	textured = tex;
-	colored = col;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+void Batched::Initialize(const JargShader* tex, const JargShader* col){
+	m_texturedShader = tex;
+	m_coloredShader = col;
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glGenBuffers(1, &m_indecesBuffer);
 	glGenBuffers(1, &m_textureBuffer);
 
-	glGenVertexArrays(1, &lvao);
-	glBindVertexArray(lvao);
+	glGenVertexArrays(1, &m_lvao);
+	glBindVertexArray(m_lvao);
 
-	glGenBuffers(1, &l_vertexBuffer);
-	glGenBuffers(1, &l_indecesBuffer);
-	glGenBuffers(1, &l_colorBuffer);
+	glGenBuffers(1, &m_lineVertexBuffer);
+	glGenBuffers(1, &m_lineIndecesBuffer);
+	glGenBuffers(1, &m_lineColorBuffer);
 
 	glGenVertexArrays(1, &dvao);
 	glBindVertexArray(dvao);
@@ -83,63 +83,63 @@ void Batched::Initialize(JargShader* tex, JargShader* col){
 	glGenBuffers(2, dvbo);
 }
 
-void Batched::DrawString(glm::vec2 pos, std::string text, Font& font){
-	//std::vector<uint32_t> utf32text;
-	//utf8::utf8to32(text.begin(), text.end(), std::back_inserter(utf32text));
-	//currentFont = &font;
-	//FontTexture fontTexture;
-	//float glyphX = pos.x;
-	//float glyphY = pos.y;
-	//float stringHeight = 22.0f;
-	//if(curn > 1000 - utf32text.size() - 1){
-	//	Render();
-	//}
-	//if(font.tex->textureId != currentTex->textureId){
-	//	Render();
-	//	currentTex = font.tex;
-	//}
-	//for(unsigned int i = 0; i < utf32text.size(); i++)
-	//{
-	//	fontTexture = font.GetGlyphTexture(utf32text[i]);
-	//	float ypos = glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown;
-	//	//innerDraw( vec2(glyphX, ypos), vec2((float)fontTexture.width, (float)fontTexture.height), 0, *font.tex, Rect(fontTexture.texture.u1, fontTexture.texture.v1, fontTexture.texture.u2 - fontTexture.texture.u1, fontTexture.texture.v2 - fontTexture.texture.v1));
-	//	vertex[4*curn+0] = glm::vec3(glyphX, ypos, curz);
-	//	vertex[4*curn+1] = glm::vec3(glyphX, ypos + (float)fontTexture.height, curz);
-	//	vertex[4*curn+2] = glm::vec3(glyphX + (float)fontTexture.width, ypos + (float)fontTexture.height, curz);
-	//	vertex[4*curn+3] = glm::vec3(glyphX + (float)fontTexture.width, ypos, curz);
-	//	uv[4*curn+0] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v2);
-	//	uv[4*curn+1] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v1);
-	//	uv[4*curn+2] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v1);
-	//	uv[4*curn+3] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v2);
-	//	index[6*curn+0] = 4*curn+2;
-	//	index[6*curn+1] = 4*curn+3;
-	//	index[6*curn+2] = 4*curn+0;
-	//	index[6*curn+3] = 4*curn+0;
-	//	index[6*curn+4] = 4*curn+1;
-	//	index[6*curn+5] = 4*curn+2;
-	//	curn++;
+void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
+	std::vector<std::uint32_t> utf32text;
+	utf8::utf8to32(text.begin(), text.end(), std::back_inserter(utf32text));
+	m_currentFont = &font;
+	FontTexture fontTexture;
+	float glyphX = pos.x;
+	float glyphY = pos.y;
+	float stringHeight = 22.0f;
+	if(curn > 1000 - utf32text.size() - 1){
+		Render();
+	}
+	if(font.tex->textureId != m_currentTex->textureId){
+		Render();
+		m_currentTex = font.tex;
+	}
+	for(unsigned int i = 0; i < utf32text.size(); i++)
+	{
+		fontTexture = font.GetGlyphTexture(utf32text[i]);
+		float ypos = glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown;
+		//innerDraw( vec2(glyphX, ypos), vec2((float)fontTexture.width, (float)fontTexture.height), 0, *font.tex, Rect(fontTexture.texture.u1, fontTexture.texture.v1, fontTexture.texture.u2 - fontTexture.texture.u1, fontTexture.texture.v2 - fontTexture.texture.v1));
+		vertex[4*curn+0] = glm::vec3(glyphX, ypos, curz);
+		vertex[4*curn+1] = glm::vec3(glyphX, ypos + (float)fontTexture.height, curz);
+		vertex[4*curn+2] = glm::vec3(glyphX + (float)fontTexture.width, ypos + (float)fontTexture.height, curz);
+		vertex[4*curn+3] = glm::vec3(glyphX + (float)fontTexture.width, ypos, curz);
+		uv[4*curn+0] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v2);
+		uv[4*curn+1] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v1);
+		uv[4*curn+2] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v1);
+		uv[4*curn+3] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v2);
+		index[6*curn+0] = 4*curn+2;
+		index[6*curn+1] = 4*curn+3;
+		index[6*curn+2] = 4*curn+0;
+		index[6*curn+3] = 4*curn+0;
+		index[6*curn+4] = 4*curn+1;
+		index[6*curn+5] = 4*curn+2;
+		curn++;
 
-	//	glyphX += fontTexture.width;
-	//}
-	//curz+=0.001f;
+		glyphX += fontTexture.width;
+	}
+	curz+=0.001f;
 }
 
-inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex, Rect sub){
+inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub){
 	if(curn >= 1000){
 		Render();
 	}
-	if(tex.textureId != currentTex->textureId){
+	if(tex.textureId != m_currentTex->textureId){
 		Render();
-		currentTex = &tex;
+		m_currentTex = &tex;
 	}
 	vertex[4*curn+0] = glm::vec3(pos.x, pos.y, curz);
 	vertex[4*curn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
 	vertex[4*curn+2] = glm::vec3(pos.x, pos.y + size.y, curz);
 	vertex[4*curn+3] = glm::vec3(pos.x + size.x, pos.y + size.y, curz);
-	uv[4*curn+3] = glm::vec2(sub.x, sub.y);
-	uv[4*curn+2] = glm::vec2(sub.x + sub.w, sub.y);
-	uv[4*curn+1] = glm::vec2(sub.x, sub.y + sub.h);
-	uv[4*curn+0] = glm::vec2(sub.x + sub.w, sub.y + sub.h);
+	uv[4*curn+3] = glm::vec2(sub.x + sub.w, sub.y);
+	uv[4*curn+2] = glm::vec2(sub.x, sub.y);
+	uv[4*curn+1] = glm::vec2(sub.x + sub.w, sub.y + sub.h);
+	uv[4*curn+0] = glm::vec2(sub.x, sub.y + sub.h);
 	index[6*curn+0] = 4*curn+0;
 	index[6*curn+1] = 4*curn+1;
 	index[6*curn+2] = 4*curn+2;
@@ -150,54 +150,54 @@ inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, Te
 	curz+=0.001f;
 }
 
-void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex, Rect sub)
+void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub)
 {
-	innerDraw(pos, size, rotation, tex, sub);
+	innerDraw(pos, size, rotation, (const Texture) tex, sub);
 }	
 
-void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex, int atl)
+void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, int atl)
 {
 	int i = atl%64;
 	int j = atl/64;
 	Rect aa(i/64.0, (j*32.0)/tex.height, 1/64.0, 32.0/tex.height);
-	innerDraw(pos, size, rotation, tex, aa);
+	innerDraw(pos, size, rotation, (const Texture) tex, aa);
 }
 
-void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, Texture& tex)
+void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex)
 {
-	innerDraw(pos, size, rotation, tex, Rect(0,0,1,1));
+	innerDraw(pos, size, rotation, (const Texture) tex, Rect(0,0,1,1));
 }
 
-void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, Texture& tex)
+void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, const Texture& tex)
 {
-	innerDraw(pos, size, 0, tex, Rect(0,0,1,1));
+	innerDraw(pos, size, 0, (const Texture) tex, Rect(0,0,1,1));
 }
 
-void Batched::DrawLine(glm::vec2 from, glm::vec2 to, float w, Color4 col){
+void Batched::DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col){
 	if(lcurn >= 1000){
-		LRender();
+		lineRender();
 	}
-	lvertex[4*lcurn+0] = glm::vec3(from.x - 1, from.y + 1, curz);
-	lvertex[4*lcurn+1] = glm::vec3(from.x + 1, from.y - 1, curz);
-	lvertex[4*lcurn+2] = glm::vec3(to.x - 1, to.y + 1, curz);
-	lvertex[4*lcurn+3] = glm::vec3(to.x + 1, to.y - 1, curz);
-	lcolor[4*lcurn+3] = col;
-	lcolor[4*lcurn+2] = col;
-	lcolor[4*lcurn+1] = col;
-	lcolor[4*lcurn+0] = col;
-	lindex[6*lcurn+0] = 4*lcurn+0;
-	lindex[6*lcurn+1] = 4*lcurn+1;
-	lindex[6*lcurn+2] = 4*lcurn+2;
-	lindex[6*lcurn+3] = 4*lcurn+1;
-	lindex[6*lcurn+4] = 4*lcurn+2;
-	lindex[6*lcurn+5] = 4*lcurn+3;
+	m_lineVertex[4*lcurn+0] = glm::vec3(from.x - 1, from.y + 1, curz);
+	m_lineVertex[4*lcurn+1] = glm::vec3(from.x + 1, from.y - 1, curz);
+	m_lineVertex[4*lcurn+2] = glm::vec3(to.x - 1, to.y + 1, curz);
+	m_lineVertex[4*lcurn+3] = glm::vec3(to.x + 1, to.y - 1, curz);
+	m_lineColor[4*lcurn+3] = col;
+	m_lineColor[4*lcurn+2] = col;
+	m_lineColor[4*lcurn+1] = col;
+	m_lineColor[4*lcurn+0] = col;
+	m_lineIndex[6*lcurn+0] = 4*lcurn+0;
+	m_lineIndex[6*lcurn+1] = 4*lcurn+1;
+	m_lineIndex[6*lcurn+2] = 4*lcurn+2;
+	m_lineIndex[6*lcurn+3] = 4*lcurn+1;
+	m_lineIndex[6*lcurn+4] = 4*lcurn+2;
+	m_lineIndex[6*lcurn+5] = 4*lcurn+3;
 	lcurn++;
 	curz+=0.001f;
 }
 
-void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, Color4 col){
+void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col){
 	if(dcurn >= 1000){
-		DRender();
+		line3dRender();
 	}
 	dvertex[2*dcurn+0].pos = from;
 	dvertex[2*dcurn+1].pos = to;
@@ -208,24 +208,24 @@ void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, Color4 col){
 	dcurn++;
 }
 
-void Batched::DrawRectangle(glm::vec2 pos, glm::vec2 size, Color4 col){
+void Batched::DrawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 col){
 	if(lcurn >= 1000){
-		LRender();
+		lineRender();
 	}
-	lvertex[4*lcurn+0] = glm::vec3(pos.x, pos.y, curz);
-	lvertex[4*lcurn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
-	lvertex[4*lcurn+2] = glm::vec3(pos.x, pos.y + size.y, curz);
-	lvertex[4*lcurn+3] = glm::vec3(pos.x + size.x, pos.y + size.y, curz);
-	lcolor[4*lcurn+3] = col;
-	lcolor[4*lcurn+2] = col;
-	lcolor[4*lcurn+1] = col;
-	lcolor[4*lcurn+0] = col;
-	lindex[6*lcurn+0] = 4*lcurn+0;
-	lindex[6*lcurn+1] = 4*lcurn+1;
-	lindex[6*lcurn+2] = 4*lcurn+2;
-	lindex[6*lcurn+3] = 4*lcurn+1;
-	lindex[6*lcurn+4] = 4*lcurn+2;
-	lindex[6*lcurn+5] = 4*lcurn+3;
+	m_lineVertex[4*lcurn+0] = glm::vec3(pos.x, pos.y, curz);
+	m_lineVertex[4*lcurn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
+	m_lineVertex[4*lcurn+2] = glm::vec3(pos.x, pos.y + size.y, curz);
+	m_lineVertex[4*lcurn+3] = glm::vec3(pos.x + size.x, pos.y + size.y, curz);
+	m_lineColor[4*lcurn+3] = col;
+	m_lineColor[4*lcurn+2] = col;
+	m_lineColor[4*lcurn+1] = col;
+	m_lineColor[4*lcurn+0] = col;
+	m_lineIndex[6*lcurn+0] = 4*lcurn+0;
+	m_lineIndex[6*lcurn+1] = 4*lcurn+1;
+	m_lineIndex[6*lcurn+2] = 4*lcurn+2;
+	m_lineIndex[6*lcurn+3] = 4*lcurn+1;
+	m_lineIndex[6*lcurn+4] = 4*lcurn+2;
+	m_lineIndex[6*lcurn+5] = 4*lcurn+3;
 	lcurn++;
 	curz+=0.001f;
 }
@@ -234,19 +234,19 @@ int Batched::RenderFinallyWorld()
 {
 	if(dcurn != 0){
 		glBindVertexArray(dvao);
-		colored->BindProgram();
+		m_coloredShader->BindProgram();
 
 		GLuint stride = sizeof(VertexPositionColor);
 		GLuint offset = 0;
 		glBindBuffer(GL_ARRAY_BUFFER, dvbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPositionColor)*dcurn*2, &dvertex[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPositionColor)*dcurn*2, &dvertex[0], GL_STREAM_DRAW);
 		glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 		glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, stride, (void*)(offset)); offset += sizeof(glm::vec3);
 		glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
 		glVertexAttribPointer(BUFFER_TYPE_COLOR, 4, GL_FLOAT, GL_FALSE, stride, (void*)(offset));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dvbo[1]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*dcurn*2, &dindex[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*dcurn*2, &dindex[0], GL_STREAM_DRAW);
 
 
 		glPointSize(3);
@@ -261,43 +261,44 @@ int Batched::RenderFinallyWorld()
 int Batched::RenderFinally()
 {
 	if(curn != 0) {
-		glBindVertexArray(vao);
-		textured->BindProgram();
-		glBindTexture(GL_TEXTURE_2D, currentTex->textureId);
+		glBindVertexArray(m_vao);
+		m_texturedShader->BindProgram();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_currentTex->textureId);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_STREAM_DRAW);
 		glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 		glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_textureBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_STREAM_DRAW);
 		glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
 		glVertexAttribPointer(BUFFER_TYPE_TEXTCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indecesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_STREAM_DRAW);
 
 
 		glDrawElements(GL_TRIANGLES, curn*6, GL_UNSIGNED_INT, NULL);
 		dc++;
 	}
 	if(lcurn != 0) {
-		glBindVertexArray(lvao);
-		colored->BindProgram();
+		glBindVertexArray(m_lvao);
+		m_coloredShader->BindProgram();
 
-		glBindBuffer(GL_ARRAY_BUFFER, l_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*lcurn*4, lvertex, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, m_lineVertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*lcurn*4, m_lineVertex, GL_STREAM_DRAW);
 		glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 		glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, l_colorBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Color4)*lcurn*4, lcolor, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, m_lineColorBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4)*lcurn*4, m_lineColor, GL_STREAM_DRAW);
 		glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
-		glVertexAttribPointer(BUFFER_TYPE_COLOR, 2, GL_FLOAT, GL_FALSE, sizeof(Color4), 0);
+		glVertexAttribPointer(BUFFER_TYPE_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, l_indecesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*lcurn*6, lindex, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndecesBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*lcurn*6, m_lineIndex, GL_STREAM_DRAW);
 
 
 		glDrawElements(GL_TRIANGLES, lcurn*6, GL_UNSIGNED_INT, NULL);
@@ -317,22 +318,23 @@ void Batched::Render()
 	if(curn == 0) {
 		return;
 	}
-	glBindVertexArray(vao);
-	textured->BindProgram();
-	glBindTexture(GL_TEXTURE_2D, currentTex->textureId);
+	glBindVertexArray(m_vao);
+	m_texturedShader->BindProgram();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_currentTex->textureId);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 	glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
 	glVertexAttribPointer(BUFFER_TYPE_TEXTCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indecesBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_STREAM_DRAW);
 
 
 	glDrawElements(GL_TRIANGLES, curn*6, GL_UNSIGNED_INT, NULL);
@@ -340,26 +342,26 @@ void Batched::Render()
 	dc++;
 }
 
-void Batched::LRender()
+void Batched::lineRender()
 {
 	if(lcurn == 0) {
 		return;
 	}
-	glBindVertexArray(lvao);
-	colored->BindProgram();
+	glBindVertexArray(m_lvao);
+	m_coloredShader->BindProgram();
 
-	glBindBuffer(GL_ARRAY_BUFFER, l_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*lcurn*4, lvertex, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_lineVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*lcurn*4, m_lineVertex, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 	glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, l_colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Color4)*lcurn*4, lcolor, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_lineColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4)*lcurn*4, m_lineColor, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
-	glVertexAttribPointer(BUFFER_TYPE_COLOR, 2, GL_FLOAT, GL_FALSE, sizeof(Color4), 0);
+	glVertexAttribPointer(BUFFER_TYPE_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, l_indecesBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*lcurn*6, lindex, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndecesBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*lcurn*6, m_lineIndex, GL_STREAM_DRAW);
 
 
 	glDrawElements(GL_TRIANGLES, lcurn*6, GL_UNSIGNED_INT, NULL);
@@ -367,22 +369,22 @@ void Batched::LRender()
 	lcurn = 0;
 }
 
-void Batched::DRender()
+void Batched::line3dRender()
 {
 	glBindVertexArray(dvao);
-	colored->BindProgram();
+	m_coloredShader->BindProgram();
 
 	GLuint stride = sizeof(VertexPositionColor);
 	GLuint offset = 0;
 	glBindBuffer(GL_ARRAY_BUFFER, dvbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPositionColor)*dcurn*2, &dvertex[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPositionColor)*dcurn*2, &dvertex[0], GL_STREAM_DRAW);
 	glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 	glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, stride, (void*)(offset)); offset += sizeof(glm::vec3);
 	glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
 	glVertexAttribPointer(BUFFER_TYPE_COLOR, 4, GL_FLOAT, GL_FALSE, stride, (void*)(offset));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dvbo[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*dcurn*2, &dindex[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*dcurn*2, &dindex[0], GL_STREAM_DRAW);
 
 	glPointSize(3);
 	glDrawElements(GL_LINES, dcurn*2, GL_UNSIGNED_INT, NULL);
