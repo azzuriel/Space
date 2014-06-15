@@ -6,7 +6,7 @@
 #include "JargShader.h"
 #include "Font.h"
 #include "VertexPositionTexture.h"
-#include <detail\type_vec.hpp>
+#include <glm.hpp>
 
 class Batched{
 private:
@@ -51,8 +51,8 @@ public:
 	void DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col);
 	void DrawRectangle(glm::vec2 from, glm::vec2 to, glm::vec4 col);
 	void DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col);
-
-
+	void GetStringData(glm::vec2 pos, std::string text, const Font& font, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
+	void DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
 	int RenderFinally();
 	int RenderFinallyWorld();
 
@@ -62,6 +62,6 @@ private:
 	void lineRender();
 	void Render();
 	void line3dRender();
-
+	
 };
 #endif // SpriteBatch_h__

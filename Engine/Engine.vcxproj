@@ -112,6 +112,7 @@
     <ClCompile Include="ROAMSurface.cpp" />
     <ClCompile Include="SphereTesselator.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />
+    <ClCompile Include="TextGeometry.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TreeSphere.cpp" />
     <ClCompile Include="ColorExtender.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="ROAMSurface.h" />
     <ClInclude Include="SphereTesselator.h" />
     <ClInclude Include="SpriteBatch.h" />
+    <ClInclude Include="TextGeometry.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TreeSphere.h" />
     <ClInclude Include="ColorExtender.h" />

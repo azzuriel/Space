@@ -1,19 +1,21 @@
 #include "Win.h"
 #include "glm.hpp"
 #include "WinS.h"
-#include <detail\type_vec.hpp>
+#include <glm.hpp>
 #include "Mouse.h"
 #include <vector>
 
 
 Win::Win(void)
 {
+	text = new TextGeometry("azazazaadasdasd");
 }
 
-Win::Win(glm::vec2 p, glm::vec2 s)
+Win::Win(glm::vec2 p, glm::vec2 s) :
+	size(s),
+	pos(p)
 {
-	size = s;
-	pos = p;
+	text = new TextGeometry("azazazaadasdasd");
 }
 
 
@@ -25,6 +27,7 @@ Win::~Win(void)
 		}
 	}
 	Items.clear();
+	delete text;
 }
 
 void Win::Draw() const
@@ -45,7 +48,7 @@ void Win::Draw() const
 	sb.DrawLine(glm::vec2(pos.x, pos.y + size.y), pos + size, 2, Colors::White);
 	sb.DrawLine(glm::vec2(pos.x + size.x, pos.y), pos + size, 2, Colors::White);
 
-	sb.DrawString(pos + glm::vec2(3,-8), "azazazaadasdasd", *WinS::font);
+	text->DrawAt(pos);
 
 	if(Items.size() > 0){
 		for(int i=0; i< Items.size(); i++){

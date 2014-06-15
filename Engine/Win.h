@@ -5,6 +5,7 @@
 #include <glm.hpp>
 #include "WComponent.h"
 #include <vector>
+#include "TextGeometry.h"
 class Win : public WContainer
 {
 public:
@@ -17,6 +18,7 @@ public:
 	glm::vec2 size;
 	glm::vec2 pos;
 	std::vector<WComponent*> Items;
+	TextGeometry* text;
 };
 
 #endif // Win_h__

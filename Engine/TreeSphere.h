@@ -3,7 +3,7 @@
 #include <vector>
 #include <glew.h>
 #include "Mesh.h"
-#include <detail\type_vec.hpp>
+#include <glm.hpp>
 
 struct QuadLodPart{
 public:

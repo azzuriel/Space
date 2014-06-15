@@ -317,8 +317,9 @@ void Game::Run()
 		jb->parent = w;
 		w->Items.push_back(jb);
 
-		JLabel* jl = new JLabel(glm::vec2(20,20), "qwertyqwertyuiopasdfghjkl;zxcvbnm,.qwertyuiopasdfghjkl;zxcvbnm,.qwertyuiopasdfghjkl;zxcvbnm,.qwertyuiopasdfghjkl;zxcvbnm,.uiopasdfghjkl;zxcvbnm,.");
+		JLabel* jl = new JLabel(glm::vec2(20,20));
 		jl->parent = w;
+		jl->text->setText( "qwertyuiopasdfghjklzxcvbnm\nQWERTYUIOPASDFGHJKLZXCVBNM\n1234567890\n ()_+{}[]\',.<>/?");
 		w->Items.push_back(jl);
 	}
 
@@ -486,7 +487,7 @@ void Game::Run()
 
 		Mouse::Update();
 
-		glFlush();
+		//glFlush();
 		glfwSwapBuffers(window);
 		
 		glfwPollEvents();

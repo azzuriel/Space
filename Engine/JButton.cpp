@@ -7,16 +7,20 @@
 
 JButton::JButton(void)
 {
+	text = new TextGeometry("Button");
 }
 
-JButton::JButton(glm::vec2 pos_, glm::vec2 size_)
+JButton::JButton(glm::vec2 pos_, glm::vec2 size_) : 
+	pos(pos_),
+	size(size_)
 {
-	pos = pos_; size = size_;
+	text = new TextGeometry("Button");
 }
 
 
 JButton::~JButton(void)
 {
+	delete text;
 }
 
 void JButton::Draw() const
@@ -34,7 +38,7 @@ void JButton::Draw() const
 	sb.DrawLine(glm::vec2(Pos.x, Pos.y + size.y), Pos + size, 2, col);
 	sb.DrawLine(glm::vec2(Pos.x + size.x, Pos.y), Pos + size, 2, col);
 
-	sb.DrawString(Pos + glm::vec2(3,-8), "Button", *WinS::font);
+	text->DrawAt(Pos);
 }
 
 void JButton::Update()

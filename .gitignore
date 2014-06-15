@@ -36,3 +36,5 @@ Space/logs/
 *.zip
 *.psess
 *.vsp
+*.json.png
+Space/font.json.png

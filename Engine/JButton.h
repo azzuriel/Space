@@ -5,6 +5,7 @@
 #include "WComponent.h"
 #include <string>
 #include "glm.hpp"
+#include "TextGeometry.h"
 
 class JButton : public WComponent
 {
@@ -16,8 +17,9 @@ public:
 	void Draw() const;
 	void Update();
 	glm::vec2 GlobalPos() const;
-	std::string Text;
+	void SetText(std::string s);
 	WContainer* parent;
+	TextGeometry* text;
 private:
 	glm::vec2 pos;
 	glm::vec2 size;

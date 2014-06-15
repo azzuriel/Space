@@ -5,6 +5,7 @@
 #include "Font.h"
 #include <utf8\unchecked.h>
 #include <utf8\checked.h>
+#include "TextGeometry.h"
 
 Batched::Batched()
 {
@@ -85,7 +86,44 @@ void Batched::Initialize(const JargShader* tex, const JargShader* col){
 	glGenBuffers(2, dvbo);
 }
 
-void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
+void Batched::DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *l_vertex, glm::vec2 *l_uv, glm::vec4 *l_color, GLuint *l_index, int &size) {
+	if(curn > 1000 - size - 1){
+		Render();
+	}
+	if(tex.textureId != m_currentTex->textureId){
+		Render();
+		m_currentTex = &tex;
+	}
+	auto pos3 = vec3(pos, 0);
+	for(int i = 0; i < size; i++)
+	{
+		vertex[4*curn+0] = l_vertex[4*i+0] + pos3;
+		vertex[4*curn+1] = l_vertex[4*i+1] + pos3;
+		vertex[4*curn+2] = l_vertex[4*i+2] + pos3;
+		vertex[4*curn+3] = l_vertex[4*i+3] + pos3;
+
+		uv[4*curn+0] = l_uv[4*i+0];
+		uv[4*curn+1] = l_uv[4*i+1];
+		uv[4*curn+2] = l_uv[4*i+2];
+		uv[4*curn+3] = l_uv[4*i+3];
+
+		color[4*curn+0] = l_color[4*i+0];
+		color[4*curn+1] = l_color[4*i+1];
+		color[4*curn+2] = l_color[4*i+2];
+		color[4*curn+3] = l_color[4*i+3];
+
+		index[6*curn+0] = 4*curn+2;
+		index[6*curn+1] = 4*curn+3;
+		index[6*curn+2] = 4*curn+0;
+		index[6*curn+3] = 4*curn+0;
+		index[6*curn+4] = 4*curn+1;
+		index[6*curn+5] = 4*curn+2;
+ 		curn++;
+ 		curz+=0.001f;
+	}
+}
+
+void Batched::GetStringData(glm::vec2 pos, std::string text, const Font& font, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size) {
 	std::vector<std::uint32_t> utf32text;
 	utf8::utf8to32(text.begin(), text.end(), std::back_inserter(utf32text));
 	m_currentFont = &font;
@@ -93,45 +131,60 @@ void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
 	float glyphX = pos.x;
 	float glyphY = pos.y;
 	float stringHeight = 22.0f;
-	if(curn > 1000 - utf32text.size() - 1){
+	for(unsigned int i = 0; i < utf32text.size(); i++)
+	{
+		if(utf32text[i] == 32){
+			glyphX += fontTexture.width;
+			continue;
+		}
+		if(utf32text[i] == 10){
+			glyphY += fontTexture.height+3;
+			glyphX = 0;
+			continue;
+		}
+		fontTexture = font.GetGlyphTexture(utf32text[i]);
+		float ypos = glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown;
+		//innerDraw( vec2(glyphX, ypos), vec2((float)fontTexture.width, (float)fontTexture.height), 0, *font.tex, Rect(fontTexture.texture.u1, fontTexture.texture.v1, fontTexture.texture.u2 - fontTexture.texture.u1, fontTexture.texture.v2 - fontTexture.texture.v1));
+		vertex[4*size+0] = glm::vec3(glyphX, ypos, curz);
+		vertex[4*size+1] = glm::vec3(glyphX, ypos + (float)fontTexture.height, curz);
+		vertex[4*size+2] = glm::vec3(glyphX + (float)fontTexture.width, ypos + (float)fontTexture.height, curz);
+		vertex[4*size+3] = glm::vec3(glyphX + (float)fontTexture.width, ypos, curz);
+		uv[4*size+0] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v2);
+		uv[4*size+1] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v1);
+		uv[4*size+2] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v1);
+		uv[4*size+3] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v2);
+		color[4*size+0] = Colors::White;
+		color[4*size+1] = Colors::White;
+		color[4*size+2] = Colors::White;
+		color[4*size+3] = Colors::White;
+		index[6*size+0] = 4*size+2;
+		index[6*size+1] = 4*size+3;
+		index[6*size+2] = 4*size+0;
+		index[6*size+3] = 4*size+0;
+		index[6*size+4] = 4*size+1;
+		index[6*size+5] = 4*size+2;
+		size++;
+
+		glyphX += fontTexture.width + 1;
+	}
+}
+
+void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
+	if(curn > 1000 - text.length()*4 - 1){
 		Render();
 	}
 	if(font.tex->textureId != m_currentTex->textureId){
 		Render();
 		m_currentTex = font.tex;
 	}
-	for(unsigned int i = 0; i < utf32text.size(); i++)
-	{
-		fontTexture = font.GetGlyphTexture(utf32text[i]);
-		float ypos = glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown;
-		//innerDraw( vec2(glyphX, ypos), vec2((float)fontTexture.width, (float)fontTexture.height), 0, *font.tex, Rect(fontTexture.texture.u1, fontTexture.texture.v1, fontTexture.texture.u2 - fontTexture.texture.u1, fontTexture.texture.v2 - fontTexture.texture.v1));
-		vertex[4*curn+0] = glm::vec3(glyphX, ypos, curz);
-		vertex[4*curn+1] = glm::vec3(glyphX, ypos + (float)fontTexture.height, curz);
-		vertex[4*curn+2] = glm::vec3(glyphX + (float)fontTexture.width, ypos + (float)fontTexture.height, curz);
-		vertex[4*curn+3] = glm::vec3(glyphX + (float)fontTexture.width, ypos, curz);
-		uv[4*curn+0] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v2);
-		uv[4*curn+1] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v1);
-		uv[4*curn+2] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v1);
-		uv[4*curn+3] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v2);
-		color[4*curn+0] = Colors::White;
-		color[4*curn+1] = Colors::White;
-		color[4*curn+2] = Colors::White;
-		color[4*curn+3] = Colors::White;
-		index[6*curn+0] = 4*curn+2;
-		index[6*curn+1] = 4*curn+3;
-		index[6*curn+2] = 4*curn+0;
-		index[6*curn+3] = 4*curn+0;
-		index[6*curn+4] = 4*curn+1;
-		index[6*curn+5] = 4*curn+2;
-		curn++;
 
-		glyphX += fontTexture.width + 1;
-	}
+	GetStringData(pos, text, font, vertex, uv, color, index, curn);
+
 	curz+=0.001f;
 }
 
 inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub){
-	if(curn >= 1000){
+	if(curn >= 1000 - 1){
 		Render();
 	}
 	if(tex.textureId != m_currentTex->textureId){
@@ -224,7 +277,7 @@ void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col){
 }
 
 void Batched::DrawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 col){
-	if(curn >= 1000){
+	if(curn >= 1000 - 1){
 		Render();
 	}
 // 	if(Batched::m_blankTex->textureId != m_currentTex->textureId){

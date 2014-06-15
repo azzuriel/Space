@@ -155,7 +155,7 @@ bool Font::CreateFromConfig( std::string configFileName )
 	FT_New_Face( library, "fonts\\arial.ttf", 0, &face);
 	FT_Set_Char_Size(face, 0, 9*64,  96 ,  96);
 
-	std::string glyphList = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890 ";
+	std::string glyphList = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890 ()_+{}[]\',.<>/?";
 	GenerateGlyphsList(glyphList);
 
 	if(face)

@@ -3,7 +3,6 @@
 
 #include "Bitmap.h"
 #include <glew.h>
-#include <GL\gl.h>
 
 struct TextureOld
 {
