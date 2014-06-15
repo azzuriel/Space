@@ -322,9 +322,10 @@ bool Font::GenerateOpenglGlyphs( std::string configFileName)
 
 const FontTexture Font::GetGlyphTexture( unsigned int utf32glyph ) const
 {
-	if(glyphsTextureMap.count(utf32glyph) == 0)
+	auto a = glyphsTextureMap.find(utf32glyph);
+	if(a == glyphsTextureMap.end())
 	{
 		return glyphsTextureMap.at(0);
 	} 
-	return glyphsTextureMap.at(utf32glyph);
+	return (*a).second;
 }

@@ -34,3 +34,5 @@ Space/logs/
 *.opensdf
 *.tgz
 *.zip
+*.psess
+*.vsp

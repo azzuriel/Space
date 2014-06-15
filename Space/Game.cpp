@@ -27,6 +27,7 @@
 #include <thread>
 #include "../Engine/WinS.h"
 #include "../Engine/JButton.h"
+#include "../Engine/JLabel.h"
 
 void KeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
@@ -41,6 +42,11 @@ void CursorPosCallbackGLFW3(GLFWwindow *window, double xpos, double ypos)
 void CursorClientAreaCallbackGLFW3(GLFWwindow *window, int entered)
 {
 	Mouse::CursorClientArea(entered);
+}
+
+void SetWindowSizeCallbackGLFW3(GLFWwindow* window, int a, int b){
+	Game::Resize(a, b);
+	Mouse::SetWindowSize(a, b);
 }
 
 void SetMouseButtonCallbackGLFW3(GLFWwindow *window, int a, int b, int c)
@@ -138,6 +144,7 @@ int Game::Initialize()
 	glfwSetCursorEnterCallback(window, CursorClientAreaCallbackGLFW3);	
 	glfwSetWindowFocusCallback(window, WindowFocusCallbackGLFW3);
 	glfwSetMouseButtonCallback(window, SetMouseButtonCallbackGLFW3);
+	glfwSetWindowSizeCallback(window, SetWindowSizeCallbackGLFW3);
 	wire = 0;
 
 	//*******************************
@@ -302,12 +309,17 @@ void Game::Run()
 	
 	WinS* ws = new WinS(sb.get(), *font);
 	Win* w;
-	for(int i = 0; i< 10; i++) {
+	for(int i = 0; i< 30; i++) {
 		w = new Win(glm::vec2(100 +i*5, 100 +i*5), glm::vec2(200,200));
 		ws->windows.push_back(w);
+
 		JButton* jb = new JButton(glm::vec2(10,100), glm::vec2(50,20));
 		jb->parent = w;
 		w->Items.push_back(jb);
+
+		JLabel* jl = new JLabel(glm::vec2(20,20), "qwertyqwertyuiopasdfghjkl;zxcvbnm,.qwertyuiopasdfghjkl;zxcvbnm,.qwertyuiopasdfghjkl;zxcvbnm,.qwertyuiopasdfghjkl;zxcvbnm,.uiopasdfghjkl;zxcvbnm,.");
+		jl->parent = w;
+		w->Items.push_back(jl);
 	}
 
     int iters = 0;
@@ -468,13 +480,15 @@ void Game::Run()
 		sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
 
 		int dc = sb->RenderFinallyWorld();
-		dc += sb->RenderFinally();
+ 		dc += sb->RenderFinally();
 
 		glfwSetWindowTitle(window, std::to_string(dc).c_str());
 
 		Mouse::Update();
 
+		glFlush();
 		glfwSwapBuffers(window);
+		
 		glfwPollEvents();
 		
 		//std::this_thread::sleep_for(std::chrono::milliseconds(15));
@@ -486,3 +500,13 @@ void Game::Run()
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
+
+void Game::Resize(int a, int b)
+{
+	width = a;
+	height = b;
+	glViewport(0,0,a,b);
+}
+
+int Game::width = 0;
+int Game::height = 0;

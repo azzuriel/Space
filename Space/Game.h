@@ -17,10 +17,12 @@ public:
 	bool Running;
 	std::string title;
 	bool fullscreen;
-	int width, height;
+	static int width, height;
 	GLFWwindow* window;
 	GameTimer gt;
 	FPSCounter fps;
+
+	static void Resize(int a, int b);
 
 	bool wire;
 

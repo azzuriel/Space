@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Ws">
+      <UniqueIdentifier>{878610c4-cd1c-449d-8d39-3f0bf85edf9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Quad.cpp">
@@ -97,13 +100,16 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="WinS.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Ws</Filter>
     </ClCompile>
     <ClCompile Include="Win.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Ws</Filter>
     </ClCompile>
     <ClCompile Include="JButton.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Ws</Filter>
+    </ClCompile>
+    <ClCompile Include="JLabel.cpp">
+      <Filter>Ws</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,17 +203,20 @@
     <ClInclude Include="ColorExtender.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Win.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="WinS.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Ws</Filter>
     </ClInclude>
-    <ClInclude Include="JButton.h">
-      <Filter>Заголовочные файлы</Filter>
+    <ClInclude Include="Win.h">
+      <Filter>Ws</Filter>
     </ClInclude>
     <ClInclude Include="WComponent.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Ws</Filter>
+    </ClInclude>
+    <ClInclude Include="JButton.h">
+      <Filter>Ws</Filter>
+    </ClInclude>
+    <ClInclude Include="JLabel.h">
+      <Filter>Ws</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
