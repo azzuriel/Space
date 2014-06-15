@@ -10,12 +10,13 @@ Batched::Batched()
 {
 	uv = new glm::vec2[1000*4];
 	vertex = new glm::vec3[1000*4];
+	color = new glm::vec4[1000*4];
 	index = new GLuint[1000*6];
 
 	m_lineVertex = new glm::vec3[1000*4];
 	m_lineIndex = new GLuint[1000*6];
 	m_lineColor = new glm::vec4[1000*4];
-	m_textureBuffer = m_vertexBuffer = m_indecesBuffer = m_lineColorBuffer = m_lineVertexBuffer = m_lvao = m_vao = curn = lcurn = 0;
+	m_textureBuffer = m_vertexBuffer = m_indecesBuffer = m_lineColorBuffer = m_lineVertexBuffer = m_lvao = m_vao = curn = lcurn = m_colorBuffer = 0;
 	dcurn = 0;
 	dvao = 0; dvbo = nullptr;
 	dvertex = new VertexPositionColor[1000*4];
@@ -23,8 +24,7 @@ Batched::Batched()
 
 	curz = -1;
 	m_blankTex = new Texture();
-	m_blankTex->name = "blank";
-	m_blankTex->textureId = 0;
+	m_blankTex->Load("wp.png");
 	m_currentTex = m_blankTex;
 }
 
@@ -45,6 +45,7 @@ Batched::~Batched()
 
 	glDeleteBuffers(1, &m_indecesBuffer);
 	glDeleteBuffers(1, &m_vertexBuffer);
+	glDeleteBuffers(1, &m_colorBuffer);
 	glDeleteBuffers(1, &m_textureBuffer);
 	glBindVertexArray(0);
 	glDeleteVertexArrays(1, &m_vao);
@@ -67,6 +68,7 @@ void Batched::Initialize(const JargShader* tex, const JargShader* col){
 	glBindVertexArray(m_vao);
 
 	glGenBuffers(1, &m_vertexBuffer);
+	glGenBuffers(1, &m_colorBuffer);
 	glGenBuffers(1, &m_indecesBuffer);
 	glGenBuffers(1, &m_textureBuffer);
 
@@ -111,6 +113,10 @@ void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
 		uv[4*curn+1] = glm::vec2(fontTexture.texture.u1, fontTexture.texture.v1);
 		uv[4*curn+2] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v1);
 		uv[4*curn+3] = glm::vec2(fontTexture.texture.u2, fontTexture.texture.v2);
+		color[4*curn+0] = Colors::White;
+		color[4*curn+1] = Colors::White;
+		color[4*curn+2] = Colors::White;
+		color[4*curn+3] = Colors::White;
 		index[6*curn+0] = 4*curn+2;
 		index[6*curn+1] = 4*curn+3;
 		index[6*curn+2] = 4*curn+0;
@@ -119,7 +125,7 @@ void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
 		index[6*curn+5] = 4*curn+2;
 		curn++;
 
-		glyphX += fontTexture.width;
+		glyphX += fontTexture.width + 1;
 	}
 	curz+=0.001f;
 }
@@ -140,6 +146,10 @@ inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, co
 	uv[4*curn+2] = glm::vec2(sub.x, sub.y);
 	uv[4*curn+1] = glm::vec2(sub.x + sub.w, sub.y + sub.h);
 	uv[4*curn+0] = glm::vec2(sub.x, sub.y + sub.h);
+	color[4*curn+0] = Colors::White;
+	color[4*curn+1] = Colors::White;
+	color[4*curn+2] = Colors::White;
+	color[4*curn+3] = Colors::White;
 	index[6*curn+0] = 4*curn+0;
 	index[6*curn+1] = 4*curn+1;
 	index[6*curn+2] = 4*curn+2;
@@ -174,24 +184,29 @@ void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, const Texture& tex)
 }
 
 void Batched::DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col){
-	if(lcurn >= 1000){
-		lineRender();
+	if(curn >= 1000){
+		Render();
 	}
-	m_lineVertex[4*lcurn+0] = glm::vec3(from.x - 1, from.y + 1, curz);
-	m_lineVertex[4*lcurn+1] = glm::vec3(from.x + 1, from.y - 1, curz);
-	m_lineVertex[4*lcurn+2] = glm::vec3(to.x - 1, to.y + 1, curz);
-	m_lineVertex[4*lcurn+3] = glm::vec3(to.x + 1, to.y - 1, curz);
-	m_lineColor[4*lcurn+3] = col;
-	m_lineColor[4*lcurn+2] = col;
-	m_lineColor[4*lcurn+1] = col;
-	m_lineColor[4*lcurn+0] = col;
-	m_lineIndex[6*lcurn+0] = 4*lcurn+0;
-	m_lineIndex[6*lcurn+1] = 4*lcurn+1;
-	m_lineIndex[6*lcurn+2] = 4*lcurn+2;
-	m_lineIndex[6*lcurn+3] = 4*lcurn+1;
-	m_lineIndex[6*lcurn+4] = 4*lcurn+2;
-	m_lineIndex[6*lcurn+5] = 4*lcurn+3;
-	lcurn++;
+
+	vertex[4*curn+0] = glm::vec3(from.x - 1, from.y + 1, curz);
+	vertex[4*curn+1] = glm::vec3(from.x + 1, from.y - 1, curz);
+	vertex[4*curn+2] = glm::vec3(to.x - 1, to.y + 1, curz);
+	vertex[4*curn+3] = glm::vec3(to.x + 1, to.y - 1, curz);
+	uv[4*curn+3] = glm::vec2(0, 0);
+	uv[4*curn+2] = glm::vec2(0, 0);
+	uv[4*curn+1] = glm::vec2(0, 0);
+	uv[4*curn+0] = glm::vec2(0, 0);
+	color[4*curn+0] = col;
+	color[4*curn+1] = col;
+	color[4*curn+2] = col;
+	color[4*curn+3] = col;
+	index[6*curn+0] = 4*curn+0;
+	index[6*curn+1] = 4*curn+1;
+	index[6*curn+2] = 4*curn+2;
+	index[6*curn+3] = 4*curn+1;
+	index[6*curn+4] = 4*curn+2;
+	index[6*curn+5] = 4*curn+3;
+	curn++;
 	curz+=0.001f;
 }
 
@@ -209,24 +224,32 @@ void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col){
 }
 
 void Batched::DrawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 col){
-	if(lcurn >= 1000){
-		lineRender();
+	if(curn >= 1000){
+		Render();
 	}
-	m_lineVertex[4*lcurn+0] = glm::vec3(pos.x, pos.y, curz);
-	m_lineVertex[4*lcurn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
-	m_lineVertex[4*lcurn+2] = glm::vec3(pos.x, pos.y + size.y, curz);
-	m_lineVertex[4*lcurn+3] = glm::vec3(pos.x + size.x, pos.y + size.y, curz);
-	m_lineColor[4*lcurn+3] = col;
-	m_lineColor[4*lcurn+2] = col;
-	m_lineColor[4*lcurn+1] = col;
-	m_lineColor[4*lcurn+0] = col;
-	m_lineIndex[6*lcurn+0] = 4*lcurn+0;
-	m_lineIndex[6*lcurn+1] = 4*lcurn+1;
-	m_lineIndex[6*lcurn+2] = 4*lcurn+2;
-	m_lineIndex[6*lcurn+3] = 4*lcurn+1;
-	m_lineIndex[6*lcurn+4] = 4*lcurn+2;
-	m_lineIndex[6*lcurn+5] = 4*lcurn+3;
-	lcurn++;
+// 	if(Batched::m_blankTex->textureId != m_currentTex->textureId){
+// 		Render();
+// 		m_currentTex = (const Texture *)Batched::m_blankTex;
+// 	}
+	vertex[4*curn+0] = glm::vec3(pos.x, pos.y, curz);
+	vertex[4*curn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
+	vertex[4*curn+2] = glm::vec3(pos.x, pos.y + size.y, curz);
+	vertex[4*curn+3] = glm::vec3(pos.x + size.x, pos.y + size.y, curz);
+	uv[4*curn+3] = glm::vec2(0, 0);
+	uv[4*curn+2] = glm::vec2(0, 0);
+	uv[4*curn+1] = glm::vec2(0, 0);
+	uv[4*curn+0] = glm::vec2(0, 0);
+	color[4*curn+0] = col;
+	color[4*curn+1] = col;
+	color[4*curn+2] = col;
+	color[4*curn+3] = col;
+	index[6*curn+0] = 4*curn+0;
+	index[6*curn+1] = 4*curn+1;
+	index[6*curn+2] = 4*curn+2;
+	index[6*curn+3] = 4*curn+1;
+	index[6*curn+4] = 4*curn+2;
+	index[6*curn+5] = 4*curn+3;
+	curn++;
 	curz+=0.001f;
 }
 
@@ -260,29 +283,6 @@ int Batched::RenderFinallyWorld()
 
 int Batched::RenderFinally()
 {
-	if(curn != 0) {
-		glBindVertexArray(m_vao);
-		m_texturedShader->BindProgram();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_currentTex->textureId);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_STREAM_DRAW);
-		glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
-		glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_textureBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_STREAM_DRAW);
-		glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
-		glVertexAttribPointer(BUFFER_TYPE_TEXTCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indecesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_STREAM_DRAW);
-
-
-		glDrawElements(GL_TRIANGLES, curn*6, GL_UNSIGNED_INT, NULL);
-		dc++;
-	}
 	if(lcurn != 0) {
 		glBindVertexArray(m_lvao);
 		m_coloredShader->BindProgram();
@@ -305,6 +305,37 @@ int Batched::RenderFinally()
 		dc++;
 	}
 
+	if(curn != 0) {
+		glBindVertexArray(m_vao);
+		m_texturedShader->BindProgram();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_currentTex->textureId);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Batched::m_blankTex->textureId);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_STREAM_DRAW);
+		glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
+		glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_textureBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_STREAM_DRAW);
+		glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
+		glVertexAttribPointer(BUFFER_TYPE_TEXTCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4)*curn*4, color, GL_STREAM_DRAW);
+		glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
+		glVertexAttribPointer(BUFFER_TYPE_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indecesBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_STREAM_DRAW);
+
+
+		glDrawElements(GL_TRIANGLES, curn*6, GL_UNSIGNED_INT, NULL);
+		dc++;
+	}
+
 	curz = -90;
 	curn = 0;
 	lcurn = 0;
@@ -322,6 +353,8 @@ void Batched::Render()
 	m_texturedShader->BindProgram();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_currentTex->textureId);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, Batched::m_blankTex->textureId);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*curn*4, vertex, GL_STREAM_DRAW);
@@ -332,6 +365,11 @@ void Batched::Render()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2)*curn*4, uv, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
 	glVertexAttribPointer(BUFFER_TYPE_TEXTCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4)*curn*4, color, GL_STREAM_DRAW);
+	glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
+	glVertexAttribPointer(BUFFER_TYPE_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indecesBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*curn*6, index, GL_STREAM_DRAW);

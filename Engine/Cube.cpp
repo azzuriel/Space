@@ -26,7 +26,7 @@ static const GLuint __vertexIndex[INDEXCOUNT] =
 	20,23,22, 22,21,20 // right
 };
 
-Mesh Cube::getMesh()
+const Mesh Cube::getMesh()
 {
 	if(sm_mesh != nullptr){
 		return *sm_mesh;

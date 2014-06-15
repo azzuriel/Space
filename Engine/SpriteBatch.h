@@ -10,9 +10,10 @@
 
 class Batched{
 private:
-	GLuint m_vertexBuffer, m_textureBuffer, m_indecesBuffer, m_vao;
+	GLuint m_vertexBuffer, m_textureBuffer, m_indecesBuffer, m_colorBuffer, m_vao;
 	glm::vec2* uv;
 	glm::vec3* vertex;
+	glm::vec4* color;
 	GLuint* index;
 
 	GLuint m_lineVertexBuffer, m_lineColorBuffer, m_lineIndecesBuffer, m_lvao;

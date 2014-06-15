@@ -25,6 +25,8 @@
 #include <ROAMSurface.h>
 #include <chrono>
 #include <thread>
+#include "../Engine/WinS.h"
+#include "../Engine/JButton.h"
 
 void KeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
@@ -298,6 +300,15 @@ void Game::Run()
 		LOG(ERROR) << "failed to load\process font.json";
 	}
 	
+	WinS* ws = new WinS(sb.get(), *font);
+	Win* w;
+	for(int i = 0; i< 10; i++) {
+		w = new Win(glm::vec2(100 +i*5, 100 +i*5), glm::vec2(200,200));
+		ws->windows.push_back(w);
+		JButton* jb = new JButton(glm::vec2(10,100), glm::vec2(50,20));
+		jb->parent = w;
+		w->Items.push_back(jb);
+	}
 
     int iters = 0;
 	float sec = 0;
@@ -312,7 +323,7 @@ void Game::Run()
 	//auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
 
-	Mouse::SetFixedPosState(true);
+	Mouse::SetFixedPosState(false);
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -393,7 +404,7 @@ void Game::Run()
 			camera.camera_scale = gt.elapsed*10.0F;
 		}
 
-		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
+		//camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
 		pl.position = vec4(50.0f,50.0f,50.0f,1.0f)*m->World;
 
@@ -447,14 +458,19 @@ void Game::Run()
 		LinesShader->BindProgram();
 		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
-		glfwSetWindowTitle(window, std::to_string(fps.GetCount()).append(" ").append(std::to_string(glm::length(camera.position/750.0F))).c_str());
+		
+
+		ws->Update(gt);
+		ws->Draw();
+
 		sb->DrawQuad(vec2(100,100),vec2(100,100), *font->tex);
 		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), *font);		
 		sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
 
-		sb->RenderFinallyWorld();
-		sb->RenderFinally();
+		int dc = sb->RenderFinallyWorld();
+		dc += sb->RenderFinally();
 
+		glfwSetWindowTitle(window, std::to_string(dc).c_str());
 
 		Mouse::Update();
 

@@ -546,3 +546,13 @@ void Bitmap::Generate( unsigned int format_, unsigned int width_, unsigned int h
 	}
 
 }
+
+void Bitmap::BlackToWhite()
+{
+	for (int i =0; i<width*height*GetChannelCount(format); i+=GetChannelCount(format))
+	{
+		data[i] = 255 - data[i];
+		data[i+1] = 255 - data[i+1];
+		data[i+2] = 255 - data[i+2];
+	}
+}

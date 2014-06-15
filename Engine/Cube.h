@@ -4,7 +4,7 @@
 class Cube
 {
 public:
-	static Mesh getMesh();
+	static const Mesh getMesh();
 private:
 	static std::shared_ptr<Mesh> sm_mesh;
 };

@@ -100,6 +100,7 @@
     <ClCompile Include="ImageAtlas.cpp" />
     <ClCompile Include="JargFont.cpp" />
     <ClCompile Include="JargShader.cpp" />
+    <ClCompile Include="JButton.cpp" />
     <ClCompile Include="JRectangle.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -114,6 +115,8 @@
     <ClCompile Include="TreeSphere.cpp" />
     <ClCompile Include="ColorExtender.cpp" />
     <ClCompile Include="VertexPositionTexture.cpp" />
+    <ClCompile Include="Win.cpp" />
+    <ClCompile Include="WinS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="binary_triangle_tree.h" />
@@ -131,6 +134,7 @@
     <ClInclude Include="ImageAtlas.h" />
     <ClInclude Include="JargFont.h" />
     <ClInclude Include="JargShader.h" />
+    <ClInclude Include="JButton.h" />
     <ClInclude Include="JRectangle.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Material.h" />
@@ -146,6 +150,9 @@
     <ClInclude Include="TreeSphere.h" />
     <ClInclude Include="ColorExtender.h" />
     <ClInclude Include="VertexPositionTexture.h" />
+    <ClInclude Include="WComponent.h" />
+    <ClInclude Include="Win.h" />
+    <ClInclude Include="WinS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

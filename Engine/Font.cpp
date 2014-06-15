@@ -153,7 +153,7 @@ bool Font::CreateFromConfig( std::string configFileName )
 // 	configFile.close();
 
 	FT_New_Face( library, "fonts\\arial.ttf", 0, &face);
-	FT_Set_Char_Size( face, 14 << 6, 14 << 6, 96, 96);
+	FT_Set_Char_Size(face, 0, 9*64,  96 ,  96);
 
 	std::string glyphList = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890 ";
 	GenerateGlyphsList(glyphList);
@@ -241,6 +241,7 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 	}
 
 	glyphBitmap.offsetDown = bitmap_glyph->top - bitmap.rows;
+	glyphBitmap.bitmap->BlackToWhite();
 
 	return true;
 }

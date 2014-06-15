@@ -36,6 +36,9 @@ public:
 	{
 		return data;
 	}
+
+	void BlackToWhite();
+
 	unsigned int GetWidth() const
 	{
 		return width;
