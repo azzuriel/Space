@@ -2,6 +2,7 @@
 #include "GameTimer.h"
 #include <vector>
 #include <list>
+#include "Mouse.h"
 
 WinS::WinS()
 {
@@ -19,10 +20,9 @@ WinS::WinS(Batched* sb_, const Font& fnt)
 
 WinS::~WinS()
 {
-	if(windows.size() > 0){
-		for(int i=0 ;i< windows.size(); i++){
+	if(windows.size() > 0) {
+		for(int i=0 ;i< windows.size(); i++)
 			delete windows.at(i);
-		}
 	}
 	windows.clear();
 
@@ -32,18 +32,17 @@ WinS::~WinS()
 void WinS::Draw()
 {
 	if(windows.size() > 0) {
-		for (int i =0; i< windows.size(); i++) {
+		for (int i =0; i< windows.size(); i++)
 			windows.at(i)->Draw();
-		}
 	}
 }
 
-void WinS::ToTop(Win* w){
+void WinS::ToTop(Win* w) {
 	std::vector<Win*>::iterator iter;
 	bool b = false;
 	int i =0;
-	for (iter = windows.begin() ; iter != --windows.end(); ++iter){
-		if(*iter == w || b){
+	for (iter = windows.begin() ; iter != --windows.end(); ++iter) {
+		if(*iter == w || b) {
 			Win* temp = w;
 			windows[i] = windows[i+1];
 			windows[i+1] = temp;
@@ -53,17 +52,23 @@ void WinS::ToTop(Win* w){
 	}
 }
 
-void WinS::Update(GameTimer gt){
+void WinS::Update(GameTimer gt) {
 	MouseHooked = false;
+
+  KeyboardHooked = false;
+  if(windows.size() > 0)
+    windows[windows.size() - 1]->Update();
+  KeyboardHooked = true;
+
 	if(windows.size() > 0) {
-		for (int i =windows.size() - 1; i >= 0; i--) {
+		for (int i =windows.size() - 2; i >= 0; i--)
 			windows[i]->Update();
-		}
 	}
 }
 
 std::vector<Win*> WinS::windows;
 
+bool WinS::KeyboardHooked;
 bool WinS::MouseHooked;
 const Font* WinS::font;
 Texture* WinS::bp;

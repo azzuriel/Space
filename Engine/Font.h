@@ -67,6 +67,7 @@ public:
 	~Font();
 	std::string name;
 	Texture* tex;
+  int blankX, blankY;
 
 	bool Initialize();
 

@@ -6,6 +6,8 @@
 #include <string>
 #include "glm.hpp"
 #include "TextGeometry.h"
+#include "WinS.h"
+#include <functional>
 
 class JButton : public WComponent
 {
@@ -20,6 +22,7 @@ public:
 	void SetText(std::string s);
 	WContainer* parent;
 	TextGeometry* text;
+	std::function<void()> onPress;
 private:
 	glm::vec2 pos;
 	glm::vec2 size;

@@ -44,6 +44,8 @@ public:
 	void Initialize(const JargShader* tex, const JargShader* col);
 
 	void DrawString(glm::vec2 pos, std::string text, const Font& font);
+	void DrawString(glm::vec2 pos, std::string text, vec3 col, const Font& font);
+	void DrawString(glm::vec2 pos, std::string text, vec4 col, const Font& font);
 	void DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub);
 	void DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, int atl);
 	void DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex);
@@ -51,8 +53,9 @@ public:
 	void DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col);
 	void DrawRectangle(glm::vec2 from, glm::vec2 to, glm::vec4 col);
 	void DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col);
-	void GetStringData(glm::vec2 pos, std::string text, const Font& font, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
-	void DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
+	vec2 GetStringData(glm::vec2 pos, std::string text, vec4 col, const Font& font, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
+  vec2 GetStringData(glm::vec2 pos, std::string text, vec4 col, int fixer, const Font& font, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
+  void DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
 	int RenderFinally();
 	int RenderFinallyWorld();
 

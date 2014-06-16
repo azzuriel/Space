@@ -38,14 +38,24 @@ void JButton::Draw() const
 	sb.DrawLine(glm::vec2(Pos.x, Pos.y + size.y), Pos + size, 2, col);
 	sb.DrawLine(glm::vec2(Pos.x + size.x, Pos.y), Pos + size, 2, col);
 
-	text->DrawAt(Pos);
+	text->DrawAt(atCenter(text->Size, Pos, size));
 }
 
 void JButton::Update()
 {
+	if(WinS::MouseHooked){
+		aimed = false;
+		return;
+	}
+
 	glm::vec2 wpos = GlobalPos();
-	if(inLims(Mouse::GetCursorPos(), wpos, wpos + size)){
+	if(inLimsV(Mouse::GetCursorPos(), wpos, wpos + size)){
 		aimed = true;
+		if(Mouse::IsLeftPressed()){
+			if(onPress){
+				onPress();
+			}
+		}
 	} else {
 		aimed = false;
 	}

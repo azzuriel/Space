@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Font.h"
+#include "glm.hpp"
 class TextGeometry
 {
 public:
@@ -12,7 +13,11 @@ public:
 	std::string getText() const;
 	void setText(std::string s);
 	void DrawAt(glm::vec2 pos);
+  void append(std::string s);
+  void setFixer(int width);
+	glm::vec2 Size;
 private:
+  int fixer;
 	const Font* f;
 	glm::vec2* uv;
 	glm::vec3* vertex;

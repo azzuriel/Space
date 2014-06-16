@@ -1,4 +1,5 @@
 #include "Keyboard.h"
+#include <deque>
 
 int Keyboard::sm_keys[GLFW_KEY_LAST];
 
@@ -10,10 +11,22 @@ void Keyboard::Initialize()
 	}
 }
 
+int Keyboard::EnquePressed(){
+  if(pressedQueue.size() > 0){
+    int t = pressedQueue.front();
+    pressedQueue.pop_front();
+    return t;
+  }
+  return -1;
+}
+
 
 void Keyboard::SetKey( int key, int scancode, int action, int mods )
 {
 	sm_keys[key] = action;
+  if(action == GLFW_PRESS) {
+    pressedQueue.push_back(key);
+  }
 }
 
 bool Keyboard::isKeyPress( int key )
@@ -39,3 +52,5 @@ bool Keyboard::isKeyDown( int key )
 		return true;
 	return false;
 }
+
+std::deque<int> Keyboard::pressedQueue;

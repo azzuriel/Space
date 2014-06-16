@@ -59,6 +59,8 @@ public:
 	static bool IsRightPressed();
 	static bool IsLeftPressed();
 	static void Update();
+  static bool IsRightDown();
+  static bool IsLeftDown();
 };
 
 

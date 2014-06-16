@@ -103,6 +103,7 @@
     <ClCompile Include="JButton.cpp" />
     <ClCompile Include="JLabel.cpp" />
     <ClCompile Include="JRectangle.cpp" />
+    <ClCompile Include="JTextBox.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="JButton.h" />
     <ClInclude Include="JLabel.h" />
     <ClInclude Include="JRectangle.h" />
+    <ClInclude Include="JTextBox.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />

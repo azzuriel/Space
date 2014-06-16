@@ -147,12 +147,30 @@ void Mouse::WindowFocus( int focused )
 
 bool Mouse::IsRightPressed()
 {
-	return sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS;
+  if(sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS) {
+    sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] = GLFW_REPEAT;
+    return true;
+  }
+  return false;
+}
+
+bool Mouse::IsLeftDown()
+{
+  return sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS || sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_REPEAT;
+}
+
+bool Mouse::IsRightDown()
+{
+  return sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS || sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_REPEAT;
 }
 
 bool Mouse::IsLeftPressed()
 {
-	return sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS;
+  if(sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS) {
+    sm_buttons[GLFW_MOUSE_BUTTON_LEFT] = GLFW_REPEAT;
+    return true;
+  }
+  return false;
 }
 
 glm::vec2 Mouse::GetCursorDelta()

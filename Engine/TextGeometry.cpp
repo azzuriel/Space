@@ -1,23 +1,44 @@
 #include "TextGeometry.h"
 #include "WinS.h"
-TextGeometry::TextGeometry(std::string text, const Font &font)
+#include "glm.hpp"
+TextGeometry::TextGeometry(std::string text, const Font &font) :
+	color(nullptr),
+	vertex(nullptr),
+	uv(nullptr),
+  index(nullptr),
+  fixer(1000)
 {
 	f = &font;
 	setText(text);
 }
 
-TextGeometry::TextGeometry(std::string text)
+TextGeometry::TextGeometry(std::string text) :
+	color(nullptr),
+	vertex(nullptr),
+	uv(nullptr),
+  index(nullptr),
+  fixer(1000)
 {
 	f = WinS::font;
 	setText(text);
 }
 
-TextGeometry::TextGeometry(const Font &font)
+TextGeometry::TextGeometry(const Font &font) :
+	color(nullptr),
+	vertex(nullptr),
+	uv(nullptr),
+  index(nullptr),
+  fixer(1000)
 {
 	f = &font;
 }
 
-TextGeometry::TextGeometry()
+TextGeometry::TextGeometry() :
+	color(nullptr),
+	vertex(nullptr),
+	uv(nullptr),
+	index(nullptr),
+  fixer(1000)
 {
 	f = WinS::font;
 }
@@ -55,10 +76,24 @@ void TextGeometry::setText(std::string s)
 	cou = 0;
 
 	text = s;
-	WinS::sb->GetStringData(vec2(0), s, *f, vertex, uv, color, index, cou);
+	Size = WinS::sb->GetStringData(vec2(0), s, Colors::White, fixer, *f, vertex, uv, color, index, cou);
 }
 
 void TextGeometry::DrawAt(glm::vec2 pos)
 {
 	WinS::sb->DrawStored(pos, *WinS::font->tex, vertex, uv, color, index, cou);
+}
+
+void TextGeometry::append(std::string s)
+{
+  setText(text.append(s));
+}
+
+/************************************************************************/
+/* maximum width in pixels                                                                     */
+/************************************************************************/
+void TextGeometry::setFixer(int width)
+{
+  fixer = width;
+  setText(text);
 }

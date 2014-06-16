@@ -114,6 +114,9 @@
     <ClCompile Include="TextGeometry.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="JTextBox.cpp">
+      <Filter>Ws</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassicNoise.h">
@@ -223,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="TextGeometry.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="JTextBox.h">
+      <Filter>Ws</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

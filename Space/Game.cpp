@@ -12,12 +12,12 @@
 #include "../Engine/SphereTesselator.h"
 #include "../Engine/Material.h"
 #include <glm.hpp>
-#ifdef LINUX
+#ifdef __linux__
 #include <unistd.h>
-#endif
+#endif /* __linux__ */
 #ifdef _WIN32
 #include <windows.h>
-#endif
+#endif /* _WIN32 */
 #include <math.h>
 #include "../Engine/TreeSphere.h"
 #include "ROAMgrid.h"
@@ -28,36 +28,7 @@
 #include "../Engine/WinS.h"
 #include "../Engine/JButton.h"
 #include "../Engine/JLabel.h"
-
-void KeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
-{
-	Keyboard::SetKey(key, scancode, action, mods);
-}
-
-void CursorPosCallbackGLFW3(GLFWwindow *window, double xpos, double ypos)
-{
-	Mouse::SetCursorPos(xpos, ypos);
-}
-
-void CursorClientAreaCallbackGLFW3(GLFWwindow *window, int entered)
-{
-	Mouse::CursorClientArea(entered);
-}
-
-void SetWindowSizeCallbackGLFW3(GLFWwindow* window, int a, int b){
-	Game::Resize(a, b);
-	Mouse::SetWindowSize(a, b);
-}
-
-void SetMouseButtonCallbackGLFW3(GLFWwindow *window, int a, int b, int c)
-{
-	Mouse::SetButton(a, b, c);
-}
-
-void WindowFocusCallbackGLFW3(GLFWwindow *window, int focused)
-{
-	Mouse::WindowFocus(focused);
-}
+#include "../Engine/JTextBox.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -67,13 +38,13 @@ void errorCallbackGLFW3(int error, const char* description)
 
 Game::Game(void)
 {
-	srand(1);
-	Running = true;
+  srand(1);
+  Running = true;
 
 	title = "Game";
 	width = 1024;
-	height = 600;
-	fullscreen = false;
+  height = 600;
+  fullscreen = false;
 }
 
 Game::~Game(void)
@@ -83,11 +54,11 @@ Game::~Game(void)
 
 int Game::Initialize()
 {
-	google::InitGoogleLogging("Jarg.exe");
-	google::SetLogFilenameExtension(".log.");
-	google::SetLogDestination(google::INFO, "logs/space");
+  google::InitGoogleLogging("Jarg.exe");
+  google::SetLogFilenameExtension(".log.");
+  google::SetLogDestination(google::INFO, "logs/space");
 	LOG(INFO) << "Jarg initialization start";
-	glfwSetErrorCallback(errorCallbackGLFW3);
+  glfwSetErrorCallback(errorCallbackGLFW3);
 
 	int glfwErrorCode = glfwInit();
 	if (!glfwErrorCode)
@@ -96,7 +67,7 @@ int Game::Initialize()
 		return glfwErrorCode;
 	}
 
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	//glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Game::MAJOR_GL);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Game::MINOR_Gl);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -108,9 +79,9 @@ int Game::Initialize()
 	}
 
 	window = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
-	if (!window)
+  if (!window)
 	{
-		glfwTerminate();
+    glfwTerminate();
 		LOG(FATAL) << "Ошибка создания окна GLFW.";
 		return false;
 	}
@@ -130,21 +101,21 @@ int Game::Initialize()
 	int glVersion[2] = {-1, -1};
 	glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
 	glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
-	LOG(INFO) << "OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
+  LOG(INFO) << "OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
 	LOG(INFO) << "glfw: " << glfwGetVersionString();
 	
 
 	Keyboard::Initialize();
-	glfwSetKeyCallback(window, KeyCallbackGLFW3);
+	glfwSetKeyCallback(window, [](GLFWwindow *win, int key, int scancode, int action, int mods){Keyboard::SetKey(key, scancode, action, mods);});
 
 	Mouse::Initialize(window);
 	Mouse::SetWindowSize(width, height);
 //	Mouse::SetFixedPosState(true);
-	glfwSetCursorPosCallback(window, CursorPosCallbackGLFW3);
-	glfwSetCursorEnterCallback(window, CursorClientAreaCallbackGLFW3);	
-	glfwSetWindowFocusCallback(window, WindowFocusCallbackGLFW3);
-	glfwSetMouseButtonCallback(window, SetMouseButtonCallbackGLFW3);
-	glfwSetWindowSizeCallback(window, SetWindowSizeCallbackGLFW3);
+	glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xpos, double ypos){Mouse::SetCursorPos(xpos, ypos);});
+	glfwSetCursorEnterCallback(window, [](GLFWwindow *window, int entered){Mouse::CursorClientArea(entered);});	
+	glfwSetWindowFocusCallback(window, [](GLFWwindow *window, int focused){Mouse::WindowFocus(focused);});
+	glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int a, int b, int c){Mouse::SetButton(a, b, c);});
+	glfwSetWindowSizeCallback(window, [](GLFWwindow *window, int a, int b){Game::Resize(a, b); Mouse::SetWindowSize(a, b);});
 	wire = 0;
 
 	//*******************************
@@ -165,7 +136,7 @@ int Game::Initialize()
 void PointLightSetup(GLuint program, const PointLight &light)
 {
 	// установка параметров
-	glUniform4fv(glGetUniformLocation(program, "light.position"),    1, &light.position[0]);
+  glUniform4fv(glGetUniformLocation(program, "light.position"),    1, &light.position[0]);
 	glUniform4fv(glGetUniformLocation(program, "light.ambient"),     1, &light.ambient[0]);
 	glUniform4fv(glGetUniformLocation(program, "light.diffuse"),     1, &light.diffuse[0]);
 	glUniform4fv(glGetUniformLocation(program, "light.specular"),    1, &light.specular[0]);
@@ -183,10 +154,10 @@ void MaterialSetup(GLuint program, const Material &material)
 	glUniform1i(glGetUniformLocation(program, "material.normal"), 1);
 
 	// установка параметров
-	glUniform4fv(glGetUniformLocation(program, "material.ambient"),  1, &material.ambient[0]);
-	glUniform4fv(glGetUniformLocation(program, "material.diffuse"),  1, &material.diffuse[0]);
-	glUniform4fv(glGetUniformLocation(program, "material.specular"), 1, &material.specular[0]);
-	glUniform4fv(glGetUniformLocation(program, "material.emission"), 1, &material.emission[0]);
+  glUniform4fv(glGetUniformLocation(program, "material.ambient"),   1, &material.ambient[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.diffuse"),   1, &material.diffuse[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.specular"),  1, &material.specular[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.emission"),  1, &material.emission[0]);
 
 	glUniform1fv(glGetUniformLocation(program, "material.shininess"), 1, &material.shininess);
 }
@@ -217,6 +188,7 @@ void Game::Run()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 1);
 	//glEnable(GL_SMOOTH);
+  Mouse::IsLeftPressed();
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
 	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
@@ -313,14 +285,19 @@ void Game::Run()
 		w = new Win(glm::vec2(100 +i*5, 100 +i*5), glm::vec2(200,200));
 		ws->windows.push_back(w);
 
+		JLabel* jl = new JLabel(glm::vec2(20,20));
+		jl->parent = w;
+		jl->text->setText( "qwertyuiopasdfghjklzxcvbnm");
+		w->Items.push_back(jl);
+
+    JTextBox* jt = new JTextBox(glm::vec2(20,40), glm::vec2(160,160));
+    jt->parent = w;
+    w->Items.push_back(jt);
+
 		JButton* jb = new JButton(glm::vec2(10,100), glm::vec2(50,20));
 		jb->parent = w;
 		w->Items.push_back(jb);
-
-		JLabel* jl = new JLabel(glm::vec2(20,20));
-		jl->parent = w;
-		jl->text->setText( "qwertyuiopasdfghjklzxcvbnm\nQWERTYUIOPASDFGHJKLZXCVBNM\n1234567890\n ()_+{}[]\',.<>/?");
-		w->Items.push_back(jl);
+		jb->onPress = [=](){ jl->text->setText(jl->text->getText().append("1 "));};
 	}
 
     int iters = 0;
@@ -477,7 +454,7 @@ void Game::Run()
 		ws->Draw();
 
 		sb->DrawQuad(vec2(100,100),vec2(100,100), *font->tex);
-		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), *font);		
+		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
 		sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
 
 		int dc = sb->RenderFinallyWorld();
