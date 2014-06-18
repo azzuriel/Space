@@ -1,5 +1,5 @@
-#include <memory>
 #include "Game.h"
+#include <memory>
 
 int main()
 {

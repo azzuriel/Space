@@ -5,8 +5,8 @@ TextGeometry::TextGeometry(std::string text, const Font &font) :
 	color(nullptr),
 	vertex(nullptr),
 	uv(nullptr),
-  index(nullptr),
-  fixer(1000)
+	index(nullptr),
+	fixer(1000)
 {
 	f = &font;
 	setText(text);
@@ -16,8 +16,8 @@ TextGeometry::TextGeometry(std::string text) :
 	color(nullptr),
 	vertex(nullptr),
 	uv(nullptr),
-  index(nullptr),
-  fixer(1000)
+	index(nullptr),
+	fixer(1000)
 {
 	f = WinS::font;
 	setText(text);
@@ -27,8 +27,8 @@ TextGeometry::TextGeometry(const Font &font) :
 	color(nullptr),
 	vertex(nullptr),
 	uv(nullptr),
-  index(nullptr),
-  fixer(1000)
+	index(nullptr),
+	fixer(1000)
 {
 	f = &font;
 }
@@ -38,7 +38,7 @@ TextGeometry::TextGeometry() :
 	vertex(nullptr),
 	uv(nullptr),
 	index(nullptr),
-  fixer(1000)
+	fixer(1000)
 {
 	f = WinS::font;
 }
@@ -86,7 +86,7 @@ void TextGeometry::DrawAt(glm::vec2 pos)
 
 void TextGeometry::append(std::string s)
 {
-  setText(text.append(s));
+	setText(text.append(s));
 }
 
 /************************************************************************/
@@ -94,6 +94,6 @@ void TextGeometry::append(std::string s)
 /************************************************************************/
 void TextGeometry::setFixer(int width)
 {
-  fixer = width;
-  setText(text);
+	fixer = width;
+	setText(text);
 }

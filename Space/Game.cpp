@@ -29,22 +29,45 @@
 #include "../Engine/JButton.h"
 #include "../Engine/JLabel.h"
 #include "../Engine/JTextBox.h"
+#include <btBulletDynamicsCommon.h>
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include "debugDraw.h"
+#include "../Engine/DynamicObject.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
 	LOG(ERROR) << description;
 }
 
+std::string string_format(const std::string fmt_str, ...) {
+	int final_n, n = ((int)fmt_str.size()) * 2; 
+	std::string str;
+	std::unique_ptr<char[]> formatted;
+	va_list ap;
+	while(1) {
+		formatted.reset(new char[n]); 
+		strcpy(&formatted[0], fmt_str.c_str());
+		va_start(ap, fmt_str);
+		final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), ap);
+		va_end(ap);
+		if (final_n < 0 || final_n >= n)
+			n += abs(final_n - n + 1);
+		else
+			break;
+	}
+	return std::string(formatted.get());
+}
+
 
 Game::Game(void)
 {
-  srand(1);
-  Running = true;
+	srand(1);
+	Running = true;
 
 	title = "Game";
 	width = 1024;
-  height = 600;
-  fullscreen = false;
+	height = 600;
+	fullscreen = false;
 }
 
 Game::~Game(void)
@@ -54,11 +77,11 @@ Game::~Game(void)
 
 int Game::Initialize()
 {
-  google::InitGoogleLogging("Jarg.exe");
-  google::SetLogFilenameExtension(".log.");
-  google::SetLogDestination(google::INFO, "logs/space");
+	google::InitGoogleLogging("Jarg.exe");
+	google::SetLogFilenameExtension(".log.");
+	google::SetLogDestination(google::INFO, "logs/space");
 	LOG(INFO) << "Jarg initialization start";
-  glfwSetErrorCallback(errorCallbackGLFW3);
+	glfwSetErrorCallback(errorCallbackGLFW3);
 
 	int glfwErrorCode = glfwInit();
 	if (!glfwErrorCode)
@@ -79,9 +102,9 @@ int Game::Initialize()
 	}
 
 	window = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
-  if (!window)
+	if (!window)
 	{
-    glfwTerminate();
+		glfwTerminate();
 		LOG(FATAL) << "Ошибка создания окна GLFW.";
 		return false;
 	}
@@ -101,16 +124,16 @@ int Game::Initialize()
 	int glVersion[2] = {-1, -1};
 	glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
 	glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
-  LOG(INFO) << "OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
+	LOG(INFO) << "OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
 	LOG(INFO) << "glfw: " << glfwGetVersionString();
-	
+
 
 	Keyboard::Initialize();
 	glfwSetKeyCallback(window, [](GLFWwindow *win, int key, int scancode, int action, int mods){Keyboard::SetKey(key, scancode, action, mods);});
 
 	Mouse::Initialize(window);
 	Mouse::SetWindowSize(width, height);
-//	Mouse::SetFixedPosState(true);
+	//	Mouse::SetFixedPosState(true);
 	glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xpos, double ypos){Mouse::SetCursorPos(xpos, ypos);});
 	glfwSetCursorEnterCallback(window, [](GLFWwindow *window, int entered){Mouse::CursorClientArea(entered);});	
 	glfwSetWindowFocusCallback(window, [](GLFWwindow *window, int focused){Mouse::WindowFocus(focused);});
@@ -136,7 +159,7 @@ int Game::Initialize()
 void PointLightSetup(GLuint program, const PointLight &light)
 {
 	// установка параметров
-  glUniform4fv(glGetUniformLocation(program, "light.position"),    1, &light.position[0]);
+	glUniform4fv(glGetUniformLocation(program, "light.position"),    1, &light.position[0]);
 	glUniform4fv(glGetUniformLocation(program, "light.ambient"),     1, &light.ambient[0]);
 	glUniform4fv(glGetUniformLocation(program, "light.diffuse"),     1, &light.diffuse[0]);
 	glUniform4fv(glGetUniformLocation(program, "light.specular"),    1, &light.specular[0]);
@@ -154,7 +177,7 @@ void MaterialSetup(GLuint program, const Material &material)
 	glUniform1i(glGetUniformLocation(program, "material.normal"), 1);
 
 	// установка параметров
-  glUniform4fv(glGetUniformLocation(program, "material.ambient"),   1, &material.ambient[0]);
+	glUniform4fv(glGetUniformLocation(program, "material.ambient"),   1, &material.ambient[0]);
 	glUniform4fv(glGetUniformLocation(program, "material.diffuse"),   1, &material.diffuse[0]);
 	glUniform4fv(glGetUniformLocation(program, "material.specular"),  1, &material.specular[0]);
 	glUniform4fv(glGetUniformLocation(program, "material.emission"),  1, &material.emission[0]);
@@ -188,7 +211,7 @@ void Game::Run()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 1);
 	//glEnable(GL_SMOOTH);
-  Mouse::IsLeftPressed();
+	Mouse::IsLeftPressed();
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
 	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
@@ -245,12 +268,12 @@ void Game::Run()
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
-	auto m = Tesselator::SphereTesselate(2, Cube::getMesh());
+	auto m = Tesselator::SphereTesselate(2, Icosahedron::getMesh());
 	//m->loadOBJ("Data\\untitled.obj");
 	m->Bind();
 	m->Shader = BasicShader.get();
 	m->Texture = &test;
-	m->World = glm::scale(Identity, vec3(8.5,8.5,8.5));
+	m->World = glm::scale(Identity, vec3(3,3,3));
 
 	auto plane =Tesselator::Tesselate(5, Quad::GetMesh());
 	plane->Bind();
@@ -259,8 +282,8 @@ void Game::Run()
 	plane->World = glm::rotate(Identity, (float)(3.1415/2.0), vec3(1.0,0.0,0.0));
 	plane->World = glm::translate(plane->World, vec3(0.0,0.0,10.0));
 	plane->World = glm::scale(plane->World, vec3(80.5,80.5,80.5));
-	
-	auto cube = new Mesh(Cube::getMesh());
+
+	auto cube = new Mesh(Icosahedron::getMesh());
 	cube->Bind();
 	cube->Shader = BasicShader.get();
 	cube->Texture = &test;
@@ -278,37 +301,56 @@ void Game::Run()
 	if(!font->Create("font.json")){
 		LOG(ERROR) << "failed to load\process font.json";
 	}
-	
+
 	WinS* ws = new WinS(sb.get(), *font);
 	Win* w;
-	for(int i = 0; i< 30; i++) {
-		w = new Win(glm::vec2(100 +i*5, 100 +i*5), glm::vec2(200,200));
+
+	w = new Win(glm::vec2(100, 100), glm::vec2(200,200), glm::vec4(0,1,0,1));
+	ws->windows.push_back(w);
+
+	auto broadphase = std::unique_ptr<btDbvtBroadphase>(new btDbvtBroadphase());
+	auto collisionConfiguration = std::unique_ptr<btDefaultCollisionConfiguration>(new btDefaultCollisionConfiguration());
+	auto dispatcher = std::unique_ptr<btCollisionDispatcher>(new btCollisionDispatcher(collisionConfiguration.get()));
+	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher.get());
+	auto solver = std::unique_ptr<btSequentialImpulseConstraintSolver>(new btSequentialImpulseConstraintSolver);
+	auto dynamicsWorld = std::unique_ptr<btDiscreteDynamicsWorld>(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
+	dynamicsWorld->setGravity(btVector3(0,0,0));
+	auto drawer = std::unique_ptr<GLDebugDrawer>(new GLDebugDrawer());
+	drawer->setDebugMode(true);
+	dynamicsWorld->setDebugDrawer(drawer.get());
+	drawer->SetBatched(sb.get());
+
+	auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
+	sphere->bpRegister(dynamicsWorld.get());
+
+	for(int i = 1; i< 10; i++) {
+		w = new Win(glm::vec2(100 +i*25, 100 +i*25), glm::vec2(200,200), glm::vec4(0,0,0,1));
 		ws->windows.push_back(w);
 
-		JLabel* jl = new JLabel(glm::vec2(20,20));
-		jl->parent = w;
-		jl->text->setText( "qwertyuiopasdfghjklzxcvbnm");
-		w->Items.push_back(jl);
+		//JLabel* jl = new JLabel(glm::vec2(20,20));
+		//jl->parent = w;
+		//jl->text->setText( "qwertyuiopasdfghjklzxcvbnm");
+		//w->Items.push_back(jl);
 
-    JTextBox* jt = new JTextBox(glm::vec2(20,40), glm::vec2(160,160));
-    jt->parent = w;
-    w->Items.push_back(jt);
+		JTextBox* jt = new JTextBox(glm::vec2(20,40), glm::vec2(140,140));
+		jt->parent = w;
+		w->Items.push_back(jt);
 
-		JButton* jb = new JButton(glm::vec2(10,100), glm::vec2(50,20));
-		jb->parent = w;
-		w->Items.push_back(jb);
-		jb->onPress = [=](){ jl->text->setText(jl->text->getText().append("1 "));};
+		//JButton* jb = new JButton(glm::vec2(10,100), glm::vec2(50,20));
+		//jb->parent = w;
+		//w->Items.push_back(jb);
+		//jb->onPress = [=](){ jl->text->setText(jl->text->getText().append("1 "));};
 	}
 
-    int iters = 0;
+	int iters = 0;
 	float sec = 0;
 
-// 	auto ts = std::unique_ptr<QuadLod>(new QuadLod());
-// 	ts->GenerateFrom(glm::vec3(0.0,0.0,0.0));
-// 	ts->m->World = Identity;
-// 	ts->m->Shader = BasicShader.get();
-// 	ts->m->Texture = &test;
-// 	ts->Bind();
+	// 	auto ts = std::unique_ptr<QuadLod>(new QuadLod());
+	// 	ts->GenerateFrom(glm::vec3(0.0,0.0,0.0));
+	// 	ts->m->World = Identity;
+	// 	ts->m->Shader = BasicShader.get();
+	// 	ts->m->Texture = &test;
+	// 	ts->Bind();
 
 	//auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
@@ -320,6 +362,7 @@ void Game::Run()
 		glShadeModel (GL_SMOOTH);
 		gt.Update(glfwGetTime());
 		fps.Update(gt);
+		dynamicsWorld->stepSimulation(gt.elapsed,10);
 
 		//glfwSetWindowTitle(window, a.c_str());
 
@@ -345,7 +388,7 @@ void Game::Run()
 			if(iters < 0){
 				iters = 0;
 			}
-			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
+			m = Tesselator::SphereTesselate(iters, Icosahedron::getMesh());
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
@@ -357,7 +400,7 @@ void Game::Run()
 			if(iters > 9){
 				iters = 9;
 			}
-			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
+			m = Tesselator::SphereTesselate(iters, Icosahedron::getMesh());
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
@@ -365,25 +408,37 @@ void Game::Run()
 		}
 
 		if(Keyboard::isKeyPress(GLFW_KEY_F2)){
-			switch(wire){
+		switch(wire){
 			case 0:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 				wire = 1;
 				break;	
-			//case 1:
-			//	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			//	wire = 2;
-			//	break;
-			default:
+			case 1:
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				wire = 2;
+				break;
+			case 2:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 				wire = 0;
 				break;
 			}
 		}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_F6)){
-			//surf->Test();
+		if(Keyboard::isKeyDown(GLFW_KEY_DOWN)){
+			sphere->fallRigidBody->applyCentralForce(btVector3(0,1,0).rotate(sphere->fallRigidBody->getOrientation().getAxis(), sphere->fallRigidBody->getOrientation().getAngle()));
+			sphere->fallRigidBody->activate();
 		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_RIGHT)){
+			sphere->fallRigidBody->applyTorque(btVector3(1,0,0));
+			sphere->fallRigidBody->activate();
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_LEFT)){
+			sphere->fallRigidBody->applyTorque(btVector3(-1,0,0));
+			sphere->fallRigidBody->activate();
+		}
+
 		if(Keyboard::isKeyDown(GLFW_KEY_F5)){
 			camera.SetLookAt(vec3(0,0,0.0F));
 		}
@@ -408,38 +463,28 @@ void Game::Run()
 		MVP = camera.VP() * model;
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
 
-		sec += gt.elapsed;
-		if(sec > 0.1) {
-			sec = 0;
-			//surf->UpdateCells(camera.position/100.0F);
-			//surf->Bind();
-		}
-
-// 		glActiveTexture(GL_TEXTURE0);
-// 		glBindTexture(GL_TEXTURE_2D, normalTexture);
-// 		glUniform1i(glGetUniformLocation(BasicShader->program, "normalMap"), 0);
-		//surf->Render(BasicShader.get());
-
-		m->World = glm::rotate(m->World, (float)gt.elapsed, normalize(vec3(2,1,3)));
+		btTransform trans;
+		sphere->fallRigidBody->getMotionState()->getWorldTransform(trans);
+		auto q = trans.getRotation();
+		auto t = trans.getOrigin();
+		auto vect = vec3(t.getX(),t.getY(),t.getZ());
+		camera.position = vect+vec3(2);
+		camera.SetLookAt(vect);
+		m->World = glm::translate(Identity, vect);
+		auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
+		m->World = glm::rotate(m->World, q.getAngle(), vecc);
+		m->World = glm::scale(m->World, vec3(1,1,1));
+		sb->DrawString(vec2(20,20), string_format("%f %f %f Velosity = %f", vect.x, vect.y, vect.z, sphere->fallRigidBody->getLinearVelocity().getY()), Colors::Red, *font);
 		m->Render();
 
 		plane->Render();
-// 		sec += gt.elapsed;
-// 		if(sec > 0.1) {
-// 			sec = 0;
-// 			delete ts->root;
-// 			ts->m->Indeces.clear();
-// 			ts->m->Verteces.clear();
-// 			ts->root = nullptr;
-// 			ts->GenerateFrom(vec3(pl.position));
-// 			ts->Bind();
-// 		}
-//		ts->Render();
-		//cube->World = glm::translate(Identity, vec3(pl.position.x, pl.position.y, pl.position.z));
-		//cube->World = glm::scale(cube->World, vec3(500,500,500));
-		//cube->Render();
 
-		
+		if(wire == 2) {
+			LinesShader->BindProgram();
+			glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
+			dynamicsWorld->debugDrawWorld();
+		}
+
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		MVP = camera.GetOrthoProjection();
@@ -448,17 +493,21 @@ void Game::Run()
 		LinesShader->BindProgram();
 		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
-		
+
 
 		ws->Update(gt);
 		ws->Draw();
 
-		sb->DrawQuad(vec2(100,100),vec2(100,100), *font->tex);
+		//sb->DrawQuad(vec2(100,100),vec2(100,100), *font->tex);
 		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
-		sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
+		//sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
 
+		LinesShader->BindProgram();
+		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
 		int dc = sb->RenderFinallyWorld();
- 		dc += sb->RenderFinally();
+
+		dc += sb->RenderFinally();
+		
 
 		glfwSetWindowTitle(window, std::to_string(dc).c_str());
 
@@ -466,15 +515,18 @@ void Game::Run()
 
 		//glFlush();
 		glfwSwapBuffers(window);
-		
+
 		glfwPollEvents();
-		
+
 		//std::this_thread::sleep_for(std::chrono::milliseconds(15));
 	}
 
 	delete m;
 	delete plane;
 	delete cube;
+
+	sphere->bpUnregister(dynamicsWorld.get());
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }

@@ -6,14 +6,26 @@
 #include <vector>
 
 
-Win::Win(void)
+Win::Win(void) :
+	size(100, 100),
+	pos(0),
+	col(0,0,0,0.75)
 {
 	text = new TextGeometry("azazazaadasdasd");
 }
 
 Win::Win(glm::vec2 p, glm::vec2 s) :
 	size(s),
-	pos(p)
+	pos(p),
+	col(0,0,0,0.75f)
+{
+	text = new TextGeometry("azazazaadasdasd");
+}
+
+Win::Win(glm::vec2 p, glm::vec2 s, glm::vec4 t_col) :
+	size(s),
+	pos(p),
+	col(t_col)
 {
 	text = new TextGeometry("azazazaadasdasd");
 }
@@ -34,15 +46,15 @@ void Win::Draw() const
 {
 	Batched& sb = *WinS::sb;
 	
-	sb.DrawRectangle(pos, size, glm::vec4(0.F,0.F,0.F,0.75F));
-	sb.DrawLine(pos, glm::vec2(pos.x, pos.y + size.y), 2, glm::vec4(1.F,1.F,1.F,0.5F));
+	sb.DrawRectangle(pos, size, col);
+	sb.DrawLine(pos, glm::vec2(pos.x, pos.y + size.y), 2, Colors::White);
 
 	sb.DrawLine(pos, glm::vec2(pos.x + size.x, pos.y), 2, Colors::White);
 	sb.DrawLine(pos + glm::vec2(0,20), glm::vec2(pos.x + size.x, pos.y + 20), 2, Colors::White);
 	sb.DrawLine(glm::vec2(pos.x, pos.y + size.y), pos + size, 2, Colors::White);
 	sb.DrawLine(glm::vec2(pos.x + size.x, pos.y), pos + size, 2, Colors::White);
 
-	text->DrawAt(atCenter(text->Size, pos, glm::vec2(size.x, 20)));
+	//text->DrawAt(atCenter(text->Size, pos, glm::vec2(size.x, 20)));
 
 	if(Items.size() > 0){
 		for(int i=0; i< Items.size(); i++){

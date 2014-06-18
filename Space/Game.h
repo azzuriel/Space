@@ -24,7 +24,7 @@ public:
 
 	static void Resize(int a, int b);
 
-	bool wire;
+	int wire;
 
 	static const int MAJOR_GL = 3, MINOR_Gl = 3;
 };

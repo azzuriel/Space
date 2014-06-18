@@ -27,7 +27,7 @@ bool Font::Initialize()
 	if (FT_Init_FreeType( &library ))
 	{
 		LOG(ERROR) << "FT_Init_FreeType ERROR";
-	    return false;
+		return false;
 	}
 	if(!GenerateEmptyGlyph())
 	{
@@ -78,8 +78,8 @@ bool Font::GenerateEmptyGlyph()
 	unsigned int w = glyphBitmap.bitmap->GetWidth();
 	unsigned int h = glyphBitmap.bitmap->GetHeight();
 
-  blankX = w;
-  blankY = h;
+	blankX = w;
+	blankY = h;
 
 	for(unsigned int i = 0; i < w; i++)
 	{
@@ -102,57 +102,57 @@ bool Font::GenerateEmptyGlyph()
 
 bool Font::CreateFromConfig( std::string configFileName )
 {
-// 	std::ifstream configFile(configFileName);
-// 	name = configFileName;
-// 
-// 	if (!configFile.is_open())
-// 	{
-// 		//LOG_WARNING("
-// 		return false;
-// 	}
-// 
-// 
-// 	Json::Value root;
-// 	Json::Reader reader;
-// 
-// 	bool parsingSuccessful = reader.parse( configFile, root );
-// 	if ( !parsingSuccessful )
-// 	{
-// 		configFile.close();
-// 		//LOG(FATAL) << configFile << " font config file corrupted.";
-// 		return false;
-// 	}
-// 
-// 	const Json::Value fontList = root["FontList"];
-// 	for ( unsigned int i = 0; i < fontList.size(); i++ )
-// 	{
-// 		std::string fontFileName = fontList[i].get("FileName", "").asString();
-// 		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
-// 		const Json::Value glyphs = fontList[i]["Glyphs"];
-// 
-// 		if (FT_New_Face( library, fontFileName.c_str(), 0, &face ))
-// 		{
-// 			configFile.close();
-// 			//LOG(FATAL) << fontFileName << " not opened. Font cant be build.";
-// 			return false;
-// 		}
-// 
-// 		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
-// 
-// 		for ( unsigned int j = 0; j < glyphs.size(); j++ )
-// 		{
-// 			std::string glyphList = glyphs[j].asString();
-// 			GenerateGlyphsList(glyphList);
-// 		}
-// 
-// 		if(face)
-// 		{
-// 			FT_Done_Face(face);
-// 			face = nullptr;
-// 		}
-// 	}
-// 
-// 	configFile.close();
+	// 	std::ifstream configFile(configFileName);
+	// 	name = configFileName;
+	// 
+	// 	if (!configFile.is_open())
+	// 	{
+	// 		//LOG_WARNING("
+	// 		return false;
+	// 	}
+	// 
+	// 
+	// 	Json::Value root;
+	// 	Json::Reader reader;
+	// 
+	// 	bool parsingSuccessful = reader.parse( configFile, root );
+	// 	if ( !parsingSuccessful )
+	// 	{
+	// 		configFile.close();
+	// 		//LOG(FATAL) << configFile << " font config file corrupted.";
+	// 		return false;
+	// 	}
+	// 
+	// 	const Json::Value fontList = root["FontList"];
+	// 	for ( unsigned int i = 0; i < fontList.size(); i++ )
+	// 	{
+	// 		std::string fontFileName = fontList[i].get("FileName", "").asString();
+	// 		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
+	// 		const Json::Value glyphs = fontList[i]["Glyphs"];
+	// 
+	// 		if (FT_New_Face( library, fontFileName.c_str(), 0, &face ))
+	// 		{
+	// 			configFile.close();
+	// 			//LOG(FATAL) << fontFileName << " not opened. Font cant be build.";
+	// 			return false;
+	// 		}
+	// 
+	// 		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
+	// 
+	// 		for ( unsigned int j = 0; j < glyphs.size(); j++ )
+	// 		{
+	// 			std::string glyphList = glyphs[j].asString();
+	// 			GenerateGlyphsList(glyphList);
+	// 		}
+	// 
+	// 		if(face)
+	// 		{
+	// 			FT_Done_Face(face);
+	// 			face = nullptr;
+	// 		}
+	// 	}
+	// 
+	// 	configFile.close();
 
 	FT_New_Face( library, "fonts\\arial.ttf", 0, &face);
 	FT_Set_Char_Size(face, 0, 9*64, 96 , 96);
@@ -211,14 +211,14 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
 	{
-		
+
 		return false;
 	}
 
 	FT_Glyph glyph;
 	if(FT_Get_Glyph( face->glyph, &glyph ))
 	{
-	
+
 		return false;
 	}
 
@@ -312,7 +312,7 @@ bool Font::GenerateOpenglGlyphs( std::string configFileName)
 	for (auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
 	{
 		(*i).second.texture.textureId = ogltexture;
-		
+
 	}
 
 	glyphsBitmapList.clear();
