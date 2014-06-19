@@ -77,7 +77,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -103,7 +103,9 @@
     <ClCompile Include="Icosahedron.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
     <ClCompile Include="JargFont.cpp" />
-    <ClCompile Include="JargShader.cpp" />
+    <ClCompile Include="JargShader.cpp">
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
+    </ClCompile>
     <ClCompile Include="JButton.cpp" />
     <ClCompile Include="JLabel.cpp" />
     <ClCompile Include="JRectangle.cpp" />

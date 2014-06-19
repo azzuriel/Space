@@ -166,6 +166,8 @@ void Mesh::Render()
 	if(Shader != nullptr) {
 		Shader->BindProgram();
 		glUniformMatrix4fv(Shader->vars[1], 1, GL_FALSE, &World[0][0]);
+		mat3 normal         = transpose(mat3(inverse(World)));
+		glUniformMatrix4fv(Shader->vars[2], 1, GL_FALSE, &normal[0][0]);
 	}
 	if(Texture != nullptr) {
 		glBindTexture(GL_TEXTURE_2D, Texture->textureId);

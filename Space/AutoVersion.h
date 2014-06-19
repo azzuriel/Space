@@ -2,7 +2,7 @@
 #define AutoVersion_h__ 
 #include <string>
 #define Ver "";
-#define Time "1402695989";
+#define Time "1403167570";
 class AutoVersion { 
 public: 
 	static std::string GetTitle();

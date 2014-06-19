@@ -57,8 +57,8 @@ public:
 	//Getting Functions
 	CameraType GetMode();
 	void GetViewport(int &loc_x, int &loc_y, int &width, int &height);
-	void GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M);
-	mat4 VP();
+	void GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M) const;
+	mat4 VP() const;
 	void SetWindowSize(int width, int height);
 	glm::mat4 GetOrthoProjection();
 	CameraType camera_mode;

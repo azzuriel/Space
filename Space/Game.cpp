@@ -167,18 +167,15 @@ void MaterialSetup(GLuint program, const Material &material)
 	glUniform1fv(glGetUniformLocation(program, "material.shininess"), 1, &material.shininess);
 }
 
+
 void CameraSetup(GLuint program, Camera &camera, const mat4 &model, const mat4 &mvp)
 {
-	// расчитаем необходимые матрицы
-	//mat4 view           = glm::rotate(camera.rotation) * glm::translate(view, -camera.position);
-	mat3 normal         = transpose(mat3(inverse(mat4(1.0f))));
+	mat3 normal = transpose(mat3(inverse(mat4(1.0f))));
 
-	// передаем матрицы в шейдерную программу
-	glUniformMatrix4fv(glGetUniformLocation(program, "transform.model"),          1, GL_TRUE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "transform.model"), 1, GL_TRUE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "transform.viewProjection"), 1, GL_FALSE, &mvp[0][0]);
-	glUniformMatrix3fv(glGetUniformLocation(program, "transform.normal"),         1, GL_TRUE, &normal[0][0]);
+	glUniformMatrix3fv(glGetUniformLocation(program, "transform.normal"), 1, GL_TRUE, &normal[0][0]);
 
-	// передаем позицию наблюдател€ (камеры) в шейдерную программу
 	glUniform3fv(glGetUniformLocation(program, "transform.viewPosition"), 1, &camera.position[0]);
 }
 
@@ -200,7 +197,8 @@ void Game::Run()
 	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
 	BasicShader->Link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
-	auto worldID = BasicShader->LocateVars("transform.model");
+	auto worldID = BasicShader->LocateVars("transform.model"); //var1
+	BasicShader->LocateVars("transform.normal"); //var2
 	auto innerT = BasicShader->LocateVars("InnerLevel"); int camTest = 2;
 	glUniform1i(innerT, camTest);
 	auto outerT = BasicShader->LocateVars("OuterLevel"); int outerLevel = 2;
@@ -213,6 +211,7 @@ void Game::Run()
 	Texture hm;
 	hm.Load("face.png");
 
+	BasicShader->BindProgram();
 	Material mat;
 	mat.texture = test.textureId;
 	mat.normal = hm.textureId;
@@ -225,11 +224,11 @@ void Game::Run()
 	MaterialSetup(BasicShader->program, mat);
 
 	PointLight pl;
-	pl.position = vec4(30.0f, 30.0f, 30.0f, 1.0f);
+	pl.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
 	pl.ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	pl.attenuation = vec3(0.0001f, 0.0001f, 0.0001f);
+	pl.attenuation = vec3(0.005f, 0.0f, 0.0002f);
 
 	PointLightSetup(BasicShader->program, pl);
 
@@ -305,7 +304,9 @@ void Game::Run()
 	auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
 	sphere->bpRegister(dynamicsWorld.get());
 
-	for(int i = 1; i< 10; i++) {
+	float rotated = 0;
+
+	for(int i = 1; i< 1; i++) {
 		w = new Win(glm::vec2(100 +i*25, 100 +i*25), glm::vec2(200,200), glm::vec4(0,0,0,1));
 		ws->windows.push_back(w);
 
@@ -411,6 +412,10 @@ void Game::Run()
 			sphere->fallRigidBody->activate();
 		}
 
+		if(Keyboard::isKeyDown(GLFW_KEY_UP)){
+			sphere->fallRigidBody->setLinearVelocity(btVector3(0,0,0));
+		}
+
 		if(Keyboard::isKeyDown(GLFW_KEY_RIGHT)){
 			sphere->fallRigidBody->applyTorque(btVector3(1,0,0));
 			sphere->fallRigidBody->activate();
@@ -433,11 +438,9 @@ void Game::Run()
 
 		//camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
-		pl.position = vec4(50.0f,50.0f,50.0f,1.0f)*m->World;
+
 
 		auto mpos = Mouse::GetCursorPos();
-		PointLightSetup(BasicShader->program, pl);
-		MaterialSetup(BasicShader->program, mat);
 
 		BasicShader->BindProgram();
 
@@ -452,16 +455,20 @@ void Game::Run()
 		auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
 		m->World = glm::rotate(m->World, q.getAngle(), vecc);
 		m->World = glm::scale(m->World, vec3(1,1,1));
+		pl.position = vec4(sin(rotated)*15, 2, cos(rotated)*15,1);
+		rotated+=gt.elapsed;
 
 
 		camera.Update();
 		MVP = camera.VP() * model;
+
+		PointLightSetup(BasicShader->program, pl);
+		MaterialSetup(BasicShader->program, mat);
 		CameraSetup(BasicShader->program, camera, m->World, MVP);
-
-		sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
+		////////////////////////////////////////////////////////////////////////// WORLD PLACE
 		m->Render();
-
 		plane->Render();
+		//////////////////////////////////////////////////////////////////////////
 
 		if(wire == 2) {
 			LinesShader->BindProgram();
@@ -482,9 +489,8 @@ void Game::Run()
 		ws->Update(gt);
 		ws->Draw();
 
-		//sb->DrawQuad(vec2(100,100),vec2(100,100), *font->tex);
 		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
-		//sb->DrawRectangle(vec2(110,110), vec2(200,200), Colors::Green/2.0f);
+		sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
 
 		LinesShader->BindProgram();
 		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);

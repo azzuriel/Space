@@ -194,13 +194,13 @@ void Camera::GetViewport(int &loc_x, int &loc_y, int &width, int &height) {
 	height = window_height;
 }
 
-void Camera::GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M) {
+void Camera::GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M) const {
 	P = projection;
 	V = view;
 	M = model;
 }
 
-mat4 Camera::VP()
+mat4 Camera::VP() const
 {
 	return MVP;
 }
