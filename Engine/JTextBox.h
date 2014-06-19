@@ -2,6 +2,7 @@
 #include "WComponent.h"
 #include <glm.hpp>
 #include "TextGeometry.h"
+
 class JTextBox :
 	public WComponent
 {

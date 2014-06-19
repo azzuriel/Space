@@ -4,6 +4,7 @@
 #include <glm.hpp>
 #include "Mouse.h"
 #include <vector>
+#include "JHelpers_inl.h"
 
 
 Win::Win(void) :
@@ -74,7 +75,7 @@ void Win::Update()
 
 	if(Items.size() > 0){
 		for(int i=0; i< Items.size(); i++){
-			Items[i]->Update();
+			Items[i]->Update(); 
 		}
 	}
 

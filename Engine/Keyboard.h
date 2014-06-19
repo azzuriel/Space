@@ -3,6 +3,7 @@
 
 #include <glfw3.h>
 #include <deque>
+#include <ctype.h>
 
 class Keyboard
 {
@@ -18,10 +19,9 @@ public:
 	static bool isKeyPress(int key);
 	static bool isKeyUp(int key);
 	static bool isKeyDown(int key);
-  static int EnquePressed();
-  static std::deque<int> pressedQueue;
-
+    static int EnquePressed();
+    static std::deque<int> pressedQueue;
+	static bool Shift, Ctrl, Alt;
 };
-
 
 #endif // Keyboard_h__

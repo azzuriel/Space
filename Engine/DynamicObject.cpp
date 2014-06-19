@@ -1,6 +1,7 @@
 #include "DynamicObject.h"
 #include <BulletDynamics\Dynamics\btRigidBody.h>
 #include <BulletCollision\CollisionShapes\btSphereShape.h>
+#include "JHelpers_inl.h"
 
 DynamicObject::DynamicObject(void)
 {
@@ -46,4 +47,16 @@ void DynamicObject::bpUnregister(btDiscreteDynamicsWorld* dynamicsWorld)
 void DynamicObject::bpRegister(btDiscreteDynamicsWorld* dynamicsWorld)
 {
 	dynamicsWorld->addRigidBody(fallRigidBody);
+}
+
+std::string DynamicObject::getFullDebugDescription()
+{
+	auto pos = fallRigidBody->getWorldTransform().getOrigin();
+	auto vel = fallRigidBody->getLinearVelocity();
+	auto angular = fallRigidBody->getAngularVelocity();
+	return string_format("NAME %s; TYPE DynamicObject : GameObject\nPosition %s\nVelocity %s\nAngular %s", 
+		"", 
+		std::to_string(pos).c_str(), 
+		std::to_string(vel).c_str(),
+		std::to_string(angular).c_str());
 }

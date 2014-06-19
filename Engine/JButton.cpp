@@ -4,6 +4,7 @@
 #include "WinS.h"
 #include "GameMath.h"
 #include "Mouse.h"
+#include "JHelpers_inl.h"
 
 JButton::JButton(void)
 {

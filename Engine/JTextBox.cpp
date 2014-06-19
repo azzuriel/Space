@@ -3,7 +3,7 @@
 #include "SpriteBatch.h"
 #include "WinS.h"
 #include "Keyboard.h"
-
+#include "JHelpers_inl.h"
 
 JTextBox::JTextBox(void)
 {
@@ -49,7 +49,7 @@ void JTextBox::Update()
 	if(!WinS::KeyboardHooked){
     auto t = Keyboard::EnquePressed();
     if(t!= -1) {
-      text->setText(text->getText()+=keyToChar(t));
+      text->setText(text->getText()+=keyToChar(t, Keyboard::Shift));
     }
   }
 }

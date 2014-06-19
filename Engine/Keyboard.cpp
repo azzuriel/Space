@@ -24,9 +24,26 @@ int Keyboard::EnquePressed(){
 void Keyboard::SetKey( int key, int scancode, int action, int mods )
 {
 	sm_keys[key] = action;
-  if(action == GLFW_PRESS) {
-    pressedQueue.push_back(key);
-  }
+	switch(key){
+	case GLFW_KEY_LEFT_SHIFT:
+	case GLFW_KEY_RIGHT_SHIFT:
+		Shift = action != GLFW_RELEASE;
+		break;
+	case GLFW_KEY_LEFT_CONTROL:
+	case GLFW_KEY_RIGHT_CONTROL:
+		Ctrl = action != GLFW_RELEASE;
+		break;
+	case GLFW_KEY_LEFT_ALT:
+	case GLFW_KEY_RIGHT_ALT:
+		Alt = action != GLFW_RELEASE;
+		break;
+	default:
+		if(action == GLFW_PRESS || action == GLFW_REPEAT) {
+			pressedQueue.push_back(key);
+		}
+		break;
+		
+	}
 }
 
 bool Keyboard::isKeyPress( int key )
@@ -52,5 +69,10 @@ bool Keyboard::isKeyDown( int key )
 		return true;
 	return false;
 }
+
+bool Keyboard::Shift;
+bool Keyboard::Alt;
+bool Keyboard::Ctrl;
+
 
 std::deque<int> Keyboard::pressedQueue;

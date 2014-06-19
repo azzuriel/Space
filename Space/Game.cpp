@@ -33,29 +33,11 @@
 #include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include "debugDraw.h"
 #include "../Engine/DynamicObject.h"
+#include "../Engine/JHelpers_inl.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
 	LOG(ERROR) << description;
-}
-
-std::string string_format(const std::string fmt_str, ...) {
-	int final_n, n = ((int)fmt_str.size()) * 2; 
-	std::string str;
-	std::unique_ptr<char[]> formatted;
-	va_list ap;
-	while(1) {
-		formatted.reset(new char[n]); 
-		strcpy(&formatted[0], fmt_str.c_str());
-		va_start(ap, fmt_str);
-		final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), ap);
-		va_end(ap);
-		if (final_n < 0 || final_n >= n)
-			n += abs(final_n - n + 1);
-		else
-			break;
-	}
-	return std::string(formatted.get());
 }
 
 
@@ -459,10 +441,6 @@ void Game::Run()
 
 		BasicShader->BindProgram();
 
-		camera.Update();
-		MVP = camera.VP() * model;
-		CameraSetup(BasicShader->program, camera, m->World, MVP);
-
 		btTransform trans;
 		sphere->fallRigidBody->getMotionState()->getWorldTransform(trans);
 		auto q = trans.getRotation();
@@ -474,7 +452,13 @@ void Game::Run()
 		auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
 		m->World = glm::rotate(m->World, q.getAngle(), vecc);
 		m->World = glm::scale(m->World, vec3(1,1,1));
-		sb->DrawString(vec2(20,20), string_format("%f %f %f Velosity = %f", vect.x, vect.y, vect.z, sphere->fallRigidBody->getLinearVelocity().getY()), Colors::Red, *font);
+
+
+		camera.Update();
+		MVP = camera.VP() * model;
+		CameraSetup(BasicShader->program, camera, m->World, MVP);
+
+		sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
 		m->Render();
 
 		plane->Render();

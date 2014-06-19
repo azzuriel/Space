@@ -146,6 +146,7 @@
     <ClInclude Include="JargFont.h" />
     <ClInclude Include="JargShader.h" />
     <ClInclude Include="JButton.h" />
+    <ClInclude Include="JHelpers_inl.h" />
     <ClInclude Include="JLabel.h" />
     <ClInclude Include="JRectangle.h" />
     <ClInclude Include="JTextBox.h" />

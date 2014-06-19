@@ -3,6 +3,7 @@
 #include <vector>
 #include <list>
 #include "Mouse.h"
+#include <string>
 
 WinS::WinS()
 {

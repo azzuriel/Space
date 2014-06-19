@@ -178,17 +178,17 @@ glm::vec2 Batched::GetStringData(glm::vec2 pos, std::string text, vec4 col, int 
 	{
 		fontTexture = font.GetGlyphTexture(utf32text[i]);
 		if(utf32text[i] == 32){
-			glyphX += fontTexture.width;
+			glyphX += stringWidth/2;
 			continue;
 		}
 		if(utf32text[i] == 10){
 			glyphY += fontTexture.height+3;
-			glyphX = 0;
+			glyphX = pos.x;
 			continue;
 		}
 		if(glyphX + fontTexture.width + 1 + stringWidth > fixer){
 			glyphY += fontTexture.height+3;
-			glyphX = 0;
+			glyphX = pos.x;
 		}
 		float ypos = glyphY - fontTexture.height - fontTexture.offsetDown + stringHeight;
 		//innerDraw( vec2(glyphX, ypos), vec2((float)fontTexture.width, (float)fontTexture.height), 0, *font.tex, Rect(fontTexture.texture.u1, fontTexture.texture.v1, fontTexture.texture.u2 - fontTexture.texture.u1, fontTexture.texture.v2 - fontTexture.texture.v1));

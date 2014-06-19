@@ -6,6 +6,7 @@
 #include "WComponent.h"
 #include <vector>
 #include "TextGeometry.h"
+#include <string>
 class Win : public WContainer
 {
 public:
