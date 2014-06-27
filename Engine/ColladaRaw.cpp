@@ -2,7 +2,7 @@
 #include <rapidxml.hpp>
 #include <sstream>
 #include <fstream>
-#include <glog\logging.h>
+#include <easylogging++.h>
 
 ColladaRaw::ColladaRaw(void)
 {
@@ -34,7 +34,7 @@ ColladaRaw::ColladaRaw(std::string FileName)
 	xml = new char[str.size() + 1];
 	std::copy(str.begin(), str.end(), xml);
 	xml[str.size()] = '\0';
-	
+	size = str.size();
 
 	data = new rapidxml::xml_document<>();
 	data->parse<0>(xml);

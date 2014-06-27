@@ -56,6 +56,21 @@
 	 return std::string(formatted.get());
  }
 
+ inline std::string to_traf_string(double traf){
+	 if (traf > 1024*1024*1024) {
+		 return string_format("%2f GiB", traf/(1024.0*1024.0*1024.0));
+	 }
+	 if (traf > 1024 * 1024)
+	 {
+		 return string_format("%2f MiB", traf / (1024.0 * 1024.0));
+	 }
+	 if (traf > 1024)
+	 {
+		 return string_format("%2f KiB", traf / 1024.0);
+	 }
+	 return string_format("%i B", (int)traf);
+ }
+
  namespace std
  {
 	 inline std::string to_string(const glm::vec2& a){
@@ -83,5 +98,9 @@
 
 	 inline std::string to_string(const btQuaternion& a){
 		 return string_format("{%g, %g, %g, %g}", a.getX(), a.getY(), a.getZ(), a.getW());
+	 }
+
+	 inline std::string to_string(const glm::mat3& a){
+		 return string_format("{{%g, %g, %g}, {%g, %g, %g}, {%g, %g, %g}}", a[0][0], a[1][0], a[2][0], a[0][1], a[1][1], a[2][1], a[0][2], a[1][2], a[2][2]);
 	 }
  }

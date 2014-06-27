@@ -38,3 +38,6 @@ Space/logs/
 *.vsp
 *.json.png
 Space/font.json.png
+Space/*.txt
+Space/*.dae
+Space/*.dae

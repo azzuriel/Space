@@ -80,16 +80,21 @@ void main(void)
   vec3 lightDir = Vert.lightDir;
   vec3 viewDir  = Vert.viewDir;
   
-  color = texture(material.texture, Vert.texcoord) * max( dot ( normal, lightDir ), 0.0 );
-  color.w = 1;
+  vec3 e = normalize(-viewDir);
+  vec3 r = normalize(-reflect(lightDir, normal));
   
-  const vec4  diffColor = vec4 ( 1.0, 1.0, 0.0, 1.0 );
+  vec4 ambColor = light.ambient * material.ambient;
+  vec4 diffColor = light.diffuse * material.diffuse;
   const float k         = 0.8;
+  
+  vec4 specColor = material.specular * light.specular
+                     * pow(max(dot(r, e), 0.0),
+                           material.shininess);
 
   float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
   float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
 
-  color = diffColor * d1 * d2;
+  color   = (ambColor + diffColor * d1 * d2 + specColor) * texture(material.texture, Vert.texcoord);
   color.w = 1;
 }
 #endif

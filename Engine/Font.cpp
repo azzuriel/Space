@@ -6,7 +6,7 @@
 #include <math.h>
 #include <algorithm>
 #include "JRectangle.h"
-#include <glog/logging.h>
+#include <easylogging++.h>
 
 Font::Font()
 {

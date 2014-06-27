@@ -2,20 +2,21 @@
 #include <vector>
 #include "VertexPositionTexture.h"
 #include <glew.h>
-#include <glog\logging.h>
+#include <easylogging++.h>
 
 #define OPENGL_CHECK_ERRORS() \
 	while( unsigned int openGLError = glGetError()) \
 { \
-	/*LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError);*/ \
+	LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError); \
 };
 
-Mesh::Mesh(void)
+Mesh::Mesh(void) :
+	World(mat4(1.0f))
 {
 	m_vao = 0;
 	m_vbo = nullptr;
-	Texture = nullptr;
-	Shader = nullptr;
+	material = nullptr;
+	shader = nullptr;
 }
 
 
@@ -63,14 +64,21 @@ void Mesh::MergeVerteces()
 	{
 		auto n = Verteces[i].Normal;
 		float nn = 1.0f;
+		std::vector<int> same;
 		for (int j=i;j<Verteces.size();j++)
 		{
 			if(Verteces[i].Position == Verteces[j].Position){
 				n += Verteces[j].Normal;
 				nn++;
+				same.push_back(j);
 			}
 		}
-		Verteces[i].Normal = n / nn;
+		n /= nn;
+		Verteces[i].Normal = n;
+		if(same.size() > 0)
+		for(int j=0; j<same.size(); j++){
+			Verteces[same[j]].Normal = n;
+		}
 	}
 }
 
@@ -193,18 +201,37 @@ void Mesh::Bind()
 
 void Mesh::Render()
 {
+	Render(mat4(1));
+}
+
+inline void Mesh::Render(mat4 Model)
+{
 	if(Verteces.size() == 0){
 		return;
 	}
-	if(Shader != nullptr) {
-		Shader->BindProgram();
-		glUniformMatrix4fv(Shader->vars[1], 1, GL_FALSE, &World[0][0]);
-		mat3 normal = transpose(mat3(inverse(World)));
-		glUniformMatrix3fv(Shader->vars[2], 1, GL_FALSE, &normal[0][0]);
+	if(shader != nullptr) {
+		shader->BindProgram();
+		auto mult = Model*World;
+		glUniformMatrix4fv(shader->vars[1], 1, GL_FALSE, &mult[0][0]);
+		mat3 normal = transpose(mat3(inverse(mult)));
+		glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
+
+		glUniform4fv(glGetUniformLocation(shader->program, "material.ambient"),   1, &material->ambient[0]);
+		glUniform4fv(glGetUniformLocation(shader->program, "material.diffuse"),   1, &material->diffuse[0]);
+		glUniform4fv(glGetUniformLocation(shader->program, "material.specular"),  1, &material->specular[0]);
+		glUniform4fv(glGetUniformLocation(shader->program, "material.emission"),  1, &material->emission[0]);
+																					  
+		glUniform1fv(glGetUniformLocation(shader->program, "material.shininess"), 1, &material->shininess);
 	}
-	if(Texture != nullptr) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture->textureId);
+	if(material != nullptr) {
+		if(material->texture != nullptr) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
+		}
+		if(material->normal != nullptr) {
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, material->normal->textureId);
+		}
 	}
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, Indeces.size(), GL_UNSIGNED_INT, NULL);

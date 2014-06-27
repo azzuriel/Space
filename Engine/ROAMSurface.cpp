@@ -91,7 +91,7 @@ ROAMSurfaceCell::ROAMSurfaceCell(float x, float y)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, map->width, map->height, 0, GL_RGB, GL_FLOAT, map->normal_map);
 	Texture* tempt = new Texture();
 	tempt->textureId = normalTexture;
-	tp->m->Texture = tempt;
+	tp->m->material->texture = tempt;
 }
 
 ROAMSurfaceCell::~ROAMSurfaceCell()
@@ -109,7 +109,7 @@ void ROAMSurfaceCell::Bind()
 
 void ROAMSurfaceCell::Render(JargShader* active)
 {	
-	tp->m->Shader = active;
+	tp->m->shader = active;
 	tp->m->World = glm::scale(glm::mat4(1.0f), vec3(100.0F,100.0F,30.0F));
 	tp->Render();
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <rapidxml.hpp>
+#include <../libs/rapidxml-1.13/rapidxml.hpp>
 
 class ColladaRaw
 {
@@ -10,6 +10,7 @@ public:
 	~ColladaRaw(void);
 	rapidxml::xml_document<>* data;
 	char* xml;
+	int size;
 };
 
 

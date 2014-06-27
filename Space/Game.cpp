@@ -35,8 +35,11 @@
 #include "debugDraw.h"
 #include "../Engine/DynamicObject.h"
 #include "../Engine/JHelpers_inl.h"
-#include <fbxsdk.h>
 #include "../Engine/ColladaRaw.h"
+#include <gtc/matrix_transform.hpp>
+#include <Model.h>
+#include <easylogging++.h>
+
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -62,9 +65,6 @@ Game::~Game(void)
 
 int Game::Initialize()
 {
-	google::InitGoogleLogging("Jarg.exe");
-	google::SetLogFilenameExtension(".log.");
-	google::SetLogDestination(google::INFO, "logs/space");
 	LOG(INFO) << "Jarg initialization start";
 	glfwSetErrorCallback(errorCallbackGLFW3);
 
@@ -151,25 +151,6 @@ void PointLightSetup(GLuint program, const PointLight &light)
 	glUniform3fv(glGetUniformLocation(program, "light.attenuation"), 1, &light.attenuation[0]);
 }
 
-void MaterialSetup(GLuint program, const Material &material)
-{
-	// установка текстуры
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material.texture);
-	glUniform1i(glGetUniformLocation(program, "material.texture"), 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, material.normal);
-	glUniform1i(glGetUniformLocation(program, "material.normal"), 1);
-
-	// установка параметров
-	glUniform4fv(glGetUniformLocation(program, "material.ambient"),   1, &material.ambient[0]);
-	glUniform4fv(glGetUniformLocation(program, "material.diffuse"),   1, &material.diffuse[0]);
-	glUniform4fv(glGetUniformLocation(program, "material.specular"),  1, &material.specular[0]);
-	glUniform4fv(glGetUniformLocation(program, "material.emission"),  1, &material.emission[0]);
-
-	glUniform1fv(glGetUniformLocation(program, "material.shininess"), 1, &material.shininess);
-}
-
 
 void CameraSetup(GLuint program, Camera &camera, const mat4 &mvp)
 {
@@ -180,6 +161,7 @@ void CameraSetup(GLuint program, Camera &camera, const mat4 &mvp)
 void Game::Run()
 {
 	glEnable(GL_DEPTH_TEST);
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS); 
 
@@ -191,16 +173,12 @@ void Game::Run()
 	Mouse::IsLeftPressed();
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
-	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minnaert.glsl");
-	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minnaert.glsl");
+	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
+	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
 	BasicShader->Link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection"); //var0
 	auto worldID = BasicShader->LocateVars("transform.model"); //var1
 	BasicShader->LocateVars("transform.normal"); //var2
-	auto innerT = BasicShader->LocateVars("InnerLevel"); int camTest = 2;
-	glUniform1i(innerT, camTest);
-	auto outerT = BasicShader->LocateVars("OuterLevel"); int outerLevel = 2;
-	glUniform1i(outerT, outerLevel);
 	auto colorTextureLocation = BasicShader->LocateVars("material.texture");
 
 	Texture test;
@@ -211,22 +189,20 @@ void Game::Run()
 
 	BasicShader->BindProgram();
 	Material mat;
-	mat.texture = test.textureId;
-	mat.normal = hm.textureId;
+	mat.texture = &test;
+	mat.normal = &hm;
 	mat.ambient = vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	mat.diffuse = vec4(0.3f, 0.5f, 1.0f, 1.0f);
 	mat.specular = vec4(0.8f, 0.8f, 0.8f, 1.0f);
 	mat.emission = vec4(0.0f, 0.0f, 0.0f, 1.f);
 	mat.shininess = 20.0f;
 
-	MaterialSetup(BasicShader->program, mat);
-
 	PointLight pl;
 	pl.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
 	pl.ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	pl.attenuation = vec3(0.005f, 0.0f, 0.0002f);
+	pl.attenuation = vec3(0.005f, 0.0f, 0.00002f);
 
 	PointLightSetup(BasicShader->program, pl);
 
@@ -247,28 +223,34 @@ void Game::Run()
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
-	auto m = new Mesh(Icosahedron::getMesh());
-	m->Unindex();
-	m->computeNormal();
-	m->MergeVerteces();
-	//m->loadOBJ("Data\\untitled.obj");
-	m->Bind();
-	m->Shader = BasicShader.get();
-	m->Texture = &test;
-	m->World = glm::scale(Identity, vec3(3,3,3));
+// 	auto m = new Mesh(Icosahedron::getMesh());
+// 	m->Unindex();
+// 	m->computeNormal();
+// 	m->MergeVerteces();
+// 	//m->loadOBJ("Data\\untitled.obj");
+// 	m->Bind();
+// 	m->shader = BasicShader.get();
+// 	m->material = &mat;
+// 	m->World = glm::scale(Identity, vec3(3,3,3));
 
 	auto plane =Tesselator::Tesselate(5, Quad::GetMesh());
 	plane->Bind();
-	plane->Shader = BasicShader.get();
-	plane->Texture = &test;
+	plane->shader = BasicShader.get();
+	plane->material = &mat;
 	plane->World = glm::rotate(Identity, (float)(3.1415/2.0), vec3(1.0,0.0,0.0));
 	plane->World = glm::translate(plane->World, vec3(0.0,0.0,10.0));
 	plane->World = glm::scale(plane->World, vec3(80.5,80.5,80.5));
 
 	auto cube = new Mesh(Icosahedron::getMesh());
 	cube->Bind();
-	cube->Shader = BasicShader.get();
-	cube->Texture = &test;
+	cube->shader = BasicShader.get();
+	cube->material = &mat;
+
+
+	auto m = new Model("untitled3.dae");
+	m->Bind();
+	m->meshes[0]->shader = BasicShader.get();
+	m->meshes[1]->shader = BasicShader.get();
 
 	Camera camera;
 	camera.SetWindowSize(width, height);
@@ -299,30 +281,11 @@ void Game::Run()
 	dynamicsWorld->setDebugDrawer(drawer.get());
 	drawer->SetBatched(sb.get());
 
-	auto c = new ColladaRaw("untitled.dae");
+	//auto c = std::unique_ptr<Model>(new Model("untitled2.dae"));
 
 
 	auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
 	sphere->bpRegister(dynamicsWorld.get());
-
-	for(int i = 1; i< 10; i++) {
-		auto w = new Win(glm::vec2(100 + i*10,100 + i*10), glm::vec2(250,250));
-		ws->windows.push_back(w);
-
-		//JLabel* jl = new JLabel(glm::vec2(20,20));
-		//jl->parent = w;
-		//jl->text->setText( "qwertyuiopasdfghjklzxcvbnm");
-		//w->Items.push_back(jl);
-
-		JTextBox* jt = new JTextBox(glm::vec2(20,40), glm::vec2(140,140));
-		jt->parent = w;
-		w->Items.push_back(jt);
-
-		//JButton* jb = new JButton(glm::vec2(10,100), glm::vec2(50,20));
-		//jb->parent = w;
-		//w->Items.push_back(jb);
-		//jb->onPress = [=](){ jl->text->setText(jl->text->getText().append("1 "));};
-	}
 
 	int iters = 0;
 	float sec = 0;
@@ -371,36 +334,6 @@ void Game::Run()
 			camera.Move(RIGHT);
 		}
 
-		if(Keyboard::isKeyPress(GLFW_KEY_F3)){
-			iters--;
-			if(iters < 0){
-				iters = 0;
-			}
-			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
-			m->Unindex();
-			m->computeNormal();
-			m->MergeVerteces();
-			m->Bind();
-			m->Shader = BasicShader.get();
-			m->Texture = &test;
-			m->World = glm::scale(Identity, vec3(18,18,18));
-		}
-
-		if(Keyboard::isKeyPress(GLFW_KEY_F4)){
-			iters++;
-			if(iters > 9){
-				iters = 9;
-			}
-			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
-			m->Unindex();
-			m->computeNormal();
-			m->MergeVerteces();
-			m->Bind();
-			m->Shader = BasicShader.get();
-			m->Texture = &test;
-			m->World = glm::scale(Identity, vec3(18,18,18));
-		}
-
 		if(Keyboard::isKeyPress(GLFW_KEY_F2)){
 		switch(wire){
 			case 0:
@@ -427,13 +360,33 @@ void Game::Run()
 			sphere->fallRigidBody->setLinearVelocity(btVector3(0,0,0));
 		}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_RIGHT)){
+		if(Keyboard::isKeyDown(GLFW_KEY_D)){
 			sphere->fallRigidBody->applyTorque(btVector3(1,0,0));
 			sphere->fallRigidBody->activate();
 		}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_LEFT)){
+		if(Keyboard::isKeyDown(GLFW_KEY_A)){
 			sphere->fallRigidBody->applyTorque(btVector3(-1,0,0));
+			sphere->fallRigidBody->activate();
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_W)){
+			sphere->fallRigidBody->applyTorque(btVector3(0,1,0));
+			sphere->fallRigidBody->activate();
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_S)){
+			sphere->fallRigidBody->applyTorque(btVector3(0,-1,0));
+			sphere->fallRigidBody->activate();
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_Q)){
+			sphere->fallRigidBody->applyTorque(btVector3(0,0,1));
+			sphere->fallRigidBody->activate();
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_E)){
+			sphere->fallRigidBody->applyTorque(btVector3(0,0,-1));
 			sphere->fallRigidBody->activate();
 		}
 
@@ -460,8 +413,10 @@ void Game::Run()
 		auto q = trans.getRotation();
 		auto t = trans.getOrigin();
 		auto vect = vec3(t.getX(),t.getY(),t.getZ());
-		camera.position = vect+vec3(2);
+
+		camera.position = vect+vec3(5);
 		camera.SetLookAt(vect);
+
 		m->World = glm::translate(Identity, vect);
 		auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
 		m->World = glm::rotate(m->World, q.getAngle(), vecc);
@@ -479,7 +434,6 @@ void Game::Run()
 		MVP = camera.VP() * model;
 
 		PointLightSetup(BasicShader->program, pl);
-		MaterialSetup(BasicShader->program, mat);
 		CameraSetup(BasicShader->program, camera, MVP);
 		////////////////////////////////////////////////////////////////////////// WORLD PLACE
 		m->Render();
@@ -490,8 +444,7 @@ void Game::Run()
 			m->World = glm::translate(Identity, glm::vec3(sin(rott[i])*15, 2, cos(rott[i])*15));
 			m->Render();
 		}
-
-		//////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////// WORLD PLACE
 
 		if(wire == 2) {
 			LinesShader->BindProgram();

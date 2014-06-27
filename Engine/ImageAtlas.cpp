@@ -1,6 +1,6 @@
 #include "ImageAtlas.h"
-#include <glog\logging.h>
 #include <math.h>
+#include <easylogging++.h>
 
 
 ImageAtlas::ImageAtlas(void)

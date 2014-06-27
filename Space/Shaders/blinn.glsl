@@ -72,7 +72,7 @@ in Vertex {
         vec3  lightDir;
         vec3  viewDir;
         float distance;
-		vec3 bissector;
+		vec3  bissector;
 } Vert;
 
 layout(location = FRAG_OUTPUT0) out vec4 color;
@@ -90,7 +90,7 @@ void main(void)
   vec4 diff = diffColor * max ( dot ( normal, lightDir ), 0.0 );
   vec4 spec = specColor * pow ( max ( dot ( normal, Vert.bissector ), 0.0 ), specPower );
 
-  color = diff + spec;
+  color   = diff + spec;
   color.w = 1;
 }
 #endif

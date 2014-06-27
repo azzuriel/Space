@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <glog/logging.h>
 #include <glew.h>
 #pragma deprecated(LoadFromFile)
 

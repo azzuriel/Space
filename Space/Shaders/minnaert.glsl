@@ -58,7 +58,7 @@ void main(void)
   Vert.normal   = normalize(transform.normal *normal);
   Vert.distance = length(lightDir);
   Vert.lightDir = normalize(lightDir).xyz;
-  gl_Position = transform.viewProjection * vertex;
+  gl_Position   = transform.viewProjection * vertex;
 }
 #endif
 
@@ -89,8 +89,8 @@ void main(void)
   float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
   float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
 
-  color = diffColor * d1 * d2;
-  color *= texture(material.texture, Vert.texcoord);
+  color   = diffColor * d1 * d2;
+  color  *= texture(material.texture, Vert.texcoord);
   color.w = 1;
 }
 #endif

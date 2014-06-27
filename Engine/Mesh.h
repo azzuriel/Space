@@ -8,6 +8,7 @@
 #include "JargShader.h"
 #include "TextureManager.h"
 #include <string>
+#include <Material.h>
 class Mesh
 {
 public:
@@ -16,6 +17,7 @@ public:
 	void Create(std::vector<VertexPositionNormalTexture> verteces, std::vector<GLuint> indeces);
 	void Bind();
 	void Render();
+	void Render(mat4 Model);
 	void Combine(Mesh* com);
 	bool loadOBJ(std::string path);
 	void computeNormal();
@@ -23,9 +25,10 @@ public:
 	void MergeVerteces();
 	std::vector<VertexPositionNormalTexture> Verteces;
 	std::vector<GLuint> Indeces;
-	JargShader* Shader;
-	Texture* Texture;
+	JargShader* shader;
+	Material* material;
 	mat4 World;
+	std::string id;
 private:
 	GLuint m_vao;
 	GLuint* m_vbo;
