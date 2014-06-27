@@ -35,7 +35,7 @@ public:
 	~VertexPositionNormalTexture();
 
 	VertexPositionNormalTexture operator + (VertexPositionNormalTexture a){ VertexPositionNormalTexture b; b.Position = Position + a.Position; b.Uv = a.Uv + Uv; b.Normal = Normal + a.Normal; return b; }
-	VertexPositionNormalTexture operator / (float a){ VertexPositionNormalTexture b; b.Position = Position / a; b.Uv = Uv / a; b.Normal = Normal / 2.0F; return b; }
+	VertexPositionNormalTexture operator / (float a){ VertexPositionNormalTexture b; b.Position = Position / a; b.Uv = Uv / a; b.Normal = Normal / a; return b; }
 };
 
 struct VertexPositionColor{

@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine.h"
 #define GLM_FORCE_RADIANS
-#define GLM_SWIZZLE
 #include <glew.h>
 #include <glfw3.h>
 #include <Keyboard.h>
@@ -35,8 +34,6 @@
 #include "debugDraw.h"
 #include "../Engine/DynamicObject.h"
 #include "../Engine/JHelpers_inl.h"
-#include <fbxsdk.h>
-#include "../Engine/ColladaRaw.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -171,9 +168,14 @@ void MaterialSetup(GLuint program, const Material &material)
 }
 
 
-void CameraSetup(GLuint program, Camera &camera, const mat4 &mvp)
+void CameraSetup(GLuint program, Camera &camera, const mat4 &model, const mat4 &mvp)
 {
+	mat3 normal = transpose(mat3(inverse(mat4(1.0f))));
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "transform.model"), 1, GL_TRUE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "transform.viewProjection"), 1, GL_FALSE, &mvp[0][0]);
+	glUniformMatrix3fv(glGetUniformLocation(program, "transform.normal"), 1, GL_TRUE, &normal[0][0]);
+
 	glUniform3fv(glGetUniformLocation(program, "transform.viewPosition"), 1, &camera.position[0]);
 }
 
@@ -191,10 +193,10 @@ void Game::Run()
 	Mouse::IsLeftPressed();
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
-	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minnaert.glsl");
-	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minnaert.glsl");
+	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
+	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
 	BasicShader->Link();
-	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection"); //var0
+	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection");
 	auto worldID = BasicShader->LocateVars("transform.model"); //var1
 	BasicShader->LocateVars("transform.normal"); //var2
 	auto innerT = BasicShader->LocateVars("InnerLevel"); int camTest = 2;
@@ -247,10 +249,7 @@ void Game::Run()
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
-	auto m = new Mesh(Icosahedron::getMesh());
-	m->Unindex();
-	m->computeNormal();
-	m->MergeVerteces();
+	auto m = Tesselator::SphereTesselate(2, Icosahedron::getMesh());
 	//m->loadOBJ("Data\\untitled.obj");
 	m->Bind();
 	m->Shader = BasicShader.get();
@@ -299,14 +298,18 @@ void Game::Run()
 	dynamicsWorld->setDebugDrawer(drawer.get());
 	drawer->SetBatched(sb.get());
 
-	auto c = new ColladaRaw("untitled.dae");
-
-
 	auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
 	sphere->bpRegister(dynamicsWorld.get());
 
-	for(int i = 1; i< 10; i++) {
-		auto w = new Win(glm::vec2(100 + i*10,100 + i*10), glm::vec2(250,250));
+<<<<<<< Updated upstream
+	float rotated = 0;
+
+	for(int i = 1; i< 1; i++) {
+		w = new Win(glm::vec2(100 +i*25, 100 +i*25), glm::vec2(200,200), glm::vec4(0,0,0,1));
+=======
+	for(int i = 1; i<= 1; i++) {
+		auto w = new Win(glm::vec2(100 +i*25, 100 +i*25), glm::vec2(200,200), glm::vec4(0,0,0,1));
+>>>>>>> Stashed changes
 		ws->windows.push_back(w);
 
 		//JLabel* jl = new JLabel(glm::vec2(20,20));
@@ -326,13 +329,6 @@ void Game::Run()
 
 	int iters = 0;
 	float sec = 0;
- 
-	float rotated = 0;
-	float* rott = new float[25];
-	for (int i =0; i<25;i++)
-	{
-		rott[i] = 0;
-	}
 
 	// 	auto ts = std::unique_ptr<QuadLod>(new QuadLod());
 	// 	ts->GenerateFrom(glm::vec3(0.0,0.0,0.0));
@@ -348,6 +344,7 @@ void Game::Run()
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		glEnable(GL_DEPTH_TEST);
+		glShadeModel (GL_SMOOTH);
 		gt.Update(glfwGetTime());
 		fps.Update(gt);
 		dynamicsWorld->stepSimulation(gt.elapsed,10);
@@ -376,10 +373,7 @@ void Game::Run()
 			if(iters < 0){
 				iters = 0;
 			}
-			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
-			m->Unindex();
-			m->computeNormal();
-			m->MergeVerteces();
+			m = Tesselator::SphereTesselate(iters, Icosahedron::getMesh());
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
@@ -391,10 +385,7 @@ void Game::Run()
 			if(iters > 9){
 				iters = 9;
 			}
-			m = Tesselator::SphereTesselate(iters, Cube::getMesh());
-			m->Unindex();
-			m->computeNormal();
-			m->MergeVerteces();
+			m = Tesselator::SphereTesselate(iters, Icosahedron::getMesh());
 			m->Bind();
 			m->Shader = BasicShader.get();
 			m->Texture = &test;
@@ -466,31 +457,19 @@ void Game::Run()
 		auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
 		m->World = glm::rotate(m->World, q.getAngle(), vecc);
 		m->World = glm::scale(m->World, vec3(1,1,1));
-		pl.position = glm::vec4(sin(rotated)*10, 2, cos(rotated)*10, 1);
+		pl.position = vec4(sin(rotated)*15, 2, cos(rotated)*15,1);
 		rotated+=gt.elapsed;
-		for (int i=0;i<25;i++)
-		{
-			rott[i] += gt.elapsed * i / 12.0f;
-		}
 
-		cube->World = glm::translate(Identity, vec3(pl.position));
 
 		camera.Update();
 		MVP = camera.VP() * model;
 
 		PointLightSetup(BasicShader->program, pl);
 		MaterialSetup(BasicShader->program, mat);
-		CameraSetup(BasicShader->program, camera, MVP);
+		CameraSetup(BasicShader->program, camera, m->World, MVP);
 		////////////////////////////////////////////////////////////////////////// WORLD PLACE
 		m->Render();
 		plane->Render();
-		cube->Render();
-		for (int i=0;i<25;i++)
-		{
-			m->World = glm::translate(Identity, glm::vec3(sin(rott[i])*15, 2, cos(rott[i])*15));
-			m->Render();
-		}
-
 		//////////////////////////////////////////////////////////////////////////
 
 		if(wire == 2) {

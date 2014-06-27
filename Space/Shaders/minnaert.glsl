@@ -83,13 +83,14 @@ void main(void)
   color = texture(material.texture, Vert.texcoord) * max( dot ( normal, lightDir ), 0.0 );
   color.w = 1;
   
-  const vec4  diffColor = vec4 ( 1.0, 1.0, 0.0, 1.0 );
+  const vec4  diffColor = material.diffuse * light.diffuse;
   const float k         = 0.8;
 
   float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
   float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
 
   color = diffColor * d1 * d2;
+  color *= texture(material.texture, Vert.texcoord);
   color.w = 1;
 }
 #endif

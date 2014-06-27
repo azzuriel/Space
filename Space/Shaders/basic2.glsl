@@ -3,7 +3,6 @@
 #define VERT_TEXCOORD 1
 #define VERT_NORMAL 2
 #define VERT_COLOR 3
-#define FRAG_OUTPUT0 0
 
 uniform struct Transform
 {
@@ -54,15 +53,17 @@ void main(void)
   vec4 lightDir = light.position - vertex;
 
   Vert.texcoord = texcoord;
-  Vert.viewDir  = normalize(transform.viewPosition - vertex.xyz);
-  Vert.normal   = normalize(transform.normal *normal);
+  Vert.normal   = transform.normal * normal;
+  Vert.lightDir = vec3(lightDir);
+  Vert.viewDir  = transform.viewPosition - vec3(vertex);
   Vert.distance = length(lightDir);
-  Vert.lightDir = normalize(lightDir).xyz;
   gl_Position = transform.viewProjection * vertex;
 }
 #endif
 
 #ifdef _FRAGMENT_
+
+#define FRAG_OUTPUT0 0
 
 in Vertex {
         vec2  texcoord;
@@ -76,20 +77,24 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 
 void main(void)
 {
-  vec3 normal   = Vert.normal;
-  vec3 lightDir = Vert.lightDir;
-  vec3 viewDir  = Vert.viewDir;
-  
-  color = texture(material.texture, Vert.texcoord) * max( dot ( normal, lightDir ), 0.0 );
-  color.w = 1;
-  
-  const vec4  diffColor = vec4 ( 1.0, 1.0, 0.0, 1.0 );
-  const float k         = 0.8;
+  vec3 normal   = normalize(Vert.normal);
+  vec3 lightDir = normalize(Vert.lightDir);
+  vec3 viewDir  = normalize(Vert.viewDir);
 
-  float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
-  float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
+  float attenuation = 1.0 / (light.attenuation[0] +
+    light.attenuation[1] * Vert.distance +
+    light.attenuation[2] * Vert.distance * Vert.distance);
 
-  color = diffColor * d1 * d2;
-  color.w = 1;
+  color = material.emission;
+
+  color += material.ambient * light.ambient * attenuation;
+
+  float NdotL = max(dot(normal, lightDir), 0.0);
+  color += material.diffuse * light.diffuse * NdotL * attenuation;
+
+  float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
+  color += material.specular * light.specular * RdotVpow * attenuation;
+
+  color *= texture(material.texture, Vert.texcoord);
 }
 #endif

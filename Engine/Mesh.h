@@ -18,6 +18,9 @@ public:
 	void Render();
 	void Combine(Mesh* com);
 	bool loadOBJ(std::string path);
+	void computeNormal();
+	void Unindex();
+	void MergeVerteces();
 	std::vector<VertexPositionNormalTexture> Verteces;
 	std::vector<GLuint> Indeces;
 	JargShader* Shader;

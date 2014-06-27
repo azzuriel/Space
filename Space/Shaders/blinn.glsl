@@ -45,6 +45,7 @@ out Vertex {
         vec3  lightDir;
         vec3  viewDir;
         float distance;
+		vec3 bissector;
 } Vert;
 
 void main(void)
@@ -59,6 +60,7 @@ void main(void)
   Vert.distance = length(lightDir);
   Vert.lightDir = normalize(lightDir).xyz;
   gl_Position = transform.viewProjection * vertex;
+  Vert.bissector = (lightDir.xyz+Vert.viewDir)/abs(lightDir.xyz+Vert.viewDir);
 }
 #endif
 
@@ -70,6 +72,7 @@ in Vertex {
         vec3  lightDir;
         vec3  viewDir;
         float distance;
+		vec3 bissector;
 } Vert;
 
 layout(location = FRAG_OUTPUT0) out vec4 color;
@@ -79,17 +82,15 @@ void main(void)
   vec3 normal   = Vert.normal;
   vec3 lightDir = Vert.lightDir;
   vec3 viewDir  = Vert.viewDir;
-  
-  color = texture(material.texture, Vert.texcoord) * max( dot ( normal, lightDir ), 0.0 );
-  color.w = 1;
-  
-  const vec4  diffColor = vec4 ( 1.0, 1.0, 0.0, 1.0 );
-  const float k         = 0.8;
 
-  float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
-  float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
+  const vec4  diffColor = vec4 ( 0.5, 0.0, 0.0, 1.0 );
+  const vec4  specColor = vec4 ( 0.7, 0.7, 0.0, 1.0 );
+  const float specPower = 30.0;
 
-  color = diffColor * d1 * d2;
+  vec4 diff = diffColor * max ( dot ( normal, lightDir ), 0.0 );
+  vec4 spec = specColor * pow ( max ( dot ( normal, Vert.bissector ), 0.0 ), specPower );
+
+  color = diff + spec;
   color.w = 1;
 }
 #endif
