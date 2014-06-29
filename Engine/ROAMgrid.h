@@ -54,7 +54,7 @@ public:
 
 	void Bind(float *vertices, float *colors, float *normalTexels);
 	void Render();
-		Mesh* m;
+	Mesh* m;
 
 private:
 	BTTNode *allocateNode();

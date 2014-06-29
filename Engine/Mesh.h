@@ -15,7 +15,7 @@ public:
 	Mesh(void);
 	~Mesh(void);
 	void Create(std::vector<VertexPositionNormalTexture> verteces, std::vector<GLuint> indeces);
-	void Bind();
+	void Bind(int type = 0);
 	void Render();
 	void Render(mat4 Model);
 	void Combine(Mesh* com);

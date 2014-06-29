@@ -131,7 +131,19 @@ Texture::Texture(GLuint id) :
 
 Texture::~Texture()
 {
+	if(textureId != -1){
+		glDeleteTextures(1, &textureId);
+		textureId = -1;
+	}
+}
 
+void Texture::Empty(glm::vec2 size)
+{
+	name = "emptytexture";
+
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 }
 
 void Texture::Load(std::string a)

@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Space", "Space\Space.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{A252726B-481C-4A2C-9DBB-22B55F2BE2AA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelBuilder", "ModelBuilder\ModelBuilder.vcxproj", "{CCB1E6C7-13F3-416B-8AEF-6F0A2D558B65}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A252726B-481C-4A2C-9DBB-22B55F2BE2AA} = {A252726B-481C-4A2C-9DBB-22B55F2BE2AA}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +27,10 @@ Global
 		{A252726B-481C-4A2C-9DBB-22B55F2BE2AA}.Debug|Win32.Build.0 = Debug|Win32
 		{A252726B-481C-4A2C-9DBB-22B55F2BE2AA}.Release|Win32.ActiveCfg = Release|Win32
 		{A252726B-481C-4A2C-9DBB-22B55F2BE2AA}.Release|Win32.Build.0 = Release|Win32
+		{CCB1E6C7-13F3-416B-8AEF-6F0A2D558B65}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CCB1E6C7-13F3-416B-8AEF-6F0A2D558B65}.Debug|Win32.Build.0 = Debug|Win32
+		{CCB1E6C7-13F3-416B-8AEF-6F0A2D558B65}.Release|Win32.ActiveCfg = Release|Win32
+		{CCB1E6C7-13F3-416B-8AEF-6F0A2D558B65}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

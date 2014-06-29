@@ -2,7 +2,6 @@
 #ifndef Engine_h__
 #define Engine_h__
 
-#include "Game.h"
 #include "Bitmap.h"
 #include "Mesh.h"
 #include "Quad.h"

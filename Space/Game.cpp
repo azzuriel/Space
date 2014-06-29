@@ -1,4 +1,5 @@
 #pragma once
+#include "Game.h"
 #include "Engine.h"
 #define GLM_FORCE_RADIANS
 #define GLM_SWIZZLE
@@ -21,9 +22,7 @@
 #endif /* _WIN32 */
 #include <math.h>
 #include "../Engine/TreeSphere.h"
-#include "ROAMgrid.h"
 #include <ClassicNoise.h>
-#include <ROAMSurface.h>
 #include <chrono>
 #include <thread>
 #include "../Engine/WinS.h"
@@ -39,6 +38,9 @@
 #include <gtc/matrix_transform.hpp>
 #include <Model.h>
 #include <easylogging++.h>
+#include "LodSphere.h"
+#include "../Engine/ROAMgrid.h"
+#include "../Engine/ROAMSurface.h"
 
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -173,8 +175,8 @@ void Game::Run()
 	Mouse::IsLeftPressed();
 
 	auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
-	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/basic.glsl");
-	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/basic.glsl");
+	BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/unshaded.glsl");
+	BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/unshaded.glsl");
 	BasicShader->Link();
 	auto mvpBasic = BasicShader->LocateVars("transform.viewProjection"); //var0
 	auto worldID = BasicShader->LocateVars("transform.model"); //var1
@@ -202,7 +204,7 @@ void Game::Run()
 	pl.ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	pl.attenuation = vec3(0.005f, 0.0f, 0.00002f);
+	pl.attenuation = vec3(0.000f, 0.0f, 0.00000f);
 
 	PointLightSetup(BasicShader->program, pl);
 
@@ -247,10 +249,13 @@ void Game::Run()
 	cube->material = &mat;
 
 
-	auto m = new Model("untitled3.dae");
-	m->Bind();
-	m->meshes[0]->shader = BasicShader.get();
-	m->meshes[1]->shader = BasicShader.get();
+	//auto m = new Model();
+	//m->LoadBinary("untitled1.m");
+	//m->Bind();
+	//for (int i = 0; i<m->meshes.size(); i++)
+	//{
+	//	m->meshes[i]->shader = BasicShader.get();
+	//}
 
 	Camera camera;
 	camera.SetWindowSize(width, height);
@@ -306,8 +311,13 @@ void Game::Run()
 
 	//auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
+	ROAMSurface* m = new ROAMSurface();
 
-	Mouse::SetFixedPosState(false);
+	Texture emptytex = Texture();
+	emptytex.Empty(vec2(1000,1000));
+
+	Mouse::SetFixedPosState(true);
+	glCullFace(GL_BACK);
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -319,7 +329,7 @@ void Game::Run()
 
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(204/255.0F, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.9, 1, 1, 1.0f);
 
 		if(Keyboard::isKeyDown(GLFW_KEY_W)){
 			camera.Move(FORWARD);
@@ -335,17 +345,22 @@ void Game::Run()
 		}
 
 		if(Keyboard::isKeyPress(GLFW_KEY_F2)){
-		switch(wire){
+			switch(wire){
 			case 0:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				glDisable(GL_CULL_FACE);
 				wire = 1;
 				break;	
 			case 1:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_BACK);
 				wire = 2;
 				break;
 			case 2:
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_BACK);
 				wire = 0;
 				break;
 			}
@@ -358,37 +373,53 @@ void Game::Run()
 
 		if(Keyboard::isKeyDown(GLFW_KEY_UP)){
 			sphere->fallRigidBody->setLinearVelocity(btVector3(0,0,0));
+
+			GLuint FramebufferName = 0;
+			glGenFramebuffers(1, &FramebufferName);
+			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, emptytex.textureId, 0);
+
+			// Set the list of draw buffers.
+			GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+			glDrawBuffers(1, DrawBuffers);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+
+			cube->Render();
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_D)){
-			sphere->fallRigidBody->applyTorque(btVector3(1,0,0));
-			sphere->fallRigidBody->activate();
-		}
+		//if(Keyboard::isKeyDown(GLFW_KEY_S)){
+		//	sphere->fallRigidBody->applyTorque(btVector3(1,0,0));
+		//	sphere->fallRigidBody->activate();
+		//}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_A)){
-			sphere->fallRigidBody->applyTorque(btVector3(-1,0,0));
-			sphere->fallRigidBody->activate();
-		}
+		//if(Keyboard::isKeyDown(GLFW_KEY_W)){
+		//	sphere->fallRigidBody->applyTorque(btVector3(-1,0,0));
+		//	sphere->fallRigidBody->activate();
+		//}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_W)){
-			sphere->fallRigidBody->applyTorque(btVector3(0,1,0));
-			sphere->fallRigidBody->activate();
-		}
+		//if(Keyboard::isKeyDown(GLFW_KEY_A)){
+		//	sphere->fallRigidBody->applyTorque(btVector3(0,1,0));
+		//	sphere->fallRigidBody->activate();
+		//}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_S)){
-			sphere->fallRigidBody->applyTorque(btVector3(0,-1,0));
-			sphere->fallRigidBody->activate();
-		}
+		//if(Keyboard::isKeyDown(GLFW_KEY_D)){
+		//	sphere->fallRigidBody->applyTorque(btVector3(0,-1,0));
+		//	sphere->fallRigidBody->activate();
+		//}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_Q)){
-			sphere->fallRigidBody->applyTorque(btVector3(0,0,1));
-			sphere->fallRigidBody->activate();
-		}
+		//if(Keyboard::isKeyDown(GLFW_KEY_Q)){
+		//	sphere->fallRigidBody->applyTorque(btVector3(0,0,1));
+		//	sphere->fallRigidBody->activate();
+		//}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_E)){
-			sphere->fallRigidBody->applyTorque(btVector3(0,0,-1));
-			sphere->fallRigidBody->activate();
-		}
+		//if(Keyboard::isKeyDown(GLFW_KEY_E)){
+		//	sphere->fallRigidBody->applyTorque(btVector3(0,0,-1));
+		//	sphere->fallRigidBody->activate();
+		//}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_F5)){
 			camera.SetLookAt(vec3(0,0,0.0F));
@@ -400,7 +431,7 @@ void Game::Run()
 			camera.camera_scale = gt.elapsed*10.0F;
 		}
 
-		//camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
+		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
 
 
@@ -414,13 +445,15 @@ void Game::Run()
 		auto t = trans.getOrigin();
 		auto vect = vec3(t.getX(),t.getY(),t.getZ());
 
-		camera.position = vect+vec3(5);
-		camera.SetLookAt(vect);
+		auto orient = btVector3(0,1,0).rotate(sphere->fallRigidBody->getOrientation().getAxis(), sphere->fallRigidBody->getOrientation().getAngle());
+		auto vecor = vec3(orient.getX(), orient.getY(), orient.getZ());
+		//camera.position = vect - vec3(5);
+		//camera.SetLookAt(vect);
 
-		m->World = glm::translate(Identity, vect);
+		//m->World = glm::translate(Identity, vect);
 		auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
-		m->World = glm::rotate(m->World, q.getAngle(), vecc);
-		m->World = glm::scale(m->World, vec3(1,1,1));
+		//m->World = glm::rotate(m->World, q.getAngle(), vecc);
+		//m->World = glm::scale(m->World, vec3(1,1,1));
 		pl.position = glm::vec4(sin(rotated)*10, 2, cos(rotated)*10, 1);
 		rotated+=gt.elapsed;
 		for (int i=0;i<25;i++)
@@ -433,17 +466,20 @@ void Game::Run()
 		camera.Update();
 		MVP = camera.VP() * model;
 
+		sec += gt.elapsed;
+		if(sec > 0.1) {
+			sec = 0;
+			m->UpdateCells(camera.position);
+			m->Bind();
+		}
+
+
 		PointLightSetup(BasicShader->program, pl);
 		CameraSetup(BasicShader->program, camera, MVP);
 		////////////////////////////////////////////////////////////////////////// WORLD PLACE
-		m->Render();
-		plane->Render();
+		m->Render(BasicShader.get());
+		//plane->Render();
 		cube->Render();
-		for (int i=0;i<25;i++)
-		{
-			m->World = glm::translate(Identity, glm::vec3(sin(rott[i])*15, 2, cos(rott[i])*15));
-			m->Render();
-		}
 		////////////////////////////////////////////////////////////////////////// WORLD PLACE
 
 		if(wire == 2) {
@@ -453,7 +489,6 @@ void Game::Run()
 		}
 
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
 		MVP = camera.GetOrthoProjection();
 		TextureShader->BindProgram();
 		glUniformMatrix4fv(mvpTex, 1, GL_FALSE, &MVP[0][0]);
@@ -467,15 +502,13 @@ void Game::Run()
 
 		sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
 		sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
+		sb->DrawQuad(vec2(100,100), vec2(100,100), emptytex);
 
 		LinesShader->BindProgram();
 		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
 		int dc = sb->RenderFinallyWorld();
 
 		dc += sb->RenderFinally();
-		
-
-		glfwSetWindowTitle(window, std::to_string(dc).c_str());
 
 		Mouse::Update();
 

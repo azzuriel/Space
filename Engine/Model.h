@@ -20,6 +20,9 @@ public:
 	void Render();
 	Mesh* findMeshById(char* str);
 	Material* findMaterialById(char* str);
+	void SaveBinary(std::string name);
+	void LoadBinary(std::string name);
+	Material ErrorMaterial;
 };
 #endif // Model_h__
 

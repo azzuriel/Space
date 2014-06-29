@@ -161,8 +161,10 @@ bool Mesh::loadOBJ(std::string path)
 	}
 }
 
-void Mesh::Bind()
+void Mesh::Bind(int type /* = 0 */)
 {
+	auto bindtype = type == 0 ? GL_STATIC_DRAW : GL_STREAM_DRAW;
+
 	if(m_vbo) {
 		glBindVertexArray(0);
 		glDisableVertexAttribArray(BUFFER_TYPE_VERTEX);
@@ -185,7 +187,7 @@ void Mesh::Bind()
 	GLuint stride = sizeof(VertexPositionNormalTexture);
 	GLuint offset = 0;
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPositionNormalTexture)*Verteces.size(), &Verteces[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPositionNormalTexture)*Verteces.size(), &Verteces[0], bindtype);
 	glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
 	glVertexAttribPointer(BUFFER_TYPE_VERTEX, 3, GL_FLOAT, GL_FALSE, stride, (void*)(offset)); offset += sizeof(glm::vec3);
 	glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
@@ -194,7 +196,7 @@ void Mesh::Bind()
 	glVertexAttribPointer(BUFFER_TYPE_NORMALE, 3, GL_FLOAT, GL_FALSE, stride, (void*)(offset));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vbo[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*Indeces.size(), &Indeces[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*Indeces.size(), &Indeces[0], bindtype);
 
 	OPENGL_CHECK_ERRORS();
 }
@@ -219,9 +221,11 @@ inline void Mesh::Render(mat4 Model)
 		glUniform4fv(glGetUniformLocation(shader->program, "material.ambient"),   1, &material->ambient[0]);
 		glUniform4fv(glGetUniformLocation(shader->program, "material.diffuse"),   1, &material->diffuse[0]);
 		glUniform4fv(glGetUniformLocation(shader->program, "material.specular"),  1, &material->specular[0]);
-		glUniform4fv(glGetUniformLocation(shader->program, "material.emission"),  1, &material->emission[0]);
-																					  
+		glUniform4fv(glGetUniformLocation(shader->program, "material.emission"),  1, &material->emission[0]);																			  
 		glUniform1fv(glGetUniformLocation(shader->program, "material.shininess"), 1, &material->shininess);
+
+		glUniform1i(glGetUniformLocation(shader->program, "material.texture"), 0);
+		glUniform1i(glGetUniformLocation(shader->program, "material.normal"), 1);
 	}
 	if(material != nullptr) {
 		if(material->texture != nullptr) {

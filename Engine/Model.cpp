@@ -4,12 +4,15 @@
 #include "VertexPositionTexture.h"
 #include <JHelpers_inl.h>
 #include <easylogging++.h>
+#include <io.h>
 
 Model::Model(void) :
-	World(1)
+	World(1),
+	ErrorMaterial()
 {
 }
 
+//valid string "1 2 3 4"
 void parseVec4(char *str, vec4 &target){
 	if(str == nullptr){
 		return;
@@ -17,6 +20,7 @@ void parseVec4(char *str, vec4 &target){
 	sscanf(str, "%f %f %f %f", &target.x, &target.y, &target.z, &target.w);
 }
 
+//valid string "1 2 3"
 void parseVec3(char *str, vec3 &target){
 	if(str == nullptr){
 		return;
@@ -24,6 +28,7 @@ void parseVec3(char *str, vec3 &target){
 	sscanf(str, "%f %f %f", &target.x, &target.y, &target.z);
 }
 
+//valid string "1.0e-1"
 void parseFloat(char *str, float &target){
 	if(str == nullptr){
 		return;
@@ -31,6 +36,7 @@ void parseFloat(char *str, float &target){
 	sscanf(str, "%f", &target);
 }
 
+//valid string {"1.0 "}xn
 void parseFloatArray(char *str, std::vector<float> &target){
 	if(str == nullptr){
 		return;
@@ -44,6 +50,7 @@ void parseFloatArray(char *str, std::vector<float> &target){
 	}
 }
 
+//valid string {"1 "}xn
 void parseGLuintArray(char *str, std::vector<GLuint> &target){
 	if(str == nullptr){
 		return;
@@ -57,6 +64,7 @@ void parseGLuintArray(char *str, std::vector<GLuint> &target){
 	}
 }
 
+//valid string {"1 2.0 3.0e-2 "}xn
 void parseVec3Array(char *str, std::vector<vec3> &target){
 	if(str == nullptr){
 		return;
@@ -70,6 +78,7 @@ void parseVec3Array(char *str, std::vector<vec3> &target){
 	}
 }
 
+//valid string {"1 2.0 "}xn
 void parseVec2Array(char *str, std::vector<vec2> &target){
 	if(str == nullptr){
 		return;
@@ -83,6 +92,7 @@ void parseVec2Array(char *str, std::vector<vec2> &target){
 	}
 }
 
+//valid string "1"
 void parseGLuint(char *str, GLuint &target){
 	if(str == nullptr){
 		return;
@@ -90,6 +100,7 @@ void parseGLuint(char *str, GLuint &target){
 	sscanf(str, "%u", &target);
 }
 
+//valid string "1.0 2.0e-2 3 4 1 2 3 4 1 2 3 4 1 2 3 4"
 void parseMat4(char *str, mat4 &target){
 	if(str == nullptr){
 		return;
@@ -107,6 +118,172 @@ Mesh* Model::findMeshById(char* str){
 	return nullptr;
 }
 
+void Model::SaveBinary(std::string name){
+	std::ofstream file(name.c_str(), std::ios::out | std::ios::binary);
+	if (file.is_open()) {
+		
+		//40 head
+		char* head = "jmod ver 1                              ";
+		file.write(head, 40);
+
+		unsigned int efnum = (unsigned int)materials.size();
+		file.write((char*)&efnum, sizeof(unsigned int));
+
+		for (int i=0;i<efnum;i++)
+		{
+			file.write((char*)&materials[i]->emission, sizeof(glm::vec4));
+			file.write((char*)&materials[i]->ambient, sizeof(glm::vec4));
+			file.write((char*)&materials[i]->diffuse, sizeof(glm::vec4));
+			file.write((char*)&materials[i]->specular, sizeof(glm::vec4));
+			file.write((char*)&materials[i]->shininess, sizeof(float));
+			file.write((char*)&materials[i]->index_of_refraction, sizeof(float));
+		
+            unsigned int slen = materials[i]->id.length() + 1;
+			file.write((char*)&slen, sizeof(unsigned int));
+			file.write(materials[i]->id.c_str(), slen);
+		}
+
+		unsigned int menum = (unsigned int)meshes.size();
+		file.write((char*)&menum, sizeof(unsigned int));
+		for (int i=0;i<menum;i++)
+		{
+			unsigned int vcount = (unsigned int) meshes[i]->Verteces.size();
+			file.write((char*)&vcount, sizeof(unsigned int));
+			for (int j = 0; j < vcount; j++)
+			{
+				file.write((char*)&(meshes[i]->Verteces[j]), sizeof(VertexPositionNormalTexture));
+			}
+
+			unsigned int icount = (unsigned int) meshes[i]->Indeces.size();
+			file.write((char*)&icount, sizeof(unsigned int));
+			for (int j = 0; j < icount; j++)
+			{
+				file.write((char*)&(meshes[i]->Indeces[j]), sizeof(GLuint));
+			}
+
+			unsigned int slen;
+			if(meshes[i]->material != nullptr && meshes[i]->material != &ErrorMaterial) {
+				slen = meshes[i]->material->id.length() + 1;
+				file.write((char*)&slen, sizeof(unsigned int));
+				file.write((char*)meshes[i]->material->id.c_str(), slen);
+			} else {
+				slen = 13;
+				file.write((char*)&slen, sizeof(unsigned int));
+				file.write((char*)("errormaterial\0"), slen);
+			}
+
+			file.write((char*)&meshes[i]->World, sizeof(mat4));
+
+			slen = meshes[i]->id.length() + 1;
+			file.write((char*)&slen, sizeof(unsigned int));
+			file.write((char*)meshes[i]->id.c_str(), slen);
+		}
+
+		file.close();
+	} else {
+		LOG(ERROR) << "Failed to open file " << name;
+		return;
+	}
+}
+
+void Model::LoadBinary(std::string name){
+	if(materials.size() > 0){
+		for(int i=0;i<materials.size();i++){
+			delete materials[i];
+		}
+	}
+	materials.clear();
+
+	if(meshes.size() > 0){
+		for(int i=0;i<meshes.size();i++){
+			delete meshes[i];
+		}
+	}
+	meshes.clear();
+
+	LOG(INFO) << name << " loading begin";
+
+	std::ifstream file(name.c_str(), std::ios::in | std::ios::binary);
+	auto begin = file.tellg();
+	if (file.is_open()) {
+
+		//40 head
+		char head[40];
+		file.read(head, 40);
+
+		unsigned int efnum;
+		file.read((char*)&efnum, sizeof(unsigned int));
+
+		for (int i=0;i<efnum;i++)
+		{
+			materials.push_back(new Material());
+			file.read((char*)&materials[i]->emission, sizeof(glm::vec4));
+			file.read((char*)&materials[i]->ambient, sizeof(glm::vec4));
+			file.read((char*)&materials[i]->diffuse, sizeof(glm::vec4));
+			file.read((char*)&materials[i]->specular, sizeof(glm::vec4));
+			file.read((char*)&materials[i]->shininess, sizeof(float));
+			file.read((char*)&materials[i]->index_of_refraction, sizeof(float));
+
+			unsigned int slen;
+			file.read((char*)&slen, sizeof(unsigned int));
+			char* sbuf = new char[slen];
+			file.read((char*)sbuf, slen);
+			materials[i]->id = std::string(sbuf);
+			delete[] sbuf;
+		}
+
+		unsigned int menum;
+		file.read((char*)&menum, sizeof(unsigned int));
+		for (int i=0;i<menum;i++)
+		{
+			meshes.push_back(new Mesh());
+			unsigned int vcount;
+			file.read((char*)&vcount, sizeof(unsigned int));
+			meshes[i]->Verteces.resize(vcount);
+			for (int j = 0; j < vcount; j++)
+			{
+				file.read((char*)&(meshes[i]->Verteces[j]), sizeof(VertexPositionNormalTexture));
+			}
+
+			unsigned int icount;
+			file.read((char*)&icount, sizeof(unsigned int));
+			meshes[i]->Indeces.resize(icount);
+			for (int j = 0; j < icount; j++)
+			{
+				file.read((char*)&(meshes[i]->Indeces[j]), sizeof(GLuint));
+			}
+
+			unsigned int slen;
+			file.read((char*)&slen, sizeof(unsigned int));
+			char* sbuf = new char[slen];
+			file.read((char*)sbuf, slen);
+			meshes[i]->material = findMaterialById(sbuf);
+			if(meshes[i]->material == nullptr){
+				meshes[i]->material = &ErrorMaterial;
+			}
+			delete[] sbuf;
+
+			
+
+			file.read((char*)&meshes[i]->World, sizeof(mat4));
+
+			file.read((char*)&slen, sizeof(unsigned int));
+			sbuf = new char[slen];
+			file.read((char*)sbuf, slen);
+			meshes[i]->id = std::string(sbuf);
+			delete[] sbuf;
+		}
+
+		file.close();
+	} else {
+		LOG(ERROR) << "Failed to open file " << name;
+		return;
+	}
+
+	LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(file.tellg() - begin).c_str());
+	LOG(INFO) << name << " loading end";
+}
+
 Material* Model::findMaterialById(char* str){
 	for (int i=0;i<materials.size();i++)
 	{
@@ -118,7 +295,8 @@ Material* Model::findMaterialById(char* str){
 }
 
 Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
-	World(1)
+	World(1),
+	ErrorMaterial()
 {
 	auto c = new ColladaRaw(name);
 	LOG(INFO) << name << " parsing begin";

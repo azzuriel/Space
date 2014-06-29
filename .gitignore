@@ -41,3 +41,6 @@ Space/font.json.png
 Space/*.txt
 Space/*.dae
 Space/*.dae
+lastlog.txt
+*.dae
+*.m

@@ -23,6 +23,7 @@ struct Texture {
 	~Texture();
 
 	void Load(std::string a);
+	void Empty(glm::vec2 size);
 };
 
 struct Rect{

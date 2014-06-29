@@ -72,9 +72,6 @@
     <ClCompile Include="TreeSphere.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="ROAMgrid.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="binary_triangle_tree.c">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
@@ -82,9 +79,6 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="ClassicNoise.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="ROAMSurface.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
@@ -132,12 +126,15 @@
     <ClCompile Include="Material.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="ROAMgrid.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="ROAMSurface.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassicNoise.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="ROAMSurface.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Bitmap.h">
@@ -192,9 +189,6 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Quad.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="ROAMgrid.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="SphereTesselator.h">
@@ -259,6 +253,12 @@
     </ClInclude>
     <ClInclude Include="ColladaRaw.h">
       <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="ROAMgrid.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="ROAMSurface.h">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
