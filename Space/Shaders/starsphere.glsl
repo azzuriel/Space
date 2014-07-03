@@ -76,16 +76,7 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 
 void main(void)
 {
-  vec3 normal   = Vert.normal;
-  normal = normalize(texture(material.normal, Vert.texcoord) + vec4(normal, 1)).xyz;
-  vec3 lightDir = Vert.lightDir;
-  vec3 viewDir  = Vert.viewDir;
-  const float k = 0.8;
-
-  float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
-  float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
-  
-  color   = vec4(0.5,1,0.5,1) * d1 * d2;
-  color.w = 1;
+  color   = texture(material.texture, Vert.texcoord);
+  color = vec4(1,1,1,1);
 }
 #endif

@@ -132,6 +132,9 @@
     <ClCompile Include="ROAMSurface.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="SkySphere.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassicNoise.h">
@@ -258,6 +261,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="ROAMSurface.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="SkySphere.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

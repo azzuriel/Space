@@ -163,6 +163,9 @@ bool Mesh::loadOBJ(std::string path)
 
 void Mesh::Bind(int type /* = 0 */)
 {
+	if(Verteces.size() == 0){
+		return;
+	}
 	auto bindtype = type == 0 ? GL_STATIC_DRAW : GL_STREAM_DRAW;
 
 	if(m_vbo) {

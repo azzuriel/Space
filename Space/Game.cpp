@@ -18,7 +18,7 @@
 #include <unistd.h>
 #endif /* __linux__ */
 #ifdef _WIN32
-#include <windows.h>
+#include <windows.h> 
 #endif /* _WIN32 */
 #include <math.h>
 #include "../Engine/TreeSphere.h"
@@ -41,6 +41,8 @@
 #include "LodSphere.h"
 #include "../Engine/ROAMgrid.h"
 #include "../Engine/ROAMSurface.h"
+#include <sqlite3.h>
+#include "../Engine/SkySphere.h"
 
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -60,6 +62,7 @@ Game::Game(void)
 	fullscreen = false;
 }
 
+
 Game::~Game(void)
 {
 
@@ -77,7 +80,7 @@ int Game::Initialize()
 		return glfwErrorCode;
 	}
 
-	//glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Game::MAJOR_GL);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Game::MINOR_Gl);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -183,11 +186,22 @@ void Game::Run()
 	BasicShader->LocateVars("transform.normal"); //var2
 	auto colorTextureLocation = BasicShader->LocateVars("material.texture");
 
+	auto StarSphereShader = std::shared_ptr<JargShader>(new JargShader());
+	StarSphereShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/starsphere.glsl");
+	StarSphereShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/starsphere.glsl");
+	StarSphereShader->Link();
+	StarSphereShader->LocateVars("transform.viewProjection"); //var0
+	StarSphereShader->LocateVars("transform.model"); //var1
+	StarSphereShader->LocateVars("transform.normal"); //var2
+
 	Texture test;
 	test.Load("img.png");
 
 	Texture hm;
 	hm.Load("face.png");
+
+	Texture st;
+	st.Load("st.png");
 
 	BasicShader->BindProgram();
 	Material mat;
@@ -311,6 +325,36 @@ void Game::Run()
 
 	//auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
+	sqlite3 *db;
+	char *zErrMsg = 0;
+	auto rc = sqlite3_open("stars.db", &db);
+	int starsize;
+	if( rc ){
+		LOG(ERROR) << "Can't open database: " << sqlite3_errmsg(db);
+	}else{
+		LOG(INFO) << "Opened database successfully";
+		auto sql = "SELECT COUNT(*) FROM test";
+		rc = sqlite3_exec(db, sql, [](void *arg, int argc, char **argv, char **azColName)->int{ LOG(INFO) << "Total " << (argv[0] ? argv[0] : "NULL")  << " lines"; sscanf(argv[0], "%f", arg); return 0; }, &starsize, &zErrMsg);
+		if(rc){
+			LOG(ERROR) << zErrMsg;
+		}
+	}
+
+	ss.m->Verteces.resize(88000*3);
+	ss.m->Indeces.resize(88000*3);
+	auto sql = "SELECT * FROM test";
+	int starpos =0;
+	rc = sqlite3_exec(db, sql, [](void *last, int argc, char **argv, char **azColName)->int{Game::ss.Generate(last, argc, argv, azColName);(*reinterpret_cast<int*>(last))+=3; return 0;}, &starpos, &zErrMsg);
+	if(rc){
+		LOG(ERROR) << zErrMsg;
+	} else {
+		LOG(INFO) << "skysphere end";
+	}
+	ss.m->Bind();
+	ss.m->shader = StarSphereShader.get();
+	Material stm = Material();
+	stm.texture = &st;
+	ss.m->material = &stm;
 	ROAMSurface* m = new ROAMSurface();
 
 	Texture emptytex = Texture();
@@ -329,7 +373,7 @@ void Game::Run()
 
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.9, 1, 1, 1.0f);
+		glClearColor(0.2,0.1, 0.3, 1.0f);
 
 		if(Keyboard::isKeyDown(GLFW_KEY_W)){
 			camera.Move(FORWARD);
@@ -472,6 +516,7 @@ void Game::Run()
 			m->UpdateCells(camera.position);
 			m->Bind();
 		}
+		ss.m->World = glm::translate(Identity, camera.position);
 
 
 		PointLightSetup(BasicShader->program, pl);
@@ -480,6 +525,7 @@ void Game::Run()
 		m->Render(BasicShader.get());
 		//plane->Render();
 		cube->Render();
+		ss.m->Render();
 		////////////////////////////////////////////////////////////////////////// WORLD PLACE
 
 		if(wire == 2) {
@@ -537,5 +583,6 @@ void Game::Resize(int a, int b)
 	glViewport(0,0,a,b);
 }
 
+SkySphere Game::ss;
 int Game::width = 0;
 int Game::height = 0;

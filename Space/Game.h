@@ -6,6 +6,7 @@
 #include <memory>
 #include "..\Engine\GameTimer.h"
 #include "..\Engine\FPSCounter.h"
+#include "..\Engine\SkySphere.h"
 
 class Game
 {
@@ -27,4 +28,5 @@ public:
 	int wire;
 
 	static const int MAJOR_GL = 3, MINOR_Gl = 3;
+	static SkySphere ss;
 };
