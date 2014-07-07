@@ -56,6 +56,8 @@ public:
 	static double IsMoveCursorX();
 	static double IsMoveCursorY();
 
+	static void Scroll(double a);
+
 	static bool IsRightPressed();
 	static bool IsLeftPressed();
 	static void Update();

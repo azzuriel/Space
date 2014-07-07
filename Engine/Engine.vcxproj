@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Space\LodSphere.cpp" />
     <ClCompile Include="binary_triangle_tree.c" />
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -121,6 +122,7 @@
     <ClCompile Include="ROAMgrid.cpp" />
     <ClCompile Include="ROAMSurface.cpp" />
     <ClCompile Include="SkySphere.cpp" />
+    <ClCompile Include="SpaceSolver.cpp" />
     <ClCompile Include="SphereTesselator.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="TextGeometry.cpp" />
@@ -134,6 +136,7 @@
     <ClCompile Include="WinS.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Space\LodSphere.h" />
     <ClInclude Include="binary_triangle_tree.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
@@ -167,6 +170,7 @@
     <ClInclude Include="ROAMgrid.h" />
     <ClInclude Include="ROAMSurface.h" />
     <ClInclude Include="SkySphere.h" />
+    <ClInclude Include="SpaceSolver.h" />
     <ClInclude Include="SphereTesselator.h" />
     <ClInclude Include="SpriteBatch.h" />
     <ClInclude Include="TextGeometry.h" />

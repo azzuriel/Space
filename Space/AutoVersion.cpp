@@ -1,6 +1,6 @@
 #include "AutoVersion.h"
-#include <boost\date_time\posix_time\conversion.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <stdio.h>
+#include <time.h>
 
 std::string AutoVersion::GetTitle()
 {
@@ -9,11 +9,13 @@ std::string AutoVersion::GetTitle()
 	}
 	char buff[100];
 	std::string s1 = Time;
-	long t = atol(s1.c_str());
-	auto time = boost::posix_time::from_time_t(t);
+	time_t t = atol(s1.c_str());
 	std::string s2 = Ver;
-	std::string times = to_simple_string(time);
-	sprintf(buff, "%s %s %s %s", "Sandbox", s2.c_str(), "from", times.c_str());
+	struct tm  ts;
+	ts = *localtime(&t);
+	char buf[80];
+	strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S", &ts);
+	sprintf(buff, "%s %s %s %s\0", "Space", s2.c_str(), "from", buf);
 	title_ = buff;
 	ready_ = true;
 	return title_;

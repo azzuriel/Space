@@ -35,7 +35,7 @@ Win::Win(glm::vec2 p, glm::vec2 s, glm::vec4 t_col) :
 Win::~Win(void)
 {
 	if(Items.size() > 0){
-		for(int i=0; i< Items.size(); i++){
+		for(unsigned int i=0; i< Items.size(); i++){
 			delete Items[i];
 		}
 	}
@@ -58,7 +58,7 @@ void Win::Draw() const
 	//text->DrawAt(atCenter(text->Size, pos, glm::vec2(size.x, 20)));
 
 	if(Items.size() > 0){
-		for(int i=0; i< Items.size(); i++){
+		for(unsigned int i=0; i< Items.size(); i++){
 			Items[i]->Draw();
 		}
 	}
@@ -74,7 +74,7 @@ void Win::Update()
 	}
 
 	if(Items.size() > 0){
-		for(int i=0; i< Items.size(); i++){
+		for(unsigned int i=0; i< Items.size(); i++){
 			Items[i]->Update(); 
 		}
 	}

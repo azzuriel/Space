@@ -24,7 +24,7 @@
     <ClCompile Include="notepad.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="LodSphere.cpp">
+    <ClCompile Include="AutoVersion.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,11 +32,8 @@
     <ClInclude Include="Game.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="LodSphere.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="sqlite_callbacks.h">
-      <Filter>Заголовочные файлы</Filter>
+    <ClInclude Include="AutoVersion.h">
+      <Filter>Файлы исходного кода</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -43,7 +43,9 @@
 #include "../Engine/ROAMSurface.h"
 #include <sqlite3.h>
 #include "../Engine/SkySphere.h"
-
+#include "AutoVersion.h"
+#include "SpaceSolver.h"
+#include "JHelpers_inl.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -56,7 +58,7 @@ Game::Game(void)
 	srand(1);
 	Running = true;
 
-	title = "Game";
+	title = AutoVersion::GetTitle();
 	width = 1024;
 	height = 600;
 	fullscreen = false;
@@ -129,6 +131,7 @@ int Game::Initialize()
 	glfwSetWindowFocusCallback(window, [](GLFWwindow *window, int focused){Mouse::WindowFocus(focused);});
 	glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int a, int b, int c){Mouse::SetButton(a, b, c);});
 	glfwSetWindowSizeCallback(window, [](GLFWwindow *window, int a, int b){Game::Resize(a, b); Mouse::SetWindowSize(a, b);});
+	glfwSetScrollCallback(window, [](GLFWwindow *window, double a, double b){Mouse::Scroll(b);});
 	wire = 0;
 
 	//*******************************
@@ -239,15 +242,11 @@ void Game::Run()
 
 	const glm::mat4 Identity = glm::mat4(1.0f);
 
-// 	auto m = new Mesh(Icosahedron::getMesh());
-// 	m->Unindex();
-// 	m->computeNormal();
-// 	m->MergeVerteces();
-// 	//m->loadOBJ("Data\\untitled.obj");
-// 	m->Bind();
-// 	m->shader = BasicShader.get();
-// 	m->material = &mat;
-// 	m->World = glm::scale(Identity, vec3(3,3,3));
+ 	auto m = new Mesh(Icosahedron::getMesh());
+ 	//m->loadOBJ("Data\\untitled.obj");
+ 	m->Bind();
+ 	m->shader = BasicShader.get();
+ 	m->material = &mat;
 
 	auto plane =Tesselator::Tesselate(5, Quad::GetMesh());
 	plane->Bind();
@@ -325,7 +324,7 @@ void Game::Run()
 
 	//auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
-	sqlite3 *db;
+	/*sqlite3 *db;
 	char *zErrMsg = 0;
 	auto rc = sqlite3_open("stars.db", &db);
 	int starsize;
@@ -338,27 +337,87 @@ void Game::Run()
 		if(rc){
 			LOG(ERROR) << zErrMsg;
 		}
-	}
+	}*/
 
+	//std::make_shared(new std::vector<>);
 	ss.m->Verteces.resize(88000*3);
 	ss.m->Indeces.resize(88000*3);
-	auto sql = "SELECT * FROM test";
+	/*auto sql = "SELECT * FROM test";
 	int starpos =0;
 	rc = sqlite3_exec(db, sql, [](void *last, int argc, char **argv, char **azColName)->int{Game::ss.Generate(last, argc, argv, azColName);(*reinterpret_cast<int*>(last))+=3; return 0;}, &starpos, &zErrMsg);
 	if(rc){
 		LOG(ERROR) << zErrMsg;
 	} else {
 		LOG(INFO) << "skysphere end";
-	}
+	}*/
 	ss.m->Bind();
-	ss.m->shader = StarSphereShader.get();
+	ss.m->shader = BasicShader.get();
 	Material stm = Material();
 	stm.texture = &st;
 	ss.m->material = &stm;
-	ROAMSurface* m = new ROAMSurface();
+
+
+	//ROAMSurface* m = new ROAMSurface();
 
 	Texture emptytex = Texture();
 	emptytex.Empty(vec2(1000,1000));
+
+	SpaceSolver spso = SpaceSolver();
+	GameObject star1;
+	star1.majorAxis = 0.00001;
+	star1.minorAxis = 0.00001;
+	spso.objects.push_back(&star1);
+	auto so = new GameObject[13];
+
+	so[0].majorAxis = so[0].minorAxis = 0.38;
+ 	spso.objects.push_back(&so[0]);
+
+	so[1].majorAxis = so[1].minorAxis = 0.72;
+	spso.objects.push_back(&so[1]);
+
+	so[2].majorAxis = so[2].minorAxis = 1;
+	spso.objects.push_back(&so[2]);
+
+	so[3].majorAxis = so[3].minorAxis = 1.52;
+	spso.objects.push_back(&so[3]);
+
+	so[4].majorAxis = so[4].minorAxis = 2.76;
+	spso.objects.push_back(&so[4]);
+
+	so[5].majorAxis = so[5].minorAxis = 5.20;
+	spso.objects.push_back(&so[5]);
+
+	so[6].majorAxis = so[6].minorAxis = 9.54;
+	spso.objects.push_back(&so[6]);
+
+	so[7].majorAxis = so[7].minorAxis = 19.22;
+	spso.objects.push_back(&so[7]);
+
+	so[8].majorAxis = so[8].minorAxis = 30,06;
+	spso.objects.push_back(&so[8]);
+
+	so[9].majorAxis = so[9].minorAxis = 39,2;
+	spso.objects.push_back(&so[9]);
+
+	so[10].majorAxis = so[10].minorAxis = 42.1;
+	spso.objects.push_back(&so[10]);
+
+	so[11].majorAxis = so[11].minorAxis = 45,2;
+	spso.objects.push_back(&so[11]);
+
+	so[12].majorAxis = so[12].minorAxis = 68,03;
+	spso.objects.push_back(&so[12]);
+
+	GameObject pl1;
+	pl1.pos = vec3(11,0,11);
+	pl1.majorAxis = 11*4*2;
+	pl1.minorAxis = 11*4;
+	pl1.epoch = 11;
+	pl1.inclination = 0.2;
+	spso.objects.push_back(&pl1);
+	
+	spso.MakeOrbits();
+	
 
 	Mouse::SetFixedPosState(true);
 	glCullFace(GL_BACK);
@@ -475,6 +534,8 @@ void Game::Run()
 			camera.camera_scale = gt.elapsed*10.0F;
 		}
 
+		spso.Solve(gt);
+
 		camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
 
@@ -510,19 +571,27 @@ void Game::Run()
 		camera.Update();
 		MVP = camera.VP() * model;
 
-		sec += gt.elapsed;
+		/*sec += gt.elapsed;
 		if(sec > 0.1) {
 			sec = 0;
 			m->UpdateCells(camera.position);
 			m->Bind();
-		}
+		}*/
+
+
 		ss.m->World = glm::translate(Identity, camera.position);
 
 
 		PointLightSetup(BasicShader->program, pl);
 		CameraSetup(BasicShader->program, camera, MVP);
 		////////////////////////////////////////////////////////////////////////// WORLD PLACE
-		m->Render(BasicShader.get());
+		for (unsigned int i = 0; i < spso.objects.size(); i++)
+		{
+			cube->World = glm::translate(Identity, spso.objects[i]->pos);
+			cube->Render();
+			sb->DrawLines3d(spso.objects[i]->orbit, Colors::Red);
+		}
+		
 		//plane->Render();
 		cube->Render();
 		ss.m->Render();
@@ -541,7 +610,7 @@ void Game::Run()
 		LinesShader->BindProgram();
 		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
-
+		int dc = 0;
 
 		ws->Update(gt);
 		ws->Draw();
@@ -552,9 +621,12 @@ void Game::Run()
 
 		LinesShader->BindProgram();
 		glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
-		int dc = sb->RenderFinallyWorld();
+		
 
 		dc += sb->RenderFinally();
+
+		glEnable(GL_DEPTH_TEST);
+		dc = sb->RenderFinallyWorld();
 
 		Mouse::Update();
 
@@ -563,12 +635,13 @@ void Game::Run()
 
 		glfwPollEvents();
 
-		//std::this_thread::sleep_for(std::chrono::milliseconds(15));
+		std::this_thread::sleep_for(std::chrono::milliseconds(15));
 	}
 
 	delete m;
 	delete plane;
 	delete cube;
+	delete[] so;
 
 	sphere->bpUnregister(dynamicsWorld.get());
 

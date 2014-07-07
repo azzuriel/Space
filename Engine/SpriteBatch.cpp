@@ -6,6 +6,7 @@
 #include <utf8\unchecked.h>
 #include <utf8\checked.h>
 #include "TextGeometry.h"
+#include <vector>
 
 Batched::Batched()
 {
@@ -84,6 +85,13 @@ void Batched::Initialize(const JargShader* tex, const JargShader* col){
 	glBindVertexArray(dvao);
 	dvbo = new GLuint[2];
 	glGenBuffers(2, dvbo);
+}
+
+void Batched::DrawLines3d(std::vector<glm::vec3> a, glm::vec4 col){
+	for (unsigned int i = 0; i < a.size(); i+=2)
+	{
+		DrawLine3d(a[i], a[i+1], col);
+	}
 }
 
 void Batched::DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *l_vertex, glm::vec2 *l_uv, glm::vec4 *l_color, GLuint *l_index, int &size) {
@@ -307,7 +315,7 @@ void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Text
 
 void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex)
 {
-	innerDraw(pos, size, rotation, (const Texture) tex, Rect(0,0,1,1));
+    innerDraw(pos, size, rotation, (const Texture) tex, Rect(0,0,1,1));
 }
 
 void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, const Texture& tex)
@@ -406,8 +414,8 @@ int Batched::RenderFinallyWorld()
 
 		glPointSize(3);
 		glDrawElements(GL_LINES, dcurn*2, GL_UNSIGNED_INT, NULL);
-		glDrawElements(GL_POINTS, dcurn*2, GL_UNSIGNED_INT, NULL);
-		dc++; dc++;
+		//glDrawElements(GL_POINTS, dcurn*2, GL_UNSIGNED_INT, NULL);
+		dc++; //dc++;
 	}
 	dcurn = 0;
 	return dc;
@@ -558,8 +566,8 @@ void Batched::line3dRender()
 
 	glPointSize(3);
 	glDrawElements(GL_LINES, dcurn*2, GL_UNSIGNED_INT, NULL);
-	glDrawElements(GL_POINTS, dcurn*2, GL_UNSIGNED_INT, NULL);
-	dc++; dc++;
+	//glDrawElements(GL_POINTS, dcurn*2, GL_UNSIGNED_INT, NULL);
+	dc++; //dc++;
 	dcurn = 0;
 }
 

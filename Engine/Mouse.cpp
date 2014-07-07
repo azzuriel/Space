@@ -38,6 +38,9 @@ void Mouse::SetButton( int button, int state ,int c )
 	Mouse::sm_buttons[button] = state;
 }
 
+void Mouse::Scroll(double a){
+}
+
 void Mouse::SetCursorPos( double x, double y )
 {
 	if(!sm_isWindowFocused)

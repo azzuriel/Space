@@ -1,4 +1,5 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <glm.hpp>
 #include <gtx/quaternion.hpp>
 #include <memory>
@@ -6,7 +7,37 @@
 #include <stdarg.h>
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btQuaternion.h>
+#include <glm.hpp>
+#include <math.h>
+
+#define G 6.671919999999999999999e-11
+#define Pc 3.0856776e+16
+#define Ae 149597870.7
  
+ inline double getExcentricity(double a, double b){
+	 return sqrt(1 - ((b*b)/(a*a)));
+ }
+
+ inline double getFocalLength(double a, double b){
+	 return getExcentricity(a,b)*a;
+ }
+
+ inline double getSpaceSpeed1st(double mass, double radius)	{
+	 return sqrt(G*(mass/radius));
+ }
+
+ inline double getSpaceSpeed2st(double mass, double radius)	{
+	 return sqrt(2*G*(mass/radius));
+ }
+
+ inline glm::vec3 SphToDec(float phi, float theta, float r){
+	return glm::vec3(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
+ }
+
+ inline double RotTime(double mass, double majorAxis){
+	 return pow(2*M_PI*majorAxis, 3.0/2.0)*(G*mass)-1/2;
+ }
+
  inline bool inLimsV(glm::vec2 param1, glm::vec2 wpos, glm::vec2 size)
  {
  	return param1.x >= wpos.x && param1.y >= wpos.y && param1.x <= size.x && param1.y <= size.y;
@@ -16,6 +47,26 @@
  inline bool inLims(T param1, T wpos, T size)
  {
  	return param1 >= wpos && param1 <= size;
+ }
+
+ template<class T>
+ inline T kmToParsec(T a){
+	return (T)(a / (3.0856776e+13)); 
+ }
+
+  template<class T>
+ inline T mToParsec(T a){
+	return (T)(a / (3.0856776e+16));
+ }
+
+  template<class T>
+ inline T kmToAE(T a){
+	return (T)(a / 149597870.7);
+ }
+
+   template<class T>
+ inline T mToAE(T a){
+	return (T)(a / 149597870700.0);
  }
  
  template<class T>

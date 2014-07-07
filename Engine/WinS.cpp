@@ -22,7 +22,7 @@ WinS::WinS(Batched* sb_, const Font& fnt)
 WinS::~WinS()
 {
 	if(windows.size() > 0) {
-		for(int i=0 ;i< windows.size(); i++)
+		for(unsigned int i=0 ;i< windows.size(); i++)
 			delete windows.at(i);
 	}
 	windows.clear();
@@ -33,7 +33,7 @@ WinS::~WinS()
 void WinS::Draw()
 {
 	if(windows.size() > 0) {
-		for (int i =0; i< windows.size(); i++)
+		for (unsigned int i =0; i< windows.size(); i++)
 			windows.at(i)->Draw();
 	}
 }
@@ -41,7 +41,7 @@ void WinS::Draw()
 void WinS::ToTop(Win* w) {
 	std::vector<Win*>::iterator iter;
 	bool b = false;
-	int i =0;
+	int i =0;  
 	for (iter = windows.begin() ; iter != --windows.end(); ++iter) {
 		if(*iter == w || b) {
 			Win* temp = w;
