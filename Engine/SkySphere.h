@@ -4,9 +4,9 @@
 class SkySphere
 {
 public:
-	SkySphere(void);
-	~SkySphere(void);
-	int Generate(void *NotUsed, int argc, char **argv, char **azColName);
-	Mesh* m;
+    SkySphere(void);
+    ~SkySphere(void);
+    int Generate(void *NotUsed, int argc, char **argv, char **azColName);
+    Mesh* m;
 };
 

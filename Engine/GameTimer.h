@@ -3,10 +3,10 @@
 
 class GameTimer{
 public:
-	GameTimer(void);
-	~GameTimer(void);
-	double elapsed, current, last;
-	void Update(double wglTime);
+    GameTimer(void);
+    ~GameTimer(void);
+    double elapsed, current, last;
+    void Update(double wglTime);
 };
 
 #endif // GameTimer_h__

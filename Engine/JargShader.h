@@ -7,14 +7,14 @@
 
 class JargShader{
 public:
-	JargShader();
-	~JargShader(void);
-	std::vector<int> vars;
-	void BindProgram() const;
-	int LocateVars(std::string s);
-	void loadShaderFromSource(GLenum type, std::string source);
-	bool Link();
-	int program;
-	std::vector<GLuint> shaders_;
+    JargShader();
+    ~JargShader(void);
+    std::vector<int> vars;
+    void BindProgram() const;
+    int LocateVars(std::string s);
+    void loadShaderFromSource(GLenum type, std::string source);
+    bool Link();
+    int program;
+    std::vector<GLuint> shaders_;
 };
 #endif // JargShader_h__

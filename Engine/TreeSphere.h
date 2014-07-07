@@ -7,24 +7,24 @@
 
 struct QuadLodPart{
 public:
-	Mesh* m;
-	glm::vec3 pos;
-	QuadLodPart *NE, *NW, *SE, *SW;
-	QuadLodPart();
-	~QuadLodPart();
-	vec3 start, end;
-	float initialSize;
+    Mesh* m;
+    glm::vec3 pos;
+    QuadLodPart *NE, *NW, *SE, *SW;
+    QuadLodPart();
+    ~QuadLodPart();
+    vec3 start, end;
+    float initialSize;
 };
 
 class QuadLod
 {
 public:
-	QuadLod(void);
-	~QuadLod(void);
-	void GenerateFrom(glm::vec3 cam);
-	void Render();
-	void Bind();
-	Mesh* m;
-	QuadLodPart* root;
-	
+    QuadLod(void);
+    ~QuadLod(void);
+    void GenerateFrom(glm::vec3 cam);
+    void Render();
+    void Bind();
+    Mesh* m;
+    QuadLodPart* root;
+
 };

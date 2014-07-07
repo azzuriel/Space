@@ -4,22 +4,22 @@
 #include <LinearMath\btDefaultMotionState.h>
 #include <string>
 class DynamicObject :
-	public GameObject
+    public GameObject
 {
 public:
-	DynamicObject(void);
-	DynamicObject(float a);
-	~DynamicObject(void);
+    DynamicObject(void);
+    DynamicObject(float a);
+    ~DynamicObject(void);
 
-	void bpRegister(btDiscreteDynamicsWorld* dynamicsWorld);
-	void bpUnregister(btDiscreteDynamicsWorld* dynamicsWorld);
+    void bpRegister(btDiscreteDynamicsWorld* dynamicsWorld);
+    void bpUnregister(btDiscreteDynamicsWorld* dynamicsWorld);
 
-	btRigidBody* fallRigidBody;
+    btRigidBody* fallRigidBody;
 
-	std::string getFullDebugDescription();
+    std::string getFullDebugDescription();
 private:
-	btCollisionShape* fallShape;
-	btDefaultMotionState* fallMotionState;
-	
+    btCollisionShape* fallShape;
+    btDefaultMotionState* fallMotionState;
+
 };
 

@@ -6,9 +6,9 @@
 class Icosahedron
 {
 public:
-	static Mesh getMesh();
+    static Mesh getMesh();
 private:
-	static Mesh* sm_mesh;
+    static Mesh* sm_mesh;
 };
 #endif // Icosahedron_h__
 

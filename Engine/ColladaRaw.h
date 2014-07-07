@@ -5,12 +5,12 @@
 class ColladaRaw
 {
 public:
-	ColladaRaw(void);
-	ColladaRaw(std::string name);
-	~ColladaRaw(void);
-	rapidxml::xml_document<>* data;
-	char* xml;
-	int size;
+    ColladaRaw(void);
+    ColladaRaw(std::string name);
+    ~ColladaRaw(void);
+    rapidxml::xml_document<>* data;
+    char* xml;
+    int size;
 };
 
 

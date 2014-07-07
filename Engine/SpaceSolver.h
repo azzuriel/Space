@@ -5,10 +5,10 @@
 class SpaceSolver
 {
 public:
-	SpaceSolver(void);
-	~SpaceSolver(void);
-	void Solve(GameTimer gt);
-	void MakeOrbits(void);
-	std::vector<GameObject*> objects;
+    SpaceSolver(void);
+    ~SpaceSolver(void);
+    void Solve(GameTimer gt);
+    void MakeOrbits(void);
+    std::vector<GameObject*> objects;
 };
 

@@ -10,19 +10,19 @@
 class Model
 {
 public:
-	Model(void);
-	Model(std::string name, int model_type = COLLADA_MODEL);
-	~Model(void);
-	std::vector<Mesh*> meshes;
-	std::vector<Material*> materials;
-	mat4 World;
-	void Bind();
-	void Render();
-	Mesh* findMeshById(char* str);
-	Material* findMaterialById(char* str);
-	void SaveBinary(std::string name);
-	void LoadBinary(std::string name);
-	Material ErrorMaterial;
+    Model(void);
+    Model(std::string name, int model_type = COLLADA_MODEL);
+    ~Model(void);
+    std::vector<Mesh*> meshes;
+    std::vector<Material*> materials;
+    mat4 World;
+    void Bind();
+    void Render();
+    Mesh* findMeshById(char* str);
+    Material* findMaterialById(char* str);
+    void SaveBinary(std::string name);
+    void LoadBinary(std::string name);
+    Material ErrorMaterial;
 };
 #endif // Model_h__
 

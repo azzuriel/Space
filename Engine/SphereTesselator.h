@@ -6,11 +6,11 @@
 class Tesselator
 {
 public:
-	static Mesh* Tesselate(int iters, const Mesh& mesh);
-	static Mesh* SphereTesselate(int iters, const Mesh& mesh);
+    static Mesh* Tesselate(int iters, const Mesh& mesh);
+    static Mesh* SphereTesselate(int iters, const Mesh& mesh);
 private:
-	static Mesh* SubTesselate(const Mesh& mesh);
-	static Mesh* SphereSubTesselate(const Mesh& mesh);
+    static Mesh* SubTesselate(const Mesh& mesh);
+    static Mesh* SphereSubTesselate(const Mesh& mesh);
 };
 #endif // SphereTesselator_h__
 

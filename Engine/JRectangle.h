@@ -8,25 +8,25 @@
 class JRectangle
 {
 private:
-	TextureOld texture;
+    TextureOld texture;
 
-	float x, y, z;
-	float width;
-	float height;
+    float x, y, z;
+    float width;
+    float height;
 
-	BufferArray buffer;
+    BufferArray buffer;
 
 public:
-	JRectangle(void);
-	~JRectangle(void);
+    JRectangle(void);
+    ~JRectangle(void);
 
-	void SetSize(float width, float height);
-	void SetPos(const vec3 &pos);
+    void SetSize(float width, float height);
+    void SetPos(const vec3 &pos);
 
-	void SetTexture(const TextureOld &texture);
-	TextureOld GetTexture();
+    void SetTexture(const TextureOld &texture);
+    TextureOld GetTexture();
 
-	BufferArray &GetBufferArray();
+    BufferArray &GetBufferArray();
 
 };
 

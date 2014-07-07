@@ -7,18 +7,18 @@
 class FPSCounter
 {
 private:
-	//std::list<double> fpsStack;
+    //std::list<double> fpsStack;
 
-	int sm_fps, sm_fpsC;
-	double sm_fpsTime;
+    int sm_fps, sm_fpsC;
+    double sm_fpsTime;
 
 public:
-	FPSCounter(void);
-	~FPSCounter(void);
+    FPSCounter(void);
+    ~FPSCounter(void);
 
-	void Update(GameTimer gt);
+    void Update(GameTimer gt);
 
-	unsigned int GetCount();
+    unsigned int GetCount();
 
 };
 

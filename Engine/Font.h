@@ -18,64 +18,64 @@
 
 struct FontTexture
 {
-	TextureOld texture;
-	unsigned int width;
-	unsigned int height;
-	int offsetDown;
+    TextureOld texture;
+    unsigned int width;
+    unsigned int height;
+    int offsetDown;
 };
 
 class Font
 {
 private:
 
-	FT_Library library;
-	FT_Face face;
+    FT_Library library;
+    FT_Face face;
 
-	ImageAtlas glyphAtlas;
-
-
-	struct GlyphBitmap
-	{
-		Bitmap* bitmap;
-		int offsetDown;
-		unsigned int key;
-
-		bool operator < (const GlyphBitmap& second)
-		{
-			return (bitmap->GetHeight() * bitmap->GetWidth())
-				< (second.bitmap->GetHeight() * second.bitmap->GetWidth());
-		}
-	};
+    ImageAtlas glyphAtlas;
 
 
-	std::list<GlyphBitmap> glyphsBitmapList;
+    struct GlyphBitmap
+    {
+        Bitmap* bitmap;
+        int offsetDown;
+        unsigned int key;
+
+        bool operator < (const GlyphBitmap& second)
+        {
+            return (bitmap->GetHeight() * bitmap->GetWidth())
+                < (second.bitmap->GetHeight() * second.bitmap->GetWidth());
+        }
+    };
+
+
+    std::list<GlyphBitmap> glyphsBitmapList;
 
 
 
 private:
-	bool CreateFromConfig( std::string configFileName );
+    bool CreateFromConfig( std::string configFileName );
 
-	bool GenerateGlyphsList( std::string glyphList );
-	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
-	bool GenerateOpenglGlyphs( std::string configFileName);
+    bool GenerateGlyphsList( std::string glyphList );
+    bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
+    bool GenerateOpenglGlyphs( std::string configFileName);
 
-	bool GenerateEmptyGlyph();
-	
+    bool GenerateEmptyGlyph();
+
 
 public:
-	Font();
-	~Font();
-	std::string name;
-	Texture* tex;
-  int blankX, blankY;
+    Font();
+    ~Font();
+    std::string name;
+    Texture* tex;
+    int blankX, blankY;
 
-	bool Initialize();
+    bool Initialize();
 
-	bool Create(std::string configFileName);
-	void Remove();
+    bool Create(std::string configFileName);
+    void Remove();
 
-	const FontTexture GetGlyphTexture(unsigned int utf32glyph) const;
-	std::map<unsigned int, FontTexture> glyphsTextureMap;
+    const FontTexture GetGlyphTexture(unsigned int utf32glyph) const;
+    std::map<unsigned int, FontTexture> glyphsTextureMap;
 };
 
 

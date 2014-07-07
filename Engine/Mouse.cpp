@@ -18,24 +18,24 @@ bool Mouse::sm_isWindowFocused;
 
 void Mouse::Initialize( GLFWwindow *win )
 {
-	sm_window = win;
-	sm_xpos = 1.0;
-	sm_ypos = 1.0;
-	sm_dxpos = 0.0;
-	sm_dypos = 0.0;
-	sm_windowWidth = 0;
-	sm_windowHeight = 0;
-	sm_stateFixedMousePos = false;
-	sm_isCursorClientArea = true;
-	sm_isWindowFocused = true;
+    sm_window = win;
+    sm_xpos = 1.0;
+    sm_ypos = 1.0;
+    sm_dxpos = 0.0;
+    sm_dypos = 0.0;
+    sm_windowWidth = 0;
+    sm_windowHeight = 0;
+    sm_stateFixedMousePos = false;
+    sm_isCursorClientArea = true;
+    sm_isWindowFocused = true;
 
-	glfwSetCursorPos(sm_window, sm_xpos, sm_ypos);
+    glfwSetCursorPos(sm_window, sm_xpos, sm_ypos);
 }
 
 
 void Mouse::SetButton( int button, int state ,int c )
 {
-	Mouse::sm_buttons[button] = state;
+    Mouse::sm_buttons[button] = state;
 }
 
 void Mouse::Scroll(double a){
@@ -43,147 +43,147 @@ void Mouse::Scroll(double a){
 
 void Mouse::SetCursorPos( double x, double y )
 {
-	if(!sm_isWindowFocused)
-		return;
+    if(!sm_isWindowFocused)
+        return;
 
-	sm_dxpos = x - sm_xpos;
-	sm_dypos = y - sm_ypos;
-	sm_deltaxpos = sm_dxpos;
-	sm_deltaypos = sm_dypos;
-	sm_lastxpos = sm_xpos;
-	sm_lastypos = sm_ypos;
+    sm_dxpos = x - sm_xpos;
+    sm_dypos = y - sm_ypos;
+    sm_deltaxpos = sm_dxpos;
+    sm_deltaypos = sm_dypos;
+    sm_lastxpos = sm_xpos;
+    sm_lastypos = sm_ypos;
 
-	if(!sm_isCursorClientArea)
-	{
-		sm_dxpos = 0.0;
-		sm_dypos = 0.0;
-	}
+    if(!sm_isCursorClientArea)
+    {
+        sm_dxpos = 0.0;
+        sm_dypos = 0.0;
+    }
 
-	if(sm_stateFixedMousePos)
-	{
-		// устанавливаем курсор в центр экрана
-		sm_xpos = double(sm_windowWidth) / 2.0;
-		sm_ypos = double(sm_windowHeight) / 2.0;
-		glfwSetCursorPos(sm_window, sm_xpos, sm_ypos);
-	}
-	else
-	{
-		sm_xpos = x;
-		sm_ypos = y;
-	}
+    if(sm_stateFixedMousePos)
+    {
+        // устанавливаем курсор в центр экрана
+        sm_xpos = double(sm_windowWidth) / 2.0;
+        sm_ypos = double(sm_windowHeight) / 2.0;
+        glfwSetCursorPos(sm_window, sm_xpos, sm_ypos);
+    }
+    else
+    {
+        sm_xpos = x;
+        sm_ypos = y;
+    }
 }
 
 double Mouse::IsMoveCursorX()
 {
-	double dx = sm_dxpos;
-	sm_dxpos = 0.0;
-	return dx;
+    double dx = sm_dxpos;
+    sm_dxpos = 0.0;
+    return dx;
 }
 
 double Mouse::IsMoveCursorY()
 {
-	double dy = sm_dypos;
-	sm_dypos = 0.0;
-	return dy;
+    double dy = sm_dypos;
+    sm_dypos = 0.0;
+    return dy;
 }
 
 void Mouse::GetCursorPos( double &x, double &y )
 {
-	x = sm_xpos;
-	y = sm_ypos;
+    x = sm_xpos;
+    y = sm_ypos;
 }
 
 glm::vec2 Mouse::GetCursorPos()
 {
-	return glm::vec2(sm_xpos, sm_ypos);
+    return glm::vec2(sm_xpos, sm_ypos);
 }
 
 void Mouse::SetFixedPosState( bool state )
 {
-	sm_stateFixedMousePos = state;
-	if(sm_stateFixedMousePos)
-	{
-		sm_xpos = double(sm_windowWidth) / 2.0;
-		sm_ypos = double(sm_windowHeight) / 2.0;
-		sm_dxpos = 0.0;
-		sm_dypos = 0.0;
-		glfwSetCursorPos(sm_window, sm_xpos, sm_ypos);
-	}
+    sm_stateFixedMousePos = state;
+    if(sm_stateFixedMousePos)
+    {
+        sm_xpos = double(sm_windowWidth) / 2.0;
+        sm_ypos = double(sm_windowHeight) / 2.0;
+        sm_dxpos = 0.0;
+        sm_dypos = 0.0;
+        glfwSetCursorPos(sm_window, sm_xpos, sm_ypos);
+    }
 }
 
 void Mouse::SetWindowSize( unsigned int width, unsigned int height )
 {
-	sm_windowWidth = width;
-	sm_windowHeight = height;
+    sm_windowWidth = width;
+    sm_windowHeight = height;
 }
 
 void Mouse::CursorClientArea( int entered )
 {
-	if(entered == GL_TRUE)
-	{
-		sm_isCursorClientArea = true;
-		glfwGetCursorPos(sm_window, &sm_xpos, &sm_ypos);
-	}
-	else
-	{
-		sm_isCursorClientArea = false;
-	}
+    if(entered == GL_TRUE)
+    {
+        sm_isCursorClientArea = true;
+        glfwGetCursorPos(sm_window, &sm_xpos, &sm_ypos);
+    }
+    else
+    {
+        sm_isCursorClientArea = false;
+    }
 }
 
 void Mouse::Update(){
-	sm_deltaypos = 0;
-	sm_deltaxpos = 0;
+    sm_deltaypos = 0;
+    sm_deltaxpos = 0;
 }
 
 void Mouse::WindowFocus( int focused )
 {
-	if(focused == GL_TRUE)
-	{
-		sm_isWindowFocused = true;
-		glfwGetCursorPos(sm_window, &sm_xpos, &sm_ypos);
-	}
-	else
-	{
-		sm_isWindowFocused = false;
-	}
+    if(focused == GL_TRUE)
+    {
+        sm_isWindowFocused = true;
+        glfwGetCursorPos(sm_window, &sm_xpos, &sm_ypos);
+    }
+    else
+    {
+        sm_isWindowFocused = false;
+    }
 }
 
 bool Mouse::IsRightPressed()
 {
-  if(sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS) {
-    sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] = GLFW_REPEAT;
-    return true;
-  }
-  return false;
+    if(sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS) {
+        sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] = GLFW_REPEAT;
+        return true;
+    }
+    return false;
 }
 
 bool Mouse::IsLeftDown()
 {
-  return sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS || sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_REPEAT;
+    return sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS || sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_REPEAT;
 }
 
 bool Mouse::IsRightDown()
 {
-  return sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS || sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_REPEAT;
+    return sm_buttons[GLFW_MOUSE_BUTTON_RIGHT] == GLFW_PRESS || sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_REPEAT;
 }
 
 bool Mouse::IsLeftPressed()
 {
-  if(sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS) {
-    sm_buttons[GLFW_MOUSE_BUTTON_LEFT] = GLFW_REPEAT;
-    return true;
-  }
-  return false;
+    if(sm_buttons[GLFW_MOUSE_BUTTON_LEFT] == GLFW_PRESS) {
+        sm_buttons[GLFW_MOUSE_BUTTON_LEFT] = GLFW_REPEAT;
+        return true;
+    }
+    return false;
 }
 
 glm::vec2 Mouse::GetCursorDelta()
 {
-	return glm::vec2(sm_deltaxpos, sm_deltaypos);
+    return glm::vec2(sm_deltaxpos, sm_deltaypos);
 }
 
 glm::vec2 Mouse::GetCursorLastPos()
 {
-	return glm::vec2(sm_lastxpos, sm_lastypos);
+    return glm::vec2(sm_lastxpos, sm_lastypos);
 }
 
 double Mouse::sm_lastypos;

@@ -6,9 +6,9 @@
 class Quad
 {
 public:
-	static Mesh GetMesh();
+    static Mesh GetMesh();
 private:
-	static Mesh* sm_mesh;
+    static Mesh* sm_mesh;
 };
 #endif // Quad_h__
 

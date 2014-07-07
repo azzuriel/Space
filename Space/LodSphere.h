@@ -3,8 +3,8 @@
 class LodSphere
 {
 public:
-	LodSphere(void);
-	~LodSphere(void);
+    LodSphere(void);
+    ~LodSphere(void);
 
 protected:
 

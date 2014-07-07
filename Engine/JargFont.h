@@ -2,7 +2,7 @@
 class JargFont
 {
 public:
-	JargFont(void);
-	~JargFont(void);
+    JargFont(void);
+    ~JargFont(void);
 };
 

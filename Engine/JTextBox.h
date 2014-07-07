@@ -4,21 +4,21 @@
 #include "TextGeometry.h"
 
 class JTextBox :
-	public WComponent
+    public WComponent
 {
 public:
-	JTextBox(glm::vec2 p, glm::vec2 s);
-	JTextBox(void);
-	~JTextBox(void);
-	virtual void Draw() const;
-	virtual void Update();
-	virtual glm::vec2 GlobalPos() const;
+    JTextBox(glm::vec2 p, glm::vec2 s);
+    JTextBox(void);
+    ~JTextBox(void);
+    virtual void Draw() const;
+    virtual void Update();
+    virtual glm::vec2 GlobalPos() const;
 
-	WContainer* parent;
-	glm::vec2 Size;
-	TextGeometry* text;
+    WContainer* parent;
+    glm::vec2 Size;
+    TextGeometry* text;
 
 private:
-	glm::vec2 pos;
+    glm::vec2 pos;
 };
 

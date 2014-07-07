@@ -5,35 +5,35 @@
 
 JLabel::JLabel(void)
 {
-	text = new TextGeometry();
+    text = new TextGeometry();
 }
 
 JLabel::JLabel(glm::vec2 a) :
-	pos(a)
+    pos(a)
 {
-	text = new TextGeometry();
+    text = new TextGeometry();
 }
 
 
 JLabel::~JLabel(void)
 {
-	if(text){
-		delete text;
-	}
+    if(text){
+        delete text;
+    }
 }
 
 void JLabel::Draw() const
 {
-	text->DrawAt(GlobalPos());
+    text->DrawAt(GlobalPos());
 }
 
 void JLabel::Update()
 {
-	
+
 }
 
 glm::vec2 JLabel::GlobalPos() const
 {
-	return parent->GlobalPos() + pos;
+    return parent->GlobalPos() + pos;
 }
 
