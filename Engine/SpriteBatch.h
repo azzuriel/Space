@@ -22,13 +22,19 @@ private:
     glm::vec4* m_lineColor;
     GLuint* m_lineIndex;
 
+
+    GLuint lines_2d_vao;
+    GLuint* lines_2d_vbo;
+    VertexPositionColor* lines_2d_vertex;
+    GLuint* lines_2d_index;
+
     GLuint dvao;
     GLuint* dvbo;
     VertexPositionColor* dvertex;
     GLuint* dindex;
 
     float curz;
-    int curn, lcurn, dcurn;
+    int curn, lcurn, dcurn, lines_2d_curn;
     int dc;
 
     const Texture* m_currentTex;
@@ -53,6 +59,7 @@ public:
     void DrawQuad(glm::vec2 pos, glm::vec2 size, const Texture& tex);
     void DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col);
     void DrawRectangle(glm::vec2 from, glm::vec2 to, glm::vec4 col);
+    void DrawLine2d(glm::vec2 from, glm::vec2 to, glm::vec4 col);
     void DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col);
     void DrawLines3d(std::vector<glm::vec3> a, glm::vec4 col);
     vec2 GetStringData(glm::vec2 pos, std::string text, vec4 col, const Font& font, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
@@ -67,6 +74,7 @@ private:
     void lineRender();
     void Render();
     void line3dRender();
+    void line2dRender();
 
 };
 #endif // SpriteBatch_h__

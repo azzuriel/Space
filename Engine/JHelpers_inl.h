@@ -19,7 +19,7 @@ inline double getExcentricity(double a, double b){
 }
 
 inline double getFocalLength(double a, double b){
-    return getExcentricity(a,b)*a;
+    return sqrt(1 - ((b*b)/(a*a)))*a;
 }
 
 inline double getSpaceSpeed1st(double mass, double radius)	{

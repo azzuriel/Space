@@ -90,6 +90,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Space\LodSphere.cpp" />
+    <ClCompile Include="BasicJargShader.cpp" />
     <ClCompile Include="binary_triangle_tree.c" />
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="FPSCounter.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="GraphBox.cpp" />
     <ClCompile Include="Heightmap.cpp" />
     <ClCompile Include="Icosahedron.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
@@ -137,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Space\LodSphere.h" />
+    <ClInclude Include="BasicJargShader.h" />
     <ClInclude Include="binary_triangle_tree.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
@@ -151,6 +154,7 @@
     <ClInclude Include="GameMath.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="GraphBox.h" />
     <ClInclude Include="Heightmap.h" />
     <ClInclude Include="Icosahedron.h" />
     <ClInclude Include="ImageAtlas.h" />

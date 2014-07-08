@@ -9,6 +9,7 @@
 #include "TextureManager.h"
 #include <string>
 #include <Material.h>
+#include "BasicJargShader.h"
 class Mesh
 {
 public:
@@ -25,7 +26,7 @@ public:
     void MergeVerteces();
     std::vector<VertexPositionNormalTexture> Verteces;
     std::vector<GLuint> Indeces;
-    JargShader* shader;
+    BasicJargShader* shader;
     Material* material;
     mat4 World;
     std::string id;

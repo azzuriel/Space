@@ -46,6 +46,9 @@
 #include "AutoVersion.h"
 #include "SpaceSolver.h"
 #include "JHelpers_inl.h"
+#include "../Engine/BasicJargShader.h"
+#include "../Engine/GraphBox.h"
+#include "WComponent.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -180,7 +183,7 @@ void Game::Run()
     //glEnable(GL_SMOOTH);
     Mouse::IsLeftPressed();
 
-    auto BasicShader = std::shared_ptr<JargShader>(new JargShader());
+    auto BasicShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/unshaded.glsl");
     BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/unshaded.glsl");
     BasicShader->Link();
@@ -285,7 +288,6 @@ void Game::Run()
     }
 
     WinS* ws = new WinS(sb.get(), *font);
-
 
     auto broadphase = std::unique_ptr<btDbvtBroadphase>(new btDbvtBroadphase());
     auto collisionConfiguration = std::unique_ptr<btDefaultCollisionConfiguration>(new btDefaultCollisionConfiguration());
@@ -434,6 +436,10 @@ void Game::Run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.2,0.1, 0.3, 1.0f);
 
+
+        if(Keyboard::isKeyPress(GLFW_KEY_LEFT_CONTROL)){
+            Mouse::SetFixedPosState(!Mouse::GetFixedPosState());
+        }
         if(Keyboard::isKeyDown(GLFW_KEY_W)){
             camera.Move(FORWARD);
         }
@@ -536,7 +542,8 @@ void Game::Run()
 
         spso.Solve(gt);
 
-        camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
+        if(Mouse::GetFixedPosState())
+            camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
 
 
 
@@ -603,6 +610,8 @@ void Game::Run()
             dynamicsWorld->debugDrawWorld();
         }
 
+        int dc = sb->RenderFinallyWorld();
+
         glDisable(GL_DEPTH_TEST);
         MVP = camera.GetOrthoProjection();
         TextureShader->BindProgram();
@@ -610,23 +619,18 @@ void Game::Run()
         LinesShader->BindProgram();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
-        int dc = 0;
+        sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
+        sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
+        sb->DrawRectangle(vec2(10,10), vec2(100,100), Colors::Red);
+        sb->DrawQuad(vec2(100,100), vec2(100,100), emptytex);
 
         ws->Update(gt);
         ws->Draw();
 
-        sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
-        sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
-        sb->DrawQuad(vec2(100,100), vec2(100,100), emptytex);
-
         LinesShader->BindProgram();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
 
-
-        dc += sb->RenderFinally();
-
-        glEnable(GL_DEPTH_TEST);
-        dc = sb->RenderFinallyWorld();
+        dc += sb->RenderFinally();        
 
         Mouse::Update();
 

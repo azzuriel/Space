@@ -26,8 +26,8 @@ double get_eccentric_anomaly(double mean, double eps) {
 }
 
 inline glm::vec3 solveSome(double a, double b, double epoch, double incl) {
-    auto focal_lenght = getFocalLength(a, b);
-    auto eps = getExcentricity(a, b);
+    const auto focal_lenght = getFocalLength(a, b);
+    const auto eps = getExcentricity(a, b);
     epoch = get_eccentric_anomaly(epoch, eps);
     auto t = glm::vec3(a*sin(epoch) + focal_lenght, 0, b*cos(epoch));
     if(incl == 0) {
@@ -39,23 +39,27 @@ inline glm::vec3 solveSome(double a, double b, double epoch, double incl) {
 
 void SpaceSolver::MakeOrbits() {
     for (unsigned int i = 0; i < objects.size(); i++) {
-        GameObject* go = objects[i];
-        go->orbit.clear();
-        for (unsigned int j = 0; j < 62; j++) {
-            go->orbit.push_back(solveSome(go->majorAxis, go->minorAxis, j/10.0, go->inclination));
-            go->orbit.push_back(solveSome(go->majorAxis, go->minorAxis, (j+1)/10.0, go->inclination));
+        GameObject& go = *objects[i];
+        go.orbit.clear();
+
+        const auto pi_size = (int)(M_PI*2*10);
+        for (unsigned int j = 0; j < pi_size; j++) {
+            go.orbit.push_back(solveSome(go.majorAxis, go.minorAxis, j/10.0, go.inclination));
+            go.orbit.push_back(solveSome(go.majorAxis, go.minorAxis, (j+1)/10.0, go.inclination));
         }
+        go.orbit.push_back(solveSome(go.majorAxis, go.minorAxis, pi_size/10.0, go.inclination));
+        go.orbit.push_back(solveSome(go.majorAxis, go.minorAxis, 0, go.inclination));
     }
 }
 
 void SpaceSolver::Solve(GameTimer gt) {
     for (unsigned int i = 0; i < objects.size(); i++) {
 
-        GameObject* go = objects[i];
-        go->epoch += gt.elapsed/(go->majorAxis/10.0);
-        if(go->epoch > M_PI*2) {
-            go->epoch = go->epoch - M_PI*2;
+        GameObject& go = *objects[i];
+        go.epoch += gt.elapsed/(go.majorAxis/10.0);
+        if(go.epoch > M_PI*2) {
+            go.epoch = go.epoch - M_PI*2;
         }
-        go->pos = solveSome(go->majorAxis, go->minorAxis, go->epoch, go->inclination);
+        go.pos = solveSome(go.majorAxis, go.minorAxis, go.epoch, go.inclination);
     }
 }

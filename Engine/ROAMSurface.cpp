@@ -4,6 +4,7 @@
 #include <gtc/matrix_transform.hpp>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "BasicJargShader.h"
 
 ROAMSurface::ROAMSurface(void)
 {
@@ -50,7 +51,7 @@ void ROAMSurface::Bind()
     }
 }
 
-void ROAMSurface::Render(JargShader* active)
+void ROAMSurface::Render(BasicJargShader* active)
 {
     const glm::mat4 Identity = glm::mat4(1);
     cells[0]->tp->m->World = rotate(Identity, 0.0f, vec3(1,0,0));
@@ -116,7 +117,7 @@ void ROAMSurfaceCell::Bind()
     tp->Bind(triPool, colorPool, normalTexelPool);
 }
 
-void ROAMSurfaceCell::Render(JargShader* active)
+void ROAMSurfaceCell::Render(BasicJargShader* active)
 {	
     tp->m->shader = active;
     tp->Render();

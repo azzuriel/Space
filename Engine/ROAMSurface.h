@@ -2,6 +2,7 @@
 #include <vector>
 #include <ROAMgrid.h>
 #include <JargShader.h>
+#include "BasicJargShader.h"
 class ROAMSurfaceCell {
 public:
     TerrainPatch* tp;
@@ -9,7 +10,7 @@ public:
     ROAMSurfaceCell(float x = 0, float y = 0);
     ~ROAMSurfaceCell();
     void Bind();
-    void Render(JargShader* active);
+    void Render(BasicJargShader* active);
 
     float *triPool;
     float *colorPool;
@@ -24,7 +25,7 @@ public:
     std::vector<ROAMSurfaceCell*> cells;
 
     void Bind();
-    void Render(JargShader* active);
+    void Render(BasicJargShader* active);
     void Test();
     int i;
 };

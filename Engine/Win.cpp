@@ -55,7 +55,7 @@ void Win::Draw() const
     sb.DrawLine(glm::vec2(pos.x, pos.y + size.y), pos + size, 2, Colors::White);
     sb.DrawLine(glm::vec2(pos.x + size.x, pos.y), pos + size, 2, Colors::White);
 
-    //text->DrawAt(atCenter(text->Size, pos, glm::vec2(size.x, 20)));
+    text->DrawAt(atCenter(text->Size, pos, glm::vec2(size.x, 20)));
 
     if(Items.size() > 0){
         for(unsigned int i=0; i< Items.size(); i++){

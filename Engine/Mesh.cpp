@@ -221,14 +221,14 @@ inline void Mesh::Render(mat4 Model)
         mat3 normal = transpose(mat3(inverse(mult)));
         glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
 
-        glUniform4fv(glGetUniformLocation(shader->program, "material.ambient"),   1, &material->ambient[0]);
-        glUniform4fv(glGetUniformLocation(shader->program, "material.diffuse"),   1, &material->diffuse[0]);
-        glUniform4fv(glGetUniformLocation(shader->program, "material.specular"),  1, &material->specular[0]);
-        glUniform4fv(glGetUniformLocation(shader->program, "material.emission"),  1, &material->emission[0]);																			  
-        glUniform1fv(glGetUniformLocation(shader->program, "material.shininess"), 1, &material->shininess);
+        glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
+        glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
+        glUniform4fv(shader->specular_location,  1, &material->specular[0]);
+        glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
+        glUniform1fv(shader->shininess_location, 1, &material->shininess);
 
-        glUniform1i(glGetUniformLocation(shader->program, "material.texture"), 0);
-        glUniform1i(glGetUniformLocation(shader->program, "material.normal"), 1);
+        glUniform1i(shader->texture_location, 0);
+        glUniform1i(shader->normal_location, 1);
     }
     if(material != nullptr) {
         if(material->texture != nullptr) {

@@ -144,6 +144,12 @@
     <ClCompile Include="SpaceSolver.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="BasicJargShader.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphBox.cpp">
+      <Filter>Ws</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassicNoise.h">
@@ -280,6 +286,12 @@
     </ClInclude>
     <ClInclude Include="SpaceSolver.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicJargShader.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphBox.h">
+      <Filter>Ws</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
