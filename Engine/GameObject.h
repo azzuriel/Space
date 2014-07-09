@@ -2,12 +2,14 @@
 #include <glm.hpp>
 #include <gtx\quaternion.hpp>
 #include <vector>
+#include <string>
 
 class GameObject
 {
 public:
     GameObject(void);
     ~GameObject(void);
+    std::string getFullDebugDescription();
     double M;
     GameObject* center;
     double speed;

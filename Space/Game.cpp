@@ -418,6 +418,31 @@ void Game::Run()
     pl1.inclination = 0.2;
     spso.objects.push_back(&pl1);
 
+    GameObject pl2;
+    pl2.pos = vec3(11,0,11);
+    pl2.majorAxis = 11*4*1.5;
+    pl2.minorAxis = 11*4;
+    pl2.epoch = 11;
+    pl2.inclination = 0.2;
+    spso.objects.push_back(&pl2);
+
+    GameObject pl3;
+    pl3.pos = vec3(11,0,11);
+    pl3.majorAxis = 11*4*1.2;
+    pl3.minorAxis = 11*4;
+    pl3.epoch = 11;
+    pl3.inclination = 0.2;
+    spso.objects.push_back(&pl3);
+
+    GameObject pl4;
+    pl4.pos = vec3(11,0,11);
+    pl4.majorAxis = 11*4*4;
+    pl4.minorAxis = 11*4;
+    pl4.epoch = 11;
+    pl4.inclination = 0.2;
+    spso.objects.push_back(&pl4);
+
+
     spso.MakeOrbits();
 
 
@@ -620,8 +645,7 @@ void Game::Run()
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
         sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
-        sb->DrawString(vec2(20,20), sphere->getFullDebugDescription(), Colors::Red, *font);
-        sb->DrawRectangle(vec2(10,10), vec2(100,100), Colors::Red);
+        sb->DrawString(vec2(20,20), pl4.getFullDebugDescription(), Colors::Red, *font);
         sb->DrawQuad(vec2(100,100), vec2(100,100), emptytex);
 
         ws->Update(gt);

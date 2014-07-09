@@ -107,6 +107,17 @@ inline std::string string_format(const std::string fmt_str, ...) {
     return std::string(formatted.get());
 }
 
+inline std::string MetersSpeedString(double speed){
+    auto mspeed = Ae * speed;
+    if(mspeed > Pc) {
+        return string_format("%f pc/s", mspeed/Pc);
+    }
+    if(mspeed > 1000) {
+        return string_format("%f Km/s", mspeed/1000.0);
+    }
+    return string_format("%f m/s", mspeed);
+}
+
 inline std::string to_traf_string(double traf){
     if (traf > 1024*1024*1024) {
         return string_format("%2f GiB", traf/(1024.0*1024.0*1024.0));
