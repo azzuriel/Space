@@ -359,7 +359,7 @@ void Game::Run()
     ss.m->material = &stm;
 
 
-    //ROAMSurface* m = new ROAMSurface();
+    ROAMSurface* planet = new ROAMSurface();
 
     Texture emptytex = Texture();
     emptytex.Empty(vec2(1000,1000));
@@ -448,6 +448,7 @@ void Game::Run()
 
     Mouse::SetFixedPosState(true);
     glCullFace(GL_BACK);
+    vec3 camlast;
     while(Running && !glfwWindowShouldClose(window)) 
     {
         glEnable(GL_DEPTH_TEST);
@@ -603,12 +604,13 @@ void Game::Run()
         camera.Update();
         MVP = camera.VP() * model;
 
-        /*sec += gt.elapsed;
-        if(sec > 0.1) {
-        sec = 0;
-        m->UpdateCells(camera.position);
-        m->Bind();
-        }*/
+        sec += gt.elapsed;
+        if(sec > 0.5 && distance(camlast, camera.position) > 0) {
+            sec = 0;
+            planet->UpdateCells(camera.position);
+            planet->Bind();
+        }
+        camlast = camera.position;
 
 
         ss.m->World = glm::translate(Identity, camera.position);
@@ -621,19 +623,23 @@ void Game::Run()
         {
             cube->World = glm::translate(Identity, spso.objects[i]->pos);
             cube->Render();
-            sb->DrawLines3d(spso.objects[i]->orbit, Colors::Red);
+            //sb->DrawLines3d(spso.objects[i]->orbit, Colors::Red);
         }
 
         //plane->Render();
+       
+        planet->Render(BasicShader.get());
         cube->Render();
         ss.m->Render();
         ////////////////////////////////////////////////////////////////////////// WORLD PLACE
 
+        
         if(wire == 2) {
             LinesShader->BindProgram();
             glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
             dynamicsWorld->debugDrawWorld();
         }
+        
 
         int dc = sb->RenderFinallyWorld();
 

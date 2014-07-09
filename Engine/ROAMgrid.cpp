@@ -125,13 +125,13 @@ void TerrainPatch::tessellate(const glm::vec3 &view, float errorMargin)
         0, m_map->height-1,
         m_map->width-1, 0,
         0, 0,
-        m_leftVariance, 1);
+        m_leftVariance, 1, m_map);
     tessellateRecursive(
         m_rightRoot, view, errorMargin,
         m_map->width-1, 0,
         0, m_map->height-1,
         m_map->width-1, m_map->height-1,
-        m_rightVariance, 1);
+        m_rightVariance, 1, m_map);
 
     m_leftLeaves = BTTNode_number_of_leaves(m_leftRoot);
     m_rightLeaves = BTTNode_number_of_leaves(m_rightRoot);
@@ -228,16 +228,18 @@ void TerrainPatch::split(BTTNode *node)
 void TerrainPatch::tessellateRecursive(
     BTTNode *node, const glm::vec3 &view, float errorMargin,
     int left_x, int left_y, int right_x, int right_y, int apex_x, int apex_y,
-    float *variance_tree, int variance_idx)
+    float *variance_tree, int variance_idx, Heightmap *map)
 {
-    float center_x = (left_x + right_x) * 0.5f;
-    float center_y = (left_y + right_y) * 0.5f;
-
     if (variance_idx < m_varianceSize) {
-        float a = center_x/m_map->width - view.x;
-        float b = center_y/m_map->height - view.y;
-        float distance = 1 + ((a*a + b*b)*m_map->width/128.0f);
-        float variance = variance_tree[variance_idx]/distance;
+        float center_x = (left_x + right_x) * 0.5f;
+        float center_y = (left_y + right_y) * 0.5f;
+        float center_z = 0;//distance(vec3(0), vec3(center_x, center_y, 0));
+
+        float a = (center_x)/m_map->width;
+        float b = (center_y)/m_map->height;
+        float c = center_z/m_map->width;
+        float distance = glm::distance(vec3(a,b,c), view)*3.0;
+        float variance = variance_tree[variance_idx]/pow(distance, 20000);
         //if(view.z > 1) {
         //	variance /= view.z;
         //}
@@ -249,11 +251,11 @@ void TerrainPatch::tessellateRecursive(
                 tessellateRecursive(
                     node->left_child, view, errorMargin*distance,
                     apex_x, apex_y, left_x, left_y, center_x, center_y,
-                    variance_tree, (variance_idx<<1));
+                    variance_tree, (variance_idx<<1), map);
                 tessellateRecursive(
                     node->right_child, view, errorMargin*distance,
                     right_x, right_y, apex_x, apex_y, center_x, center_y,
-                    variance_tree, (variance_idx<<1)+1);
+                    variance_tree, (variance_idx<<1)+1, map);
             }
         }
     }
@@ -344,7 +346,7 @@ void TerrainPatch::Bind(float *vertices, float *colors, float *normalTexels)
 
     for (int i=0; i<leaves*3; i++)
     {
-        m->Verteces[i].Position = normalize(glm::vec3(vertices[i*3]-0.5, vertices[i*3+1]-0.5, -0.5)); //+ vec3(0,0,vertices[i*3+2]/5.0);
+        m->Verteces[i].Position = vec3(vertices[i*3], vertices[i*3+1], 0); //normalize(glm::vec3(vertices[i*3]-0.5, vertices[i*3+1]-0.5, -0.5)); //+ vec3(0,0,vertices[i*3+2]/5.0);
         m->Verteces[i].Normal = m->Verteces[i].Position;
         m->Indeces[i] = i;
         m->Verteces[i].Uv = glm::vec2(normalTexels[i*2], normalTexels[i*2+1]);

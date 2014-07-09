@@ -64,7 +64,7 @@ private:
     void tessellateRecursive(
         BTTNode *node, const glm::vec3 &view, float errorMargin,
         int left_x, int left_y, int right_x, int right_y, int apex_x, int apex_y,
-        float *variance, int variance_idx);
+        float *variance, int variance_idx, Heightmap *map);
 
     void computeVarianceRecursive(
         int maxTessellationLevels, int level, float *varianceTree, int idx, Heightmap *map,

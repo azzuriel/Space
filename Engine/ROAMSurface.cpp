@@ -53,8 +53,9 @@ void ROAMSurface::Bind()
 
 void ROAMSurface::Render(BasicJargShader* active)
 {
-    const glm::mat4 Identity = glm::mat4(1);
-    cells[0]->tp->m->World = rotate(Identity, 0.0f, vec3(1,0,0));
+    glm::mat4 Identity = glm::mat4(1);
+    Identity = scale(Identity, vec3(100,100,100));
+    cells[0]->tp->m->World = Identity;
     cells[0]->Render(active);
     cells[1]->tp->m->World = rotate(Identity, (float)M_PI, vec3(1,0,0));
     cells[1]->Render(active);
