@@ -14,6 +14,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelBuilder", "ModelBuilde
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{D4375C60-5BFD-4748-BFE7-394C14A46BF2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A252726B-481C-4A2C-9DBB-22B55F2BE2AA} = {A252726B-481C-4A2C-9DBB-22B55F2BE2AA}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

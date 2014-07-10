@@ -54,7 +54,7 @@ private:
     size_type last_full;
 public:
     sparse_vector(){
-        last_full = 0;
+        last_full = -1;
     }
 
     iterator erase(iterator _Where)
@@ -65,12 +65,28 @@ public:
             last_full--;
         }
         (*_Where).reset();
-        return _Where + 1;
+        return (_Make_iter(_Where));
+    }
+
+    iterator erase(iterator _First_arg,
+        iterator _Last_arg)
+    {	
+        iterator i = _First_arg;
+        while(i != _Last_arg) {
+            empty.push_back(i - vector::begin());
+            (*i).reset();
+            i++;
+        }
+        if(last_full > _First_arg - vector::begin()){
+            last_full == _First_arg - vector::begin() - 1;
+        }
+        
+        return (_Make_iter(_First_arg));
     }
 
     void pop_back(){
         empty.push_back(last_full);
-        ((nullable<_Ty>)*(vector::begin() + last_full)).reset();
+        vector::at(last_full).reset();
         last_full--;
     }
 

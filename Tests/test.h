@@ -7,13 +7,31 @@
 #define BREAK_ON_ERROR 2
 
 #define TEST_ASSERT_EQUAL(a, b, showpassed, fail) \
-    if(showpassed == BREAK_ON_ERROR) \
-        assert(a == b); \
     if(a != b) \
-        LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << #b << " (" << a << " == " << b << ") failed"; \
+        { LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << #b << " (" << a << " == " << b << ") failed"; \
+          fail = true; \
+          if(showpassed == BREAK_ON_ERROR) throw std::logic_error("Test error."); \
+        } \
     else if(showpassed == SHOW_PASSED) \
-        LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << #b << " (" << a << " == " << b << ") passed"; \
-    if(fail == false) fail = a == b;
+        LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << #b << " (" << a << " == " << b << ") passed"; 
+
+#define TEST_ASSERT_FALSE(a, showpassed, fail) \
+    if(a != false) \
+        { LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << "false" << " (" << a << " == " << 0 << ") failed"; \
+          fail = true; \
+          if(showpassed == BREAK_ON_ERROR) throw std::logic_error("Test error."); \
+        } \
+    else if(showpassed == SHOW_PASSED) \
+        LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << "false" << " (" << a << " == " << 0 << ") passed";
+
+#define TEST_ASSERT_TRUE(a, showpassed, fail) \
+    if(a != true) \
+        { LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << "true" << " (" << a << " == " << 1 << ") failed"; \
+          fail = true; \
+          if(showpassed == BREAK_ON_ERROR) throw std::logic_error("Test error."); \
+        } \
+    else if(showpassed == SHOW_PASSED) \
+    LOG(ERROR) << __FILE__ << " line " << __LINE__ << " :: " << #a << "==" << "true" << " (" << a << " == " << 1 << ") passed";
 
 class test{
 public:

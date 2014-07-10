@@ -49,7 +49,7 @@
 #include "../Engine/BasicJargShader.h"
 #include "../Engine/GraphBox.h"
 #include "WComponent.h"
-#include "../Engine/starse_vector.h"
+#include "../Engine/sparse_vector.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
