@@ -44,9 +44,6 @@ private:
     bool m_isSet;
 };
 
-// vector, that did't move elements after pop_back() erase() methods
-// using this methods selected elements value = 0 and mark their places as free
-// sequent push_back() using that free place
 template <class _Ty, class _Alloc = std::allocator<_Ty> > class sparse_vector : public std::vector<nullable<_Ty>, _Alloc>
 {
 private:
