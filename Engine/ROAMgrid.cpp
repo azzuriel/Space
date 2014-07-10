@@ -8,7 +8,7 @@
 #include <string.h>
 #include "ClassicNoise.h"
 
-#define tempres 256
+#define tempres 16
 
 TerrainPatch::TerrainPatch(int offset_x, int offset_y)
     : m_map(nullptr)
@@ -22,7 +22,7 @@ TerrainPatch::TerrainPatch(int offset_x, int offset_y)
     , m_leftLeaves(0)
     , m_rightLeaves(0)
     , m_triPool(0)
-    , m_poolSize(100000)
+    , m_poolSize(200000)
     , m_poolNext(0)
 {
     //m_map = Heightmap_read(fn);
@@ -233,13 +233,11 @@ void TerrainPatch::tessellateRecursive(
     if (variance_idx < m_varianceSize) {
         float center_x = (left_x + right_x) * 0.5f;
         float center_y = (left_y + right_y) * 0.5f;
-        float center_z = 0;//distance(vec3(0), vec3(center_x, center_y, 0));
 
-        float a = (center_x)/m_map->width;
-        float b = (center_y)/m_map->height;
-        float c = center_z/m_map->width;
-        float distance = glm::distance(vec3(a,b,c), view)*3.0;
-        float variance = variance_tree[variance_idx]/pow(distance, 20000);
+        auto point = normalize(glm::vec3(center_x/m_map->width-0.5, center_y/m_map->height-0.5, -0.5));
+        float distance = 1 + glm::distance(point, view);
+        float variance = variance_tree[variance_idx]/distance;
+        
         //if(view.z > 1) {
         //	variance /= view.z;
         //}
@@ -346,7 +344,7 @@ void TerrainPatch::Bind(float *vertices, float *colors, float *normalTexels)
 
     for (int i=0; i<leaves*3; i++)
     {
-        m->Verteces[i].Position = vec3(vertices[i*3], vertices[i*3+1], 0); //normalize(glm::vec3(vertices[i*3]-0.5, vertices[i*3+1]-0.5, -0.5)); //+ vec3(0,0,vertices[i*3+2]/5.0);
+        m->Verteces[i].Position = normalize(glm::vec3(vertices[i*3]-0.5, vertices[i*3+1]-0.5, -0.5)) * ((97+vertices[i*3+2]*3)/100.0f);
         m->Verteces[i].Normal = m->Verteces[i].Position;
         m->Indeces[i] = i;
         m->Verteces[i].Uv = glm::vec2(normalTexels[i*2], normalTexels[i*2+1]);

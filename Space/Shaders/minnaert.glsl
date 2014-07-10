@@ -79,18 +79,20 @@ void main(void)
   vec3 normal   = Vert.normal;
   vec3 lightDir = Vert.lightDir;
   vec3 viewDir  = Vert.viewDir;
+  vec3 surfnorm = normalize(vec3(texture(material.normal, Vert.texcoord)) + normal);
+  vec3 mininormal = vec3(texture(material.normal, Vert.texcoord*10.0));
+  vec3 mininormal2 = vec3(texture(material.normal, Vert.texcoord*20.0));
+  surfnorm += mininormal/10.0 + mininormal2/20.0;
+  surfnorm = normalize(surfnorm);
   
-  color = texture(material.texture, Vert.texcoord) * max( dot ( normal, lightDir ), 0.0 );
-  color.w = 1;
-  
-  const vec4  diffColor = material.diffuse * light.diffuse;
-  const float k         = 0.8;
+  vec4  diffColor = material.diffuse;
+  float k         = 0.8;
 
-  float d1 = pow ( max ( dot ( normal, lightDir ), 0.0 ), 1.0 + k );
-  float d2 = pow ( 1.0 - dot ( normal, viewDir ), 1.0 - k );
+  float d1 = pow ( max ( dot ( surfnorm, lightDir ), 0.0 ), 1.0 + k );
+  float d2 = pow ( 1.0 - dot ( surfnorm, viewDir ), 1.0 - k );
 
-  color   = diffColor * d1 * d2;
-  color  *= texture(material.texture, Vert.texcoord);
+  color   = vec4(1,0.5,1,1) * d1 * d2;
+ // color  *= vec4(texture(material.texture, Vert.texcoord));
   color.w = 1;
 }
 #endif

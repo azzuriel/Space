@@ -2,6 +2,9 @@
 #include <glew.h>
 #include <gtc\matrix_transform.inl>
 #include <gtx\quaternion.hpp>
+#include <string>
+#include "JHelpers_inl.h"
+#include <gtc\quaternion.hpp>
 
 Camera::Camera() {
     camera_mode = FREE;
@@ -33,35 +36,26 @@ void Camera::Update() {
     //glLoadIdentity();
     //glViewport(viewport_x, viewport_y, window_width, window_height);
 
-    if (camera_mode == ORTHO) {
-        //our projection matrix will be an orthogonal one in this case
-        //if the values are not floating point, this command does not work properly
-        //need to multiply by aspect!!! (otherise will not scale properly)
-        projection = glm::ortho(-1.5f * float(aspect), 1.5f * float(aspect), -1.5f, 1.5f, -10.0f, 10.f);
-    } else if (camera_mode == FREE) {
-        projection = glm::perspective(field_of_view, aspect, near_clip, far_clip);
-        //detmine axis for pitch rotation
-        glm::vec3 axis = glm::cross(direction, up);
-        //compute quaternion for pitch based on the camera pitch angle
-        glm::quat pitch_quat = glm::angleAxis(camera_pitch, axis);
-        //determine heading quaternion from the camera up vector and the heading angle
-        glm::quat heading_quat = glm::angleAxis(camera_heading, up);
-        //add the two quaternions
-        glm::quat temp = glm::cross(pitch_quat, heading_quat);
-        temp = glm::normalize(temp);
-        //update the direction from the quaternion
-        direction = glm::rotate(temp, direction);
-        //add the camera delta
-        position += position_delta;
-        //set the look at to be infront of the camera
-        look_at = position + direction * 1.0f;
-        //damping for smooth camera
-        camera_heading *= .5;
-        camera_pitch *= .5;
-        position_delta = position_delta * .8f;
-    }
-    //compute the MVP
-    view = glm::lookAt(position, look_at, up);
+
+    auto yawq = glm::angleAxis(camera_pitch, vec3(1,0,0));
+    auto pitchq = glm::angleAxis(camera_heading, vec3(0,1,0));
+
+    projection = glm::perspective(field_of_view, aspect, near_clip, far_clip);
+
+    rotation_quaternion = pitchq * yawq * rotation_quaternion;
+    rotation_quaternion = normalize(rotation_quaternion);
+
+    position += position_delta;
+    look_at = position + direction;
+
+
+    camera_heading *= .5;
+    camera_pitch *= .5;
+    position_delta = position_delta * .8f;
+    
+    view = translate(mat4_cast(rotation_quaternion), -position);//glm::lookAt(position, look_at, up);
+    up = vec3(view[1][0],view[1][1],view[1][2]);
+    direction = vec3(view[0][0],view[0][1],view[0][2]);
     model = glm::mat4(1.0f);
     MVP = projection * view * model;
     //glLoadMatrixf(glm::value_ptr(MVP));
@@ -80,6 +74,7 @@ void Camera::SetPosition(glm::vec3 pos) {
 
 void Camera::SetLookAt(glm::vec3 pos) {
     look_at = pos;
+    rotation_quaternion = quat_cast(lookAt(position, pos, vec3(0,1,0)));
 }
 void Camera::SetFOV(double fov) {
     field_of_view = fov;
@@ -102,22 +97,22 @@ void Camera::Move(CameraDirection dir) {
     if (camera_mode == FREE) {
         switch (dir) {
         case UP:
-            position_delta += up * camera_scale;
+           position_delta += vec3(0, -camera_scale, 0) * rotation_quaternion;
             break;
         case DOWN:
-            position_delta -= up * camera_scale;
+            position_delta += vec3(0, camera_scale, 0) * rotation_quaternion;
             break;
         case LEFT:
-            position_delta -= glm::cross(direction, up) * camera_scale;
+           position_delta += vec3(-camera_scale, 0, 0) * rotation_quaternion;
             break;
         case RIGHT:
-            position_delta += glm::cross(direction, up) * camera_scale;
+           position_delta += vec3(camera_scale, 0, 0) * rotation_quaternion;
             break;
         case FORWARD:
-            position_delta += direction * camera_scale;
+            position_delta += vec3(0, 0, -camera_scale) * rotation_quaternion;
             break;
         case BACK:
-            position_delta -= direction * camera_scale;
+           position_delta += vec3(0, 0, camera_scale) * rotation_quaternion;
             break;
         }
     }
@@ -161,7 +156,7 @@ void Camera::ChangeHeading(float degrees) {
 }
 void Camera::Move2D(int x, int y) {
     //compute the mouse delta from the previous mouse position
-    glm::vec3 mouse_delta = glm::vec3(-x, -y, 0) * 3.0F;
+    glm::vec3 mouse_delta = glm::vec3(x, y, 0) * 3.0F;
     //if the camera is moving, meaning that the mouse was clicked and dragged, change the pitch and heading
     if (move_camera) {
         ChangeHeading(.08f * mouse_delta.x);
@@ -172,13 +167,13 @@ void Camera::Move2D(int x, int y) {
 
 void Camera::SetPos(int button, int state, int x, int y) {
     //if (button == 3 && state == GLUT_DOWN) {
-    //	position_delta += up * .05f;
+    // position_delta += up * .05f;
     //} else if (button == 4 && state == GLUT_DOWN) {
-    //	position_delta -= up * .05f;
+    // position_delta -= up * .05f;
     //} else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    //	move_camera = true;
+    // move_camera = true;
     //} else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-    //	move_camera = false;
+    // move_camera = false;
     //}
     //mouse_position = glm::vec3(x, y, 0);
 }
@@ -198,6 +193,17 @@ void Camera::GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M) const {
     P = projection;
     V = view;
     M = model;
+}
+
+std::string Camera::getFullDebugDescription()
+{
+    return string_format("CAMERA\n%s\nheading = %s pitch = %s\nup = %s\ndir = %s\ncross = %s", 
+        std::to_string(view).c_str(), 
+        std::to_string(camera_heading).c_str(), 
+        std::to_string(camera_pitch).c_str(),
+        std::to_string(up).c_str(),
+        std::to_string(direction).c_str(),
+        std::to_string(glm::cross(direction, up)).c_str());
 }
 
 mat4 Camera::VP() const

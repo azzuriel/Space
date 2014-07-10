@@ -293,5 +293,8 @@
     <ClInclude Include="GraphBox.h">
       <Filter>Ws</Filter>
     </ClInclude>
+    <ClInclude Include="sparse_vector.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

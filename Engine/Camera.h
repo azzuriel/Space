@@ -5,6 +5,7 @@
 #include "GameMath.h"
 #include <glm.hpp>
 #include <gtx\quaternion.hpp>
+#include <string>
 
 
 enum CameraType {
@@ -61,6 +62,7 @@ public:
     mat4 VP() const;
     void SetWindowSize(int width, int height);
     glm::mat4 GetOrthoProjection();
+    std::string getFullDebugDescription();
     CameraType camera_mode;
 
     int viewport_x;

@@ -82,7 +82,7 @@ ROAMSurfaceCell::ROAMSurfaceCell(float x, float y)
 {
     tp = new TerrainPatch(x, y);
 
-    tp->computeVariance(12);
+    tp->computeVariance(18);
     tp->m->World = glm::mat4(1.0f);
     //patch->m->Shader = BasicShader.get();
     auto m_poolSize = tp->poolSize();

@@ -177,6 +177,7 @@
     <ClInclude Include="SpaceSolver.h" />
     <ClInclude Include="SphereTesselator.h" />
     <ClInclude Include="SpriteBatch.h" />
+    <ClInclude Include="sparse_vector.h" />
     <ClInclude Include="TextGeometry.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TreeSphere.h" />

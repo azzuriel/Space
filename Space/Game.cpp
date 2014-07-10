@@ -49,6 +49,7 @@
 #include "../Engine/BasicJargShader.h"
 #include "../Engine/GraphBox.h"
 #include "WComponent.h"
+#include "../Engine/starse_vector.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -119,9 +120,13 @@ int Game::Initialize()
     int glVersion[2] = {-1, -1};
     glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
     glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
-    LOG(INFO) << "OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
+    
+    LOG(INFO) << "Renderer: " << glGetString(GL_RENDERER);
+    LOG(INFO) << "Vendor: " <<  glGetString(GL_VENDOR);
+    LOG(INFO) << "Version: " <<  glGetString(GL_VERSION);
+    LOG(INFO) << "GLSL version: " <<  glGetString(GL_SHADING_LANGUAGE_VERSION);
+    LOG(INFO) << "using OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
     LOG(INFO) << "glfw: " << glfwGetVersionString();
-
 
     Keyboard::Initialize();
     glfwSetKeyCallback(window, [](GLFWwindow *win, int key, int scancode, int action, int mods){Keyboard::SetKey(key, scancode, action, mods);});
@@ -184,8 +189,8 @@ void Game::Run()
     Mouse::IsLeftPressed();
 
     auto BasicShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/unshaded.glsl");
-    BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/unshaded.glsl");
+    BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minnaert.glsl");
+    BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minnaert.glsl");
     BasicShader->Link();
     auto mvpBasic = BasicShader->LocateVars("transform.viewProjection"); //var0
     auto worldID = BasicShader->LocateVars("transform.model"); //var1
@@ -479,6 +484,8 @@ void Game::Run()
             camera.Move(RIGHT);
         }
 
+        std::vector<int> a;
+
         if(Keyboard::isKeyPress(GLFW_KEY_F2)){
             switch(wire){
             case 0:
@@ -592,14 +599,12 @@ void Game::Run()
         auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
         //m->World = glm::rotate(m->World, q.getAngle(), vecc);
         //m->World = glm::scale(m->World, vec3(1,1,1));
-        pl.position = glm::vec4(sin(rotated)*10, 2, cos(rotated)*10, 1);
+        pl.position = glm::vec4(sin(rotated)*500, 2, cos(rotated)*500, 1);
         rotated+=gt.elapsed;
         for (int i=0;i<25;i++)
         {
             rott[i] += gt.elapsed * i / 12.0f;
         }
-
-        cube->World = glm::translate(Identity, vec3(pl.position));
 
         camera.Update();
         MVP = camera.VP() * model;
@@ -612,12 +617,14 @@ void Game::Run()
         }
         camlast = camera.position;
 
-
-        ss.m->World = glm::translate(Identity, camera.position);
-
-
         PointLightSetup(BasicShader->program, pl);
         CameraSetup(BasicShader->program, camera, MVP);
+
+        ss.m->World = glm::translate(Identity, camera.position);
+        cube->World = glm::translate(Identity, vec3(pl.position));
+        cube->Render();
+
+        
         ////////////////////////////////////////////////////////////////////////// WORLD PLACE
         for (unsigned int i = 0; i < spso.objects.size(); i++)
         {
@@ -651,7 +658,7 @@ void Game::Run()
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
         sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
-        sb->DrawString(vec2(20,20), pl4.getFullDebugDescription(), Colors::Red, *font);
+        sb->DrawString(vec2(20,20), camera.getFullDebugDescription(), Colors::Red, *font);
         sb->DrawQuad(vec2(100,100), vec2(100,100), emptytex);
 
         ws->Update(gt);
