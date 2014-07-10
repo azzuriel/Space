@@ -43,34 +43,34 @@ inline bool inLimsV(glm::vec2 param1, glm::vec2 wpos, glm::vec2 size)
     return param1.x >= wpos.x && param1.y >= wpos.y && param1.x <= size.x && param1.y <= size.y;
 }
 
-template<class T>
-inline bool inLims(T param1, T wpos, T size)
+template<class _Ty>
+inline bool inLims(_Ty param1, _Ty wpos, _Ty size)
 {
     return param1 >= wpos && param1 <= size;
 }
 
-template<class T>
-inline T kmToParsec(T a){
-    return (T)(a / (3.0856776e+13)); 
+template<class _Ty>
+inline _Ty kmToParsec(_Ty a){
+    return (_Ty)(a / (3.0856776e+13)); 
 }
 
-template<class T>
-inline T mToParsec(T a){
-    return (T)(a / (3.0856776e+16));
+template<class _Ty>
+inline _Ty mToParsec(_Ty a){
+    return (_Ty)(a / (3.0856776e+16));
 }
 
-template<class T>
-inline T kmToAE(T a){
-    return (T)(a / 149597870.7);
+template<class _Ty>
+inline _Ty kmToAE(_Ty a){
+    return (_Ty)(a / 149597870.7);
 }
 
-template<class T>
-inline T mToAE(T a){
-    return (T)(a / 149597870700.0);
+template<class _Ty>
+inline _Ty mToAE(_Ty a){
+    return (_Ty)(a / 149597870700.0);
 }
 
-template<class T>
-inline T atCenter(T size, T zoneBegin, T zoneSize){
+template<class _Ty>
+inline _Ty atCenter(_Ty size, _Ty zoneBegin, _Ty zoneSize){
     return zoneBegin + zoneSize/2.0f - (size)/2.0f;
 }
 

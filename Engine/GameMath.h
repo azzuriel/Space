@@ -13,24 +13,24 @@ inline int next_p2( int a )
     return rval;
 }
 
-template < typename T >
-inline T fade( T t )
+template < typename _Ty >
+inline _Ty fade( _Ty t )
 {
     return t * t * t * ( t * ( t * 6 - 15 ) + 10 );
 }
 
-template < typename T >
-inline T MAX(T a, T b){
+template < typename _Ty >
+inline _Ty MAX(_Ty a, _Ty b){
     return a > b ? a : b;
 }
 
-template < typename T >
-inline T MIN(T a, T b){
+template < typename _Ty >
+inline _Ty MIN(_Ty a, _Ty b){
     return a < b ? a : b;
 }
 
-template < typename T >
-inline bool isInRange(T some, T min, T max){
+template < typename _Ty >
+inline bool isInRange(_Ty some, _Ty min, _Ty max){
     return (some >= min && some <= max);
 }
 
@@ -62,20 +62,20 @@ struct iRect
     }
 };
 
-template <typename T>
-inline T sqr(T value) {
+template <typename _Ty>
+inline _Ty sqr(_Ty value) {
     return value*value;
 }
 
 /**
 * Cubic Hermite spline.
 */
-template <typename T>
-inline T spline(T x, size_t nknots, T *knots)
+template <typename _Ty>
+inline _Ty spline(_Ty x, size_t nknots, _Ty *knots)
 {
     int span;
     int nspans = nknots - 3;
-    T c0, c1, c2, c3; // coefficients of the cubic.
+    _Ty c0, c1, c2, c3; // coefficients of the cubic.
 
     assert(nspans >= 1);
 
@@ -120,8 +120,8 @@ inline T spline(T x, size_t nknots, T *knots)
 /**
 * Extension to spline function to work with colors.
 */
-template <typename T>
-inline glm::vec3 spline(T param, size_t nknots, glm::vec3 *knots)
+template <typename _Ty>
+inline glm::vec3 spline(_Ty param, size_t nknots, glm::vec3 *knots)
 {
     float x[nknots];
     float y[nknots];
@@ -133,10 +133,10 @@ inline glm::vec3 spline(T param, size_t nknots, glm::vec3 *knots)
         z[i] = knots[i].z;
     }
 
-    return Vec3<T>(
-        spline<T>(param, nknots, x),
-        spline<T>(param, nknots, y),
-        spline<T>(param, nknots, z));
+    return Vec3<_Ty>(
+        spline<_Ty>(param, nknots, x),
+        spline<_Ty>(param, nknots, y),
+        spline<_Ty>(param, nknots, z));
 }
 
 
