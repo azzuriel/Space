@@ -17,7 +17,7 @@ public:
     std::vector<std::shared_ptr<Material>> materials;
     mat4 World;
     void Bind();
-    void Render();
+    void Render() const;
     std::shared_ptr<Mesh> findMeshById(char* str);
     std::shared_ptr<Material> findMaterialById(char* str);
     void SaveBinary(std::string name);

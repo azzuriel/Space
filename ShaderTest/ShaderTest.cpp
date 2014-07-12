@@ -157,17 +157,23 @@ void PointLightSetup(GLuint program, const PointLight &light)
 }
 
 
-void CameraSetup(GLuint program, Camera &camera)
+void CameraSetup(GLuint program, const Camera &camera)
 {
     auto vp = camera.projection * camera.view;
     glUniformMatrix4fv(glGetUniformLocation(program, "transform.viewProjection"), 1, GL_FALSE, &vp[0][0]);
     glUniform3fv(glGetUniformLocation(program, "transform.viewPosition"), 1, &camera.position[0]);
 }
 
-void RenderScene(std::shared_ptr<BasicJargShader> BasicShader, Camera camera, Model* model)
+void RenderScene(std::shared_ptr<BasicJargShader> current_shader, const Camera &camera, const Model &model, const PointLight &light)
 {
-    CameraSetup(BasicShader->program, camera);
-    model->Render();
+    current_shader->Use();
+    CameraSetup(current_shader->program, camera);
+    PointLightSetup(current_shader->program, light);
+    for (int i = 0; i<model.meshes.size(); i++)
+    {
+        model.meshes[i]->shader = current_shader;
+    }
+    model.Render();
 }
 
 GLuint FBO_Test(const Texture& depth) {
@@ -213,13 +219,22 @@ void Game::Run()
     BasicShader->LocateVars("transform.normal"); //var2
     auto colorTextureLocation = BasicShader->LocateVars("material.texture");
 
-    auto StarSphereShader = std::shared_ptr<JargShader>(new JargShader());
+    auto StarSphereShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     StarSphereShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/starsphere.glsl");
     StarSphereShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/starsphere.glsl");
     StarSphereShader->Link();
     StarSphereShader->LocateVars("transform.viewProjection"); //var0
     StarSphereShader->LocateVars("transform.model"); //var1
     StarSphereShader->LocateVars("transform.normal"); //var2
+
+    auto TestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    TestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/testshader.glsl");
+    TestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/testshader.glsl");
+    TestShader->Link();
+    TestShader->UpdateUniforms();
+    TestShader->LocateVars("transform.viewProjection"); //var0
+    TestShader->LocateVars("transform.model"); //var1
+    TestShader->LocateVars("transform.normal"); //var2
 
     auto MinimalShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     MinimalShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minimal.glsl");
@@ -237,13 +252,13 @@ void Game::Run()
     pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     pl.attenuation = vec3(0.000f, 0.0f, 0.00000f);
 
-    auto LinesShader = std::shared_ptr<JargShader>(new JargShader());
+    auto LinesShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     LinesShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/colored.glsl");
     LinesShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/colored.glsl");
     LinesShader->Link();
     auto mvpLine = LinesShader->LocateVars("MVP");
 
-    auto TextureShader = std::shared_ptr<JargShader>(new JargShader());
+    auto TextureShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     TextureShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/textured.glsl");
     TextureShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/textured.glsl");
     TextureShader->Link();
@@ -279,9 +294,12 @@ void Game::Run()
         LOG(ERROR) << "failed to load\process font.json";
     }
 
+    auto cur_shader = BasicShader;
     WinS *ws = new WinS(sb.get(), *font);
     ShaderSelectWindow *ssw = new ShaderSelectWindow();
     ws->windows.push_back(ssw);
+    ssw->apply1->onPress = [&cur_shader, BasicShader](){cur_shader = BasicShader;};
+    ssw->apply2->onPress = [&cur_shader, TestShader](){cur_shader = TestShader;};
 
     auto broadphase = std::unique_ptr<btDbvtBroadphase>(new btDbvtBroadphase());
     auto collisionConfiguration = std::unique_ptr<btDefaultCollisionConfiguration>(new btDefaultCollisionConfiguration());
@@ -403,7 +421,7 @@ void Game::Run()
 
         auto mpos = Mouse::GetCursorPos();
 
-        BasicShader->BindProgram();
+        BasicShader->Use();
 
         btTransform trans;
         sphere->fallRigidBody->getMotionState()->getWorldTransform(trans);
@@ -436,7 +454,7 @@ void Game::Run()
         glDepthMask(GL_TRUE);
         glClear(GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_FRONT);
-        RenderScene(BasicShader, lightcam, m);
+        RenderScene(BasicShader, lightcam, *m, pl);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, width, height);
@@ -444,8 +462,8 @@ void Game::Run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_BACK);
 
-        BasicShader->BindProgram();
-        glUniform1i(glGetUniformLocation(BasicShader->program, "depthTexture"), 2);
+        cur_shader->Use();
+        glUniform1i(glGetUniformLocation(cur_shader->program, "depthTexture"), 2);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, depthtexture.textureId);
 
@@ -455,12 +473,12 @@ void Game::Run()
             0.0, 0.0, 0.5, 0.0,
             0.5, 0.5, 0.5, 1.0);
         auto mult = bias * lightcam.projection * lightcam.view;
-        glUniformMatrix4fv(glGetUniformLocation(BasicShader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(cur_shader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
 
-        RenderScene(BasicShader, *cur_cam, m);
+        RenderScene(cur_shader, *cur_cam, *m, pl);
          
         if(wire == 2) {
-            LinesShader->BindProgram();
+            LinesShader->Use();
             glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
             dynamicsWorld->debugDrawWorld();
         }
@@ -472,9 +490,9 @@ void Game::Run()
 
         glDisable(GL_DEPTH_TEST);
         MVP = camera.GetOrthoProjection();
-        TextureShader->BindProgram();
+        TextureShader->Use();
         glUniformMatrix4fv(mvpTex, 1, GL_FALSE, &MVP[0][0]);
-        LinesShader->BindProgram();
+        LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
         sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
@@ -484,7 +502,7 @@ void Game::Run()
         ws->Update(gt);
         ws->Draw();
 
-        LinesShader->BindProgram();
+        LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
 
         dc += sb->RenderFinally();        

@@ -458,7 +458,7 @@ void Batched::Render()
         return;
     }
     glBindVertexArray(m_vao);
-    m_texturedShader->BindProgram();
+    m_texturedShader->Use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_currentTex->textureId);
     glActiveTexture(GL_TEXTURE1);
@@ -494,7 +494,7 @@ void Batched::lineRender()
         return;
     }
     glBindVertexArray(m_lvao);
-    m_coloredShader->BindProgram();
+    m_coloredShader->Use();
 
     glBindBuffer(GL_ARRAY_BUFFER, m_lineVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*lcurn*4, m_lineVertex, GL_STREAM_DRAW);
@@ -518,7 +518,7 @@ void Batched::lineRender()
 void Batched::line3dRender()
 {
     glBindVertexArray(dvao);
-    m_coloredShader->BindProgram();
+    m_coloredShader->Use();
 
     GLuint stride = sizeof(VertexPositionColor);
     GLuint offset = 0;
@@ -542,7 +542,7 @@ void Batched::line3dRender()
 void Batched::line2dRender()
 {
     glBindVertexArray(dvao);
-    m_texturedShader->BindProgram();
+    m_texturedShader->Use();
 
     GLuint stride = sizeof(VertexPositionColor);
     GLuint offset = 0;

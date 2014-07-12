@@ -11,7 +11,7 @@ public:
     ~JargShader(void);
     std::string name;
     std::vector<int> vars;
-    void BindProgram() const;
+    void Use() const;
     int LocateVars(std::string s);
     void loadShaderFromSource(GLenum type, std::string source);
     bool Link();

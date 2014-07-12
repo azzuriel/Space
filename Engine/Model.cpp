@@ -465,7 +465,7 @@ void Model::Bind()
     }
 }
 
-void Model::Render()
+void Model::Render() const
 {
     for (int i=0;i<meshes.size();i++)
     {

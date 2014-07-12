@@ -35,7 +35,7 @@ JargShader::~JargShader(void)
     LOG(INFO) << string_format("Deleting program %i", program);
 }
 
-void JargShader::BindProgram() const
+void JargShader::Use() const
 {
     glUseProgram(program);
 }

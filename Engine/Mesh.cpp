@@ -217,7 +217,7 @@ inline void Mesh::Render(mat4 Model)
         return;
     }
     if(shader != nullptr) {
-        shader->BindProgram();
+        shader->Use();
         auto mult = Model*World;
         glUniformMatrix4fv(shader->vars[1], 1, GL_FALSE, &mult[0][0]);
         mat3 normal = transpose(mat3(inverse(mult)));
