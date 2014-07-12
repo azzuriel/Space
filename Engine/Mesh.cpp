@@ -11,26 +11,25 @@
 };
 
 Mesh::Mesh(void) :
-    World(mat4(1.0f))
+    World(mat4(1.0f)),
+    shader(nullptr),
+    material(nullptr),
+    m_vao(0),
+    m_vbo(nullptr)
 {
-    m_vao = 0;
-    m_vbo = nullptr;
-    material = nullptr;
-    shader = nullptr;
 }
 
 
 Mesh::~Mesh(void)
 {
-    if(m_vao == 0) {
-        return;
-    }
-    glDeleteBuffers(2, m_vbo);
-    glBindVertexArray(0);
-    glDeleteVertexArrays(1, &m_vao);
+    if(m_vbo) {
+        glDeleteBuffers(2, m_vbo);
+        glBindVertexArray(0);
+        glDeleteVertexArrays(1, &m_vao);
 
-    delete m_vbo;
-    m_vbo = nullptr;
+        delete[] m_vbo;
+        m_vbo = nullptr;
+    }
 }
 
 void Mesh::Unindex()
@@ -182,6 +181,9 @@ void Mesh::Bind(int type /* = 0 */)
     if(m_vao == 0){
         glGenVertexArrays(1, &m_vao);
         glBindVertexArray(m_vao);
+        if(m_vbo){
+            delete[] m_vbo;
+        }
         m_vbo = new GLuint[2];
         glGenBuffers(2, m_vbo);
     } else {
@@ -221,6 +223,7 @@ inline void Mesh::Render(mat4 Model)
         mat3 normal = transpose(mat3(inverse(mult)));
         glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
 
+        auto werw = shader->ambient_location;
         glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
         glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
         glUniform4fv(shader->specular_location,  1, &material->specular[0]);

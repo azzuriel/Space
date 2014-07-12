@@ -10,7 +10,7 @@ public:
     ROAMSurfaceCell(float x = 0, float y = 0);
     ~ROAMSurfaceCell();
     void Bind();
-    void Render(BasicJargShader* active);
+    void Render(std::shared_ptr<BasicJargShader> active);
 
     float *triPool;
     float *colorPool;
@@ -25,7 +25,7 @@ public:
     std::vector<ROAMSurfaceCell*> cells;
 
     void Bind();
-    void Render(BasicJargShader* active);
+    void Render(std::shared_ptr<BasicJargShader> active);
     void Test();
     int i;
 };

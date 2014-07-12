@@ -9,6 +9,7 @@ class JargShader{
 public:
     JargShader();
     ~JargShader(void);
+    std::string name;
     std::vector<int> vars;
     void BindProgram() const;
     int LocateVars(std::string s);

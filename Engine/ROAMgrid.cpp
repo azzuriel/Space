@@ -8,7 +8,7 @@
 #include <string.h>
 #include "ClassicNoise.h"
 
-#define tempres 16
+#define tempres 1024
 
 TerrainPatch::TerrainPatch(int offset_x, int offset_y)
     : m_map(nullptr)
@@ -36,7 +36,7 @@ TerrainPatch::TerrainPatch(int offset_x, int offset_y)
     {
         for (int j =0; j<tempres;j++)
         {
-            float t = simplexnoise(offset_x + i/64.0F + a, offset_y + j/64.0F  + a) + simplexnoise(offset_x + i/32.0F  + a, offset_y + j/32.0F  + a)/2.0F + simplexnoise(offset_x + i/16.0F  + a, offset_y + j/16.0F + a)/4.0F;
+            float t = simplexnoise(offset_x + i/64.0F, offset_y + j/64.0F) + simplexnoise(offset_x + i/32.0F, offset_y + j/32.0F)/2.0F + simplexnoise(offset_x + i/16.0F, offset_y + j/16.0F)/4.0F;
             if(t < 0) {
                 t = -t;
                 t /= 30.0F;
@@ -48,6 +48,7 @@ TerrainPatch::TerrainPatch(int offset_x, int offset_y)
                 t /= 10.0F;
                 t += .6;
             } 
+
 
             *map = t;
             m_map->maxZ = glm::max(t, m_map->maxZ);
@@ -78,7 +79,7 @@ TerrainPatch::~TerrainPatch()
     delete [] m_leftVariance;
     delete [] m_rightVariance;
     if(m_map) {
-        Heightmap_delete(m_map);
+        maps_delete(m_map);
     }
 }
 
@@ -305,15 +306,15 @@ void TerrainPatch::getTessellationRecursive(
             right_x, right_y, apex_x, apex_y, center_x, center_y);
     } else {
         // we're at leaf
-        vertices[*idx+0] = (float) left_x / map->width;
-        vertices[*idx+1] = (float) left_y / map->height;
+        vertices[*idx+0] =  left_x /(float) (map->width - 1);
+        vertices[*idx+1] =  left_y /(float) (map->height - 1);
         vertices[*idx+2] = Heightmap_get(map, left_x, left_y);
-        vertices[*idx+3] = (float) right_x / map->width;
-        vertices[*idx+4] = (float) right_y / map->height;
+        vertices[*idx+3] =  right_x /(float) (map->width - 1);
+        vertices[*idx+4] =  right_y /(float) (map->height - 1);
         vertices[*idx+5] = Heightmap_get(map, right_x, right_y);
-        vertices[*idx+6] = (float) apex_x / map->width;
-        vertices[*idx+7] = (float) apex_y / map->height;
-        vertices[*idx+8] = Heightmap_get(map, apex_x, apex_y);
+        vertices[*idx+6] =  apex_x /(float) (map->width - 1);
+        vertices[*idx+7] =  apex_y /(float) (map->height - 1);
+         vertices[*idx+8] = Heightmap_get(map, apex_x, apex_y);
 
         colors[*idx+0] = 1;
         colors[*idx+1] = 1;
@@ -325,12 +326,12 @@ void TerrainPatch::getTessellationRecursive(
         colors[*idx+7] = 1;
         colors[*idx+8] = 1;
 
-        normalTexels[(*idx/9)*6+0] = (float) left_x / map->width;
-        normalTexels[(*idx/9)*6+1] = (float) left_y / map->height;
-        normalTexels[(*idx/9)*6+2] = (float) right_x / map->width;
-        normalTexels[(*idx/9)*6+3] = (float) right_y / map->height;
-        normalTexels[(*idx/9)*6+4] = (float) apex_x / map->width;
-        normalTexels[(*idx/9)*6+5] = (float) apex_y / map->height;
+        normalTexels[(*idx/9)*6+0] =  left_x  /(float) (map->width - 1);
+        normalTexels[(*idx/9)*6+1] =  left_y  /(float) (map->height - 1);
+        normalTexels[(*idx/9)*6+2] =  right_x /(float) (map->width - 1);
+        normalTexels[(*idx/9)*6+3] =  right_y /(float) (map->height - 1);
+        normalTexels[(*idx/9)*6+4] =  apex_x  /(float) (map->width - 1);
+        normalTexels[(*idx/9)*6+5] =  apex_y  /(float) (map->height - 1);
 
         *idx += 9;
     }
@@ -355,4 +356,9 @@ void TerrainPatch::Bind(float *vertices, float *colors, float *normalTexels)
 void TerrainPatch::Render()
 {
     m->Render();
+}
+
+void TerrainPatch::FreeMaps()
+{
+    maps_delete(m_map);
 }

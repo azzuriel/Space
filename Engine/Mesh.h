@@ -10,6 +10,7 @@
 #include <string>
 #include <Material.h>
 #include "BasicJargShader.h"
+#include <memory>
 class Mesh
 {
 public:
@@ -26,8 +27,8 @@ public:
     void MergeVerteces();
     std::vector<VertexPositionNormalTexture> Verteces;
     std::vector<GLuint> Indeces;
-    BasicJargShader* shader;
-    Material* material;
+    std::shared_ptr<BasicJargShader> shader;
+    std::shared_ptr<Material> material;
     mat4 World;
     std::string id;
 private:

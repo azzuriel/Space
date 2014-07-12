@@ -51,7 +51,7 @@ void ROAMSurface::Bind()
     }
 }
 
-void ROAMSurface::Render(BasicJargShader* active)
+void ROAMSurface::Render(std::shared_ptr<BasicJargShader> active)
 {
     glm::mat4 Identity = glm::mat4(1);
     Identity = scale(Identity, vec3(100,100,100));
@@ -98,9 +98,9 @@ ROAMSurfaceCell::ROAMSurfaceCell(float x, float y)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, map->width, map->height, 0, GL_RGB, GL_FLOAT, map->normal_map);
-    Texture* tempt = new Texture();
+    auto tempt = std::shared_ptr<Texture>(new Texture());
     tempt->textureId = normalTexture;
-    tp->m->material = new Material();
+    tp->m->material = std::shared_ptr<Material>(new Material());
     tp->m->material->normal = tempt;
     //tp->m->material->texture = tempt;
 }
@@ -118,7 +118,7 @@ void ROAMSurfaceCell::Bind()
     tp->Bind(triPool, colorPool, normalTexelPool);
 }
 
-void ROAMSurfaceCell::Render(BasicJargShader* active)
+void ROAMSurfaceCell::Render(std::shared_ptr<BasicJargShader> active)
 {	
     tp->m->shader = active;
     tp->Render();

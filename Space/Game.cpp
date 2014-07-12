@@ -8,9 +8,9 @@
 #include <Keyboard.h>
 #include <Mouse.h>
 #include <memory>
-#include "..\Engine\SpriteBatch.h"
-#include "..\Engine\Font.h"
-#include "..\Engine\Camera.h"
+#include "../Engine/SpriteBatch.h"
+#include "../Engine/Font.h"
+#include "../Engine/Camera.h"
 #include "../Engine/SphereTesselator.h"
 #include "../Engine/Material.h"
 #include <glm.hpp>
@@ -88,7 +88,7 @@ int Game::Initialize()
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Game::MAJOR_GL);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Game::MINOR_Gl);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Game::MINOR_GL);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWmonitor *monitor = nullptr;
@@ -168,18 +168,48 @@ void PointLightSetup(GLuint program, const PointLight &light)
 }
 
 
-void CameraSetup(GLuint program, Camera &camera, const mat4 &mvp)
+void CameraSetup(GLuint program, Camera &camera)
 {
-    glUniformMatrix4fv(glGetUniformLocation(program, "transform.viewProjection"), 1, GL_FALSE, &mvp[0][0]);
+    auto vp = camera.projection * camera.view;
+    glUniformMatrix4fv(glGetUniformLocation(program, "transform.viewProjection"), 1, GL_FALSE, &vp[0][0]);
     glUniform3fv(glGetUniformLocation(program, "transform.viewPosition"), 1, &camera.position[0]);
+}
+
+void RenderScene(std::shared_ptr<BasicJargShader> BasicShader, Camera camera, ROAMSurface* planet, Mesh * cube, SkySphere &ss)
+{
+    CameraSetup(BasicShader->program, camera);
+    planet->Render(BasicShader);
+    cube->Render();
+    ss.m->Render();
+}
+
+GLuint FBO_Test(const Texture& depth) {
+    GLuint depthFBO = 0;
+    GLenum fboStatus;
+
+    glGenFramebuffers(1, &depthFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+
+    // color out off
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth.textureId, 0);
+
+    if ((fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOG(ERROR) << string_format("glCheckFramebufferStatus error 0x%X\n", fboStatus);
+        return false;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return depthFBO;
 }
 
 void Game::Run()
 {
     glEnable(GL_DEPTH_TEST);
-    glShadeModel(GL_SMOOTH);
     glEnable(GL_CULL_FACE);
-    glDepthFunc(GL_LESS); 
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -192,6 +222,7 @@ void Game::Run()
     BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minnaert.glsl");
     BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minnaert.glsl");
     BasicShader->Link();
+    BasicShader->UpdateUniforms();
     auto mvpBasic = BasicShader->LocateVars("transform.viewProjection"); //var0
     auto worldID = BasicShader->LocateVars("transform.model"); //var1
     BasicShader->LocateVars("transform.normal"); //var2
@@ -205,24 +236,33 @@ void Game::Run()
     StarSphereShader->LocateVars("transform.model"); //var1
     StarSphereShader->LocateVars("transform.normal"); //var2
 
-    Texture test;
-    test.Load("img.png");
+    auto MinimalShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    MinimalShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minimal.glsl");
+    MinimalShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minimal.glsl");
+    MinimalShader->Link();
+    MinimalShader->UpdateUniforms();
+    MinimalShader->LocateVars("transform.viewProjection"); //var0
+    MinimalShader->LocateVars("transform.model"); //var1
+    MinimalShader->LocateVars("transform.normal"); //var2
 
-    Texture hm;
-    hm.Load("face.png");
+    auto test = std::shared_ptr<Texture>(new Texture());
+    test->Load("img.png");
 
-    Texture st;
-    st.Load("st.png");
+    auto hm = std::shared_ptr<Texture>(new Texture());
+    hm->Load("face.png");
+
+    auto st = std::shared_ptr<Texture>(new Texture());
+    st->Load("st.png");
 
     BasicShader->BindProgram();
-    Material mat;
-    mat.texture = &test;
-    mat.normal = &hm;
-    mat.ambient = vec4(0.2f, 0.2f, 0.2f, 1.0f);
-    mat.diffuse = vec4(0.3f, 0.5f, 1.0f, 1.0f);
-    mat.specular = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-    mat.emission = vec4(0.0f, 0.0f, 0.0f, 1.f);
-    mat.shininess = 20.0f;
+    auto mat = std::shared_ptr<Material>(new Material());
+    mat->texture = test;
+    mat->normal = hm;
+    mat->ambient = vec4(0.2f, 0.2f, 0.2f, 1.0f);
+    mat->diffuse = vec4(0.3f, 0.5f, 1.0f, 1.0f);
+    mat->specular = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+    mat->emission = vec4(0.0f, 0.0f, 0.0f, 1.f);
+    mat->shininess = 20.0f;
 
     PointLight pl;
     pl.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
@@ -253,21 +293,21 @@ void Game::Run()
     auto m = new Mesh(Icosahedron::getMesh());
     //m->loadOBJ("Data\\untitled.obj");
     m->Bind();
-    m->shader = BasicShader.get();
-    m->material = &mat;
+    m->shader = BasicShader;
+    m->material = mat;
 
     auto plane =Tesselator::Tesselate(5, Quad::GetMesh());
     plane->Bind();
-    plane->shader = BasicShader.get();
-    plane->material = &mat;
+    plane->shader = BasicShader;
+    plane->material = mat;
     plane->World = glm::rotate(Identity, (float)(3.1415/2.0), vec3(1.0,0.0,0.0));
     plane->World = glm::translate(plane->World, vec3(0.0,0.0,10.0));
     plane->World = glm::scale(plane->World, vec3(80.5,80.5,80.5));
 
     auto cube = new Mesh(Icosahedron::getMesh());
     cube->Bind();
-    cube->shader = BasicShader.get();
-    cube->material = &mat;
+    cube->shader = BasicShader;
+    cube->material = mat;
 
 
     //auto m = new Model();
@@ -316,7 +356,7 @@ void Game::Run()
     float sec = 0;
 
     float rotated = 0;
-    float* rott = new float[25];
+    auto rott = std::unique_ptr<float[]>(new float[25]);
     for (int i =0; i<25;i++)
     {
         rott[i] = 0;
@@ -331,22 +371,23 @@ void Game::Run()
 
     //auto surf = std::unique_ptr<ROAMSurface>(new ROAMSurface());
 
-    /*sqlite3 *db;
-    char *zErrMsg = 0;
-    auto rc = sqlite3_open("stars.db", &db);
-    int starsize;
-    if( rc ){
-    LOG(ERROR) << "Can't open database: " << sqlite3_errmsg(db);
-    }else{
-    LOG(INFO) << "Opened database successfully";
-    auto sql = "SELECT COUNT(*) FROM test";
-    rc = sqlite3_exec(db, sql, [](void *arg, int argc, char **argv, char **azColName)->int{ LOG(INFO) << "Total " << (argv[0] ? argv[0] : "NULL")  << " lines"; sscanf(argv[0], "%f", arg); return 0; }, &starsize, &zErrMsg);
-    if(rc){
-    LOG(ERROR) << zErrMsg;
-    }
-    }*/
+//     sqlite3 *db;
+//     char *zErrMsg = 0;
+//     auto rc = sqlite3_open("stars.db", &db);
+//     int starsize;
+//     if( rc ){
+//     LOG(ERROR) << "Can't open database: " << sqlite3_errmsg(db);
+//     }else{
+//     LOG(INFO) << "Opened database successfully";
+//     auto sql = "SELECT COUNT(*) FROM test";
+//     rc = sqlite3_exec(db, sql, [](void *arg, int argc, char **argv, char **azColName)->int{ LOG(INFO) << "Total " << (argv[0] ? argv[0] : "NULL")  << " lines"; sscanf(argv[0], "%f", arg); return 0; }, &starsize, &zErrMsg);
+//     if(rc){
+//     LOG(ERROR) << zErrMsg;
+//     }
+//     }
 
     //std::make_shared(new std::vector<>);
+    SkySphere ss;
     ss.m->Verteces.resize(88000*3);
     ss.m->Indeces.resize(88000*3);
     /*auto sql = "SELECT * FROM test";
@@ -358,16 +399,20 @@ void Game::Run()
     LOG(INFO) << "skysphere end";
     }*/
     ss.m->Bind();
-    ss.m->shader = BasicShader.get();
-    Material stm = Material();
-    stm.texture = &st;
-    ss.m->material = &stm;
+    ss.m->shader = BasicShader;
+    auto stm = std::shared_ptr<Material>(new Material());
+    stm->texture = st;
+    ss.m->material = stm;
 
 
     ROAMSurface* planet = new ROAMSurface();
 
     Texture emptytex = Texture();
-    emptytex.Empty(vec2(1000,1000));
+    emptytex.Empty(vec2(width,height));
+
+    Texture depthtexture = Texture();
+    depthtexture.CreateDepth(vec2(width*2, height*2));
+    auto test_fbo = FBO_Test(depthtexture);
 
     SpaceSolver spso = SpaceSolver();
     GameObject star1;
@@ -450,6 +495,11 @@ void Game::Run()
 
     spso.MakeOrbits();
 
+    Camera* cur_cam = &camera;
+    Camera lightcam;
+    lightcam.SetWindowSize(width, height);
+    lightcam.SetPosition(vec3(50,0,-200));
+    lightcam.SetLookAt(vec3(50,0,50));
 
     Mouse::SetFixedPosState(true);
     glCullFace(GL_BACK);
@@ -515,22 +565,6 @@ void Game::Run()
 
         if(Keyboard::isKeyDown(GLFW_KEY_UP)){
             sphere->fallRigidBody->setLinearVelocity(btVector3(0,0,0));
-
-            GLuint FramebufferName = 0;
-            glGenFramebuffers(1, &FramebufferName);
-            glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, emptytex.textureId, 0);
-
-            // Set the list of draw buffers.
-            GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-            glDrawBuffers(1, DrawBuffers);
-
-            glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-            cube->Render();
-
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
         //if(Keyboard::isKeyDown(GLFW_KEY_S)){
@@ -567,6 +601,14 @@ void Game::Run()
             camera.SetLookAt(vec3(0,0,0.0F));
         }
 
+        if(Keyboard::isKeyPress(GLFW_KEY_F11)){
+            if(cur_cam == &camera){
+                cur_cam = &lightcam;
+            } else {
+                cur_cam = &camera;
+            }
+        }
+
         camera.move_camera = true;
         camera.camera_scale = gt.elapsed/10.0F;
         if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT)){
@@ -577,8 +619,6 @@ void Game::Run()
 
         if(Mouse::GetFixedPosState())
             camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
-
-
 
         auto mpos = Mouse::GetCursorPos();
 
@@ -599,7 +639,12 @@ void Game::Run()
         auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
         //m->World = glm::rotate(m->World, q.getAngle(), vecc);
         //m->World = glm::scale(m->World, vec3(1,1,1));
-        pl.position = glm::vec4(sin(rotated)*500, 2, cos(rotated)*500, 1);
+        pl.position = glm::vec4(sin(rotated/20.f)*800, 2, cos(rotated/20.f)*800, 1);
+
+        lightcam.position = vec3(pl.position)/3.f;
+        lightcam.SetLookAt(vec3(0,0,0));
+        
+
         rotated+=gt.elapsed;
         for (int i=0;i<25;i++)
         {
@@ -607,10 +652,11 @@ void Game::Run()
         }
 
         camera.Update();
-        MVP = camera.VP() * model;
+        lightcam.Update();
+        lightcam.projection = glm::ortho<float>(-100,100,-100,100,1,1000);
 
         sec += gt.elapsed;
-        if(sec > 0.5 && distance(camlast, camera.position) > 0) {
+        if(sec > 0.2 && distance(camlast, camera.position) > 0) {
             sec = 0;
             planet->UpdateCells(camera.position);
             planet->Bind();
@@ -618,29 +664,53 @@ void Game::Run()
         camlast = camera.position;
 
         PointLightSetup(BasicShader->program, pl);
-        CameraSetup(BasicShader->program, camera, MVP);
 
         ss.m->World = glm::translate(Identity, camera.position);
-        cube->World = glm::translate(Identity, vec3(pl.position));
-        cube->Render();
+
+        
+        cube->World = glm::translate(Identity, vec3(sin(rotated)*150, 2, cos(rotated)*150)) * glm::scale(Identity, vec3(20,20,20));
 
         
         ////////////////////////////////////////////////////////////////////////// WORLD PLACE
         for (unsigned int i = 0; i < spso.objects.size(); i++)
         {
-            cube->World = glm::translate(Identity, spso.objects[i]->pos);
-            cube->Render();
+            //cube->World = glm::translate(Identity, spso.objects[i]->pos);
+            //cube->Render();
             //sb->DrawLines3d(spso.objects[i]->orbit, Colors::Red);
         }
 
         //plane->Render();
        
-        planet->Render(BasicShader.get());
-        cube->Render();
-        ss.m->Render();
-        ////////////////////////////////////////////////////////////////////////// WORLD PLACE
 
-        
+        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo);
+        glViewport(0, 0, depthtexture.width, depthtexture.height);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glDepthMask(GL_TRUE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
+        RenderScene(BasicShader, lightcam, planet, cube, ss);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, width, height);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_BACK);
+
+        BasicShader->BindProgram();
+        glUniform1i(glGetUniformLocation(BasicShader->program, "depthTexture"), 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthtexture.textureId);
+
+        static const mat4 bias(
+            0.5, 0.0, 0.0, 0.0,
+            0.0, 0.5, 0.0, 0.0,
+            0.0, 0.0, 0.5, 0.0,
+            0.5, 0.5, 0.5, 1.0);
+        auto mult = bias * lightcam.projection * lightcam.view;
+        glUniformMatrix4fv(glGetUniformLocation(BasicShader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
+
+        RenderScene(BasicShader, *cur_cam, planet, cube, ss);
+         
         if(wire == 2) {
             LinesShader->BindProgram();
             glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
@@ -649,6 +719,8 @@ void Game::Run()
         
 
         int dc = sb->RenderFinallyWorld();
+
+        ////////////////////////////////////////////////////////////////////////// WORLD PLACE
 
         glDisable(GL_DEPTH_TEST);
         MVP = camera.GetOrthoProjection();
@@ -684,8 +756,13 @@ void Game::Run()
     delete cube;
     delete[] so;
 
-    sphere->bpUnregister(dynamicsWorld.get());
+    delete ws;
+    delete planet;
 
+    sphere->bpUnregister(dynamicsWorld.get());
+}
+
+void Game::Destroy(){
     glfwDestroyWindow(window);
     glfwTerminate();
 }
@@ -697,6 +774,5 @@ void Game::Resize(int a, int b)
     glViewport(0,0,a,b);
 }
 
-SkySphere Game::ss;
 int Game::width = 0;
 int Game::height = 0;

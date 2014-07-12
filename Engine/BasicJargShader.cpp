@@ -1,8 +1,17 @@
 #include "BasicJargShader.h"
 
 
-BasicJargShader::BasicJargShader(void) :
-    JargShader()
+BasicJargShader::BasicJargShader(void)
+{
+    
+}
+
+
+BasicJargShader::~BasicJargShader(void)
+{
+}
+
+void BasicJargShader::UpdateUniforms()
 {
     ambient_location = glGetUniformLocation(program, "material.ambient");  
     diffuse_location = glGetUniformLocation(program, "material.diffuse"); 
@@ -12,9 +21,4 @@ BasicJargShader::BasicJargShader(void) :
 
     texture_location = glGetUniformLocation(program, "material.texture");
     normal_location = glGetUniformLocation(program, "material.normal");
-}
-
-
-BasicJargShader::~BasicJargShader(void)
-{
 }

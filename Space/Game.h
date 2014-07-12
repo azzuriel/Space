@@ -14,6 +14,7 @@ public:
     Game(void);
     ~Game(void);
     void Run();
+
     int Initialize();
     bool Running;
     std::string title;
@@ -24,9 +25,9 @@ public:
     FPSCounter fps;
 
     static void Resize(int a, int b);
-
+    void Destroy();
     int wire;
 
-    static const int MAJOR_GL = 3, MINOR_Gl = 3;
+    static const int MAJOR_GL = 3, MINOR_GL = 3;
     static SkySphere ss;
 };

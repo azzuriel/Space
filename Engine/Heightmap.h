@@ -19,7 +19,7 @@ void Heightmap_print(Heightmap *map);
 
 Heightmap *Heightmap_read(const char *filename);
 
-void Heightmap_delete(Heightmap *map);
+void maps_delete(Heightmap *map);
 
 void Heightmap_normalize(Heightmap *map);
 

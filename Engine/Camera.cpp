@@ -17,10 +17,11 @@ Camera::Camera() {
     max_heading_rate = 5;
     move_camera = false;
     near_clip = 0.1f;
-    far_clip = 10000;
+    far_clip = 1000;
     auto windowWidth = 1;
     auto windowHeight = 1;
     aspect = float(windowWidth) / float(windowHeight);
+camera_heading = camera_pitch = 0;
 }
 Camera::~Camera() {
 }
@@ -208,13 +209,26 @@ std::string Camera::getFullDebugDescription()
 
 mat4 Camera::VP() const
 {
-    return MVP;
+    return projection*view;
 }
 
 glm::mat4 Camera::GetOrthoProjection()
 {
     auto orthoProjection = glm::ortho(0.0f, (float)window_width, (float)window_height, 0.0f, 0.1f, 100.0f);
     return orthoProjection;
+}
+
+const mat4 OrthoProjection(float left, float right,
+                           float bottom, float top, float zNear, float zFar)
+{
+    const float tx = - (right + left) / (right - left),
+        ty = - (top + bottom) / (top - bottom),
+        tz = - (zFar + zNear) / (zFar - zNear);
+
+    return mat4(2 / (right - left), 0, 0, tx,
+        0, 2 / (top - bottom), 0, ty,
+        0, 0, -2 / (zFar - zNear), tz,
+        0, 0, 0, 1);
 }
 
 void Camera::SetWindowSize(int l_width, int l_height)

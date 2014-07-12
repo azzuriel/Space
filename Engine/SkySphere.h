@@ -7,6 +7,6 @@ public:
     SkySphere(void);
     ~SkySphere(void);
     int Generate(void *NotUsed, int argc, char **argv, char **azColName);
-    Mesh* m;
+    std::shared_ptr<Mesh> m;
 };
 

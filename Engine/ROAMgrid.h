@@ -55,6 +55,7 @@ public:
     void Bind(float *vertices, float *colors, float *normalTexels);
     void Render();
     Mesh* m;
+    void FreeMaps();
 
 private:
     BTTNode *allocateNode();
@@ -76,7 +77,7 @@ private:
         BTTNode *node, Heightmap *map,
         float *vertices, float *colors, float *normalTexels, int *idx,
         int left_x, int left_y, int right_x, int right_y, int apex_x, int apex_y);
-
+    
 };
 
 inline size_t TerrainPatch::amountOfLeaves() const

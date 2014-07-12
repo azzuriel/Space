@@ -3,10 +3,11 @@
 #include <glm.hpp>
 #include <string>
 #include "TextureManager.h"
+#include <memory>
 struct Material	
 {
     Material(void);
-    Texture *texture, *normal;
+    std::shared_ptr<Texture> texture, normal;
     glm::vec4 emission;
     glm::vec4 ambient;
     glm::vec4 diffuse;

@@ -108,7 +108,7 @@ void parseMat4(char *str, mat4 &target){
     sscanf(str, "%f %f %f %f %f %f %f %f %f %f %f %f", &target[0][0], &target[1][0], &target[2][0], &target[3][0], &target[0][1], &target[1][1], &target[2][1], &target[3][1], &target[0][2], &target[1][2], &target[2][2], &target[3][2], &target[0][3], &target[1][3], &target[2][3], &target[3][3]);
 }
 
-Mesh* Model::findMeshById(char* str){
+std::shared_ptr<Mesh> Model::findMeshById(char* str){
     for (int i=0;i<meshes.size();i++)
     {
         if(strcmp(meshes[i]->id.c_str(), str) == 0){
@@ -162,7 +162,7 @@ void Model::SaveBinary(std::string name){
             }
 
             unsigned int slen;
-            if(meshes[i]->material != nullptr && meshes[i]->material != &ErrorMaterial) {
+            if(meshes[i]->material != nullptr && meshes[i]->material != ErrorMaterial) {
                 slen = meshes[i]->material->id.length() + 1;
                 file.write((char*)&slen, sizeof(unsigned int));
                 file.write((char*)meshes[i]->material->id.c_str(), slen);
@@ -187,18 +187,7 @@ void Model::SaveBinary(std::string name){
 }
 
 void Model::LoadBinary(std::string name){
-    if(materials.size() > 0){
-        for(int i=0;i<materials.size();i++){
-            delete materials[i];
-        }
-    }
     materials.clear();
-
-    if(meshes.size() > 0){
-        for(int i=0;i<meshes.size();i++){
-            delete meshes[i];
-        }
-    }
     meshes.clear();
 
     LOG(INFO) << name << " loading begin";
@@ -216,7 +205,7 @@ void Model::LoadBinary(std::string name){
 
         for (int i=0;i<efnum;i++)
         {
-            materials.push_back(new Material());
+            materials.push_back(std::shared_ptr<Material>(new Material()));
             file.read((char*)&materials[i]->emission, sizeof(glm::vec4));
             file.read((char*)&materials[i]->ambient, sizeof(glm::vec4));
             file.read((char*)&materials[i]->diffuse, sizeof(glm::vec4));
@@ -236,7 +225,7 @@ void Model::LoadBinary(std::string name){
         file.read((char*)&menum, sizeof(unsigned int));
         for (int i=0;i<menum;i++)
         {
-            meshes.push_back(new Mesh());
+            meshes.push_back(std::shared_ptr<Mesh>(new Mesh()));
             unsigned int vcount;
             file.read((char*)&vcount, sizeof(unsigned int));
             meshes[i]->Verteces.resize(vcount);
@@ -257,9 +246,9 @@ void Model::LoadBinary(std::string name){
             file.read((char*)&slen, sizeof(unsigned int));
             char* sbuf = new char[slen];
             file.read((char*)sbuf, slen);
-            meshes[i]->material = findMaterialById(sbuf);
+            meshes[i]->material = std::shared_ptr<Material>(findMaterialById(sbuf));
             if(meshes[i]->material == nullptr){
-                meshes[i]->material = &ErrorMaterial;
+                meshes[i]->material = ErrorMaterial;
             }
             delete[] sbuf;
 
@@ -284,7 +273,7 @@ void Model::LoadBinary(std::string name){
     LOG(INFO) << name << " loading end";
 }
 
-Material* Model::findMaterialById(char* str){
+std::shared_ptr<Material> Model::findMaterialById(char* str){
     for (int i=0;i<materials.size();i++)
     {
         if(strcmp(materials[i]->id.c_str(), str) == 0){
@@ -309,7 +298,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
     auto effect = effects->first_node("effect");
     for (auto alleffects = effect; alleffects; alleffects = alleffects->next_sibling())
     {
-        auto m = new Material();
+        auto m = std::shared_ptr<Material>(new Material());
         m->id = alleffects->first_attribute("id")->value();
 
         auto technique = alleffects->first_node("profile_COMMON")->first_node("technique");
@@ -391,7 +380,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
         {
             if(strcmp(allpolylists->name(), "polylist") == 0) {
                 std::vector<GLuint> indexes;
-                auto mesh = new Mesh();
+                auto mesh = std::shared_ptr<Mesh>(new Mesh());
                 auto datacounter = allpolylists->first_node("input");
                 int datacount = 0;
                 for (auto allcounter = datacounter; allcounter; allcounter = allcounter->next_sibling())
@@ -420,7 +409,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
                     mesh->Indeces[i/datacount] = i/datacount;
                 }
                 mesh->id = geomid;
-                mesh->material = findMaterialById(polymat);
+                mesh->material = std::shared_ptr<Material>(findMaterialById(polymat));
                 meshes.push_back(mesh);
             }
         }
@@ -464,17 +453,8 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
 
 Model::~Model(void)
 {
-    if(materials.size() > 0){
-        for(int i=0;i<materials.size();i++){
-            delete materials[i];
-        }
-    }
-
-    if(meshes.size() > 0){
-        for(int i=0;i<meshes.size();i++){
-            delete meshes[i];
-        }
-    }
+    meshes.clear();
+    materials.clear();
 }
 
 void Model::Bind()

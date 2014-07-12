@@ -4,7 +4,7 @@
 
 SkySphere::SkySphere(void)
 {
-    m = new Mesh();
+    m = std::shared_ptr<Mesh>(new Mesh());
 }
 
 int SkySphere::Generate(void *last, int argc, char **argv, char **azColName){
@@ -28,7 +28,4 @@ int SkySphere::Generate(void *last, int argc, char **argv, char **azColName){
 
 SkySphere::~SkySphere(void)
 {
-    if(m){
-        delete m;
-    }
 }

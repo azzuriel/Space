@@ -50,27 +50,28 @@ GLint JargShader::LocateVars(std::string s)
 void JargShader::loadShaderFromSource(GLenum type, std::string source) {
 
     std::stringstream ss;
-    std::string name;
+    name = source;
+    std::string part_name;
     ss << "#version 330 core" << std::endl;
     if(type == GL_FRAGMENT_SHADER) {
-        name = "#define _FRAGMENT_";
-        ss << name << std::endl;
+        part_name = "#define _FRAGMENT_";
+        ss << part_name << std::endl;
     }
     else if(type == GL_VERTEX_SHADER) {
-        name = "#define _VERTEX_";
-        ss << name << std::endl;
+        part_name = "#define _VERTEX_";
+        ss << part_name << std::endl;
     }
     else if(type == GL_GEOMETRY_SHADER) {
-        name = "#define _GEOMETRY_";
-        ss << name << std::endl;
+        part_name = "#define _GEOMETRY_";
+        ss << part_name << std::endl;
     }
     else if(type == GL_TESS_EVALUATION_SHADER) {
-        name = "#define _TESSEVAL_";
-        ss << name << std::endl;
+        part_name = "#define _TESSEVAL_";
+        ss << part_name << std::endl;
     }
     else if(type == GL_TESS_CONTROL_SHADER) {
-        name = "#define _TESSCONTROL_";
-        ss << name << std::endl;
+        part_name = "#define _TESSCONTROL_";
+        ss << part_name << std::endl;
     }
     std::ifstream file(source.c_str());
     std::string line;
@@ -90,7 +91,7 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
     GLuint id = glCreateShader(type);
     glShaderSource(id, 1, (const char **)&data, &length);
     glCompileShader(id);
-    LOG(INFO) << source << " file " << name << "PART";
+    LOG(INFO) << source << " file " << part_name << "PART";
     printLog(id);
     glAttachShader(program, id);
     shaders_.push_back(id);

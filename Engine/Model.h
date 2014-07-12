@@ -13,16 +13,16 @@ public:
     Model(void);
     Model(std::string name, int model_type = COLLADA_MODEL);
     ~Model(void);
-    std::vector<Mesh*> meshes;
-    std::vector<Material*> materials;
+    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Material>> materials;
     mat4 World;
     void Bind();
     void Render();
-    Mesh* findMeshById(char* str);
-    Material* findMaterialById(char* str);
+    std::shared_ptr<Mesh> findMeshById(char* str);
+    std::shared_ptr<Material> findMaterialById(char* str);
     void SaveBinary(std::string name);
     void LoadBinary(std::string name);
-    Material ErrorMaterial;
+    std::shared_ptr<Material> ErrorMaterial;
 };
 #endif // Model_h__
 

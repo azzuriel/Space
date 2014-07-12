@@ -99,4 +99,5 @@ public:
     glm::mat4 MVP;
 
 };
+const mat4 OrthoProjection(float left, float right, float bottom, float top, float zNear, float zFar);
 #endif // Camera_h_

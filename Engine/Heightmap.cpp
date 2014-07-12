@@ -85,7 +85,7 @@ Heightmap *Heightmap_read(const char *filename)
     return map;
 }
 
-void Heightmap_delete(Heightmap *map)
+void maps_delete(Heightmap *map)
 {
     if (map->map) {
         delete[] map->map;
@@ -110,52 +110,89 @@ void Heightmap_calculate_normals(Heightmap *map)
 {
     int x, y;
 
-    map->normal_map = new float[3*map->width*map->height*sizeof(float)];
+    map->normal_map = new float[3*map->width*map->height];
     memset(map->normal_map, 0, 3*map->width*map->height*sizeof(float));
 
-    for (y=0; y<map->height; ++y) {
-        for (x=0; x<map->width; ++x) {
-            int k = 3*(map->height*y + x);
+      for (y=0; y<map->height; ++y) {
+          for (x=0; x<map->width; ++x) {
+              int k = 3*(map->height*y + x);
+  
+              // corner cases
+              if (x == 0 || x == map->width-1 || y == 0 || y == map->height-1) {
+                  map->normal_map[k+0] = 0;
+                  map->normal_map[k+1] = 0;
+                  map->normal_map[k+2] = 1.0;
+                  continue;
+              }
+  
+              // dx: Sobel filter
+              // -1  0  1
+              // -2  0  2
+              // -1  0  1
+              //
+              // dy: Sobel filter
+              // -1 -2 -1
+              //  0  0  0
+              //  1  2  1
+              float tl = Heightmap_get(map, x-1, y-1);
+              float l = Heightmap_get(map, x-1, y );
+              float bl = Heightmap_get(map, x-1, y+1);
+              float b = Heightmap_get(map, x, y+1);
+              float br = Heightmap_get(map, x+1, y+1);
+              float r = Heightmap_get(map, x+1, y );
+              float tr = Heightmap_get(map, x+1, y-1);
+              float t = Heightmap_get(map, x, y-1);
+  
+              float dx = tr + 2 * r + br - tl - 2 * l - bl;
+              float dy = bl + 2 * b + br - tl - 2 * t - tr;
+  
+              // trial & error value.
+              float str = 32.0;
+  
+              float length = sqrtf(dx*dx + dy*dy + 1.0/str*1.0/str);
+  
+              map->normal_map[k+0] = dx / length;
+              map->normal_map[k+1] = dy / length;
+              map->normal_map[k+2] = 1.0 / (str*length);
+          }
+      }
 
-            // corner cases
-            if (x == 0 || x == map->width-1 || y == 0 || y == map->height-1) {
-                map->normal_map[k+0] = 0;
-                map->normal_map[k+1] = 0;
-                map->normal_map[k+2] = 1.0;
-                continue;
-            }
+    //int	offs = 0;                   // offset to normalMap
+    //float scale = 10.0;
 
-            // dx: Sobel filter
-            // -1 0 1
-            // -2 0 2
-            // -1 0 1
-            //
-            // dy: Sobel filter
-            // -1 -2 -1
-            // 0 0 0
-            // 1 2 1
-            float tl = Heightmap_get(map, x-1, y-1);
-            float l = Heightmap_get(map, x-1, y );
-            float bl = Heightmap_get(map, x-1, y+1);
-            float b = Heightmap_get(map, x, y+1);
-            float br = Heightmap_get(map, x+1, y+1);
-            float r = Heightmap_get(map, x+1, y );
-            float tr = Heightmap_get(map, x+1, y-1);
-            float t = Heightmap_get(map, x, y-1);
+    //for ( int i = 0; i < map->height; i++ )
+    //    for ( int j = 0; j < map->width; j++ )
+    //    {
+    //        int k = 3*(map->height*i + j);
+    //        if (i == 0 || i == map->width-1 || j == 0 || j == map->height-1) {
+    //                              map->normal_map[k+0] = 0;
+    //                              map->normal_map[k+1] = 0;
+    //                              map->normal_map[k+2] = 1.0;
+    //                              continue;
+    //                          }
 
-            float dx = tr + 2 * r + br - tl - 2 * l - bl;
-            float dy = bl + 2 * b + br - tl - 2 * t - tr;
+    //        // convert height values to [0,1] range
+    //        float	c  = Heightmap_get(map, i,   j);
+    //        float	cx = Heightmap_get(map, i,   j+1);
+    //        float	cy = Heightmap_get(map, i+1, j);
 
-            // trial & error value.
-            float str = 32.0;
+    //        // find derivatives
+    //        float	dx = (c - cx) * scale;
+    //        float	dy = (c - cy) * scale;
 
-            float length = sqrtf(dx*dx + dy*dy + 1.0/str*1.0/str);
+    //        // normalize
+    //        float	len = (float) sqrt ( dx*dx + dy*dy + 1 );
 
-            map->normal_map[k+0] = dx / length;
-            map->normal_map[k+1] = dy / length;
-            map->normal_map[k+2] = 1.0 / (str*length);
-        }
-    }
+    //        // get normal
+    //        float	nx = dy   / len;
+    //        float	ny = -dx  / len;
+    //        float	nz = 1.0f / len;
+
+    //        // now convert to color and store in map
+    //        map->normal_map[k+0] = nx;
+    //        map->normal_map[k+1] = ny;
+    //        map->normal_map[k+2] = nz;
+    //    }
 }
 
 void Heightmap_get_normal(Heightmap *map, int x, int y, float *nx, float *ny, float *nz)

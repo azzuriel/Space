@@ -113,7 +113,7 @@ TextureManager::~TextureManager(void)
 }
 
 Texture::Texture() :
-    textureId(-1),
+    textureId(0),
     name("empty"),
     height(0),
     width(0)
@@ -139,12 +139,35 @@ Texture::~Texture()
 
 void Texture::Empty(glm::vec2 size)
 {
+    width = size.x;
+    height = size.y;
     name = "emptytexture";
 
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 }
+
+void Texture::CreateDepth(glm::vec2 size)
+{
+    width = size.x;
+    height = size.y;
+    name = "emptydepth";
+
+    glGenTextures(1, &textureId);
+
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
+    glTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,width,height,0,GL_DEPTH_COMPONENT,GL_FLOAT,NULL);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+
+    glBindTexture(GL_TEXTURE_2D,0);
+}
+
 
 void Texture::Load(std::string a)
 {
@@ -155,7 +178,7 @@ void Texture::Load(std::string a)
     textureId = GenerateOpenglBitmap(*b, false, false);
     height = b->GetHeight();
     width = b->GetWidth();
-    b->Free();
+    delete b;
 }
 
 Rect::Rect()

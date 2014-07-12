@@ -24,6 +24,7 @@ struct Texture {
 
     void Load(std::string a);
     void Empty(glm::vec2 size);
+    void CreateDepth(glm::vec2 size);
 };
 
 struct Rect{

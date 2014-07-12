@@ -36,21 +36,6 @@ Batched::Batched()
 
 Batched::~Batched()
 {
-    delete[] uv;
-    delete[] vertex;
-    delete[] index;
-
-    delete[] m_lineColor;
-    delete[] m_lineVertex;
-    delete[] m_lineIndex;
-
-    delete[] dindex;
-    delete[] dvertex;
-
-    delete[] lines_2d_vbo;
-
-    delete m_blankTex;
-
     glDeleteBuffers(1, &m_indecesBuffer);
     glDeleteBuffers(1, &m_vertexBuffer);
     glDeleteBuffers(1, &m_colorBuffer);
@@ -71,6 +56,25 @@ Batched::~Batched()
     glDeleteBuffers(2, lines_2d_vbo);
     glBindVertexArray(lines_2d_vao);
     glDeleteVertexArrays(1, &lines_2d_vao);
+
+    delete[] uv;
+    delete[] vertex;
+    delete[] index;
+    delete[] color;
+
+    delete[] m_lineColor;
+    delete[] m_lineVertex;
+    delete[] m_lineIndex;
+
+    delete[] dindex;
+    delete[] dvertex;
+    delete[] lines_2d_vertex;
+    delete[] lines_2d_index;
+
+    delete[] lines_2d_vbo;
+    delete[] dvbo;
+
+    delete m_blankTex;
 }
 
 void Batched::Initialize(const JargShader* tex, const JargShader* col){
@@ -318,7 +322,7 @@ inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, co
 
 void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub)
 {
-    innerDraw(pos, size, rotation, (const Texture) tex, sub);
+    innerDraw(pos, size, rotation, tex, sub);
 }	
 
 void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, int atl)
@@ -326,17 +330,17 @@ void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Text
     int i = atl%64;
     int j = atl/64;
     Rect aa(i/64.0, (j*32.0)/tex.height, 1/64.0, 32.0/tex.height);
-    innerDraw(pos, size, rotation, (const Texture) tex, aa);
+    innerDraw(pos, size, rotation, tex, aa);
 }
 
 void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex)
 {
-    innerDraw(pos, size, rotation, (const Texture) tex, Rect(0,0,1,1));
+    innerDraw(pos, size, rotation, tex, Rect(0,0,1,1));
 }
 
 void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, const Texture& tex)
 {
-    innerDraw(pos, size, 0, (const Texture) tex, Rect(0,0,1,1));
+    innerDraw(pos, size, 0,  tex, Rect(0,0,1,1));
 }
 
 void Batched::DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col){
