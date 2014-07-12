@@ -6,7 +6,9 @@
 #include "Mouse.h"
 #include "JHelpers_inl.h"
 
-JButton::JButton(void)
+JButton::JButton(void) :
+    pos(0),
+    size(50,20)
 {
     text = new TextGeometry("Button");
 }

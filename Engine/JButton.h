@@ -23,7 +23,6 @@ public:
     WContainer* parent;
     TextGeometry* text;
     std::function<void()> onPress;
-private:
     glm::vec2 pos;
     glm::vec2 size;
     bool aimed;

@@ -45,3 +45,6 @@ lastlog.txt
 *.dae
 *.m
 *.db
+ShaderTest/fonts/
+ShaderTest/Shaders/
+ShaderTest/*.png
