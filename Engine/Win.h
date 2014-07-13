@@ -17,6 +17,7 @@ public:
     void Draw() const;
     void Update();
     glm::vec2 GlobalPos() const;
+
     glm::vec2 size;
     glm::vec2 pos;
     glm::vec4 col;

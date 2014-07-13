@@ -403,7 +403,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
                         mesh->Verteces[i/datacount] = VertexPositionNormalTexture(normals[indexes[i+1]], positions[indexes[i]], glm::vec2(1));
                         break;
                     case 3:
-                        mesh->Verteces[i/datacount] = VertexPositionNormalTexture(normals[indexes[i+1]], positions[indexes[i]], glm::vec2(1));//uvs[indexes[i+1]]);
+                        mesh->Verteces[i/datacount] = VertexPositionNormalTexture(normals[indexes[i+1]], positions[indexes[i]], uvs[indexes[i+2]]);//);
                         break;
                     }
                     mesh->Indeces[i/datacount] = i/datacount;

@@ -107,6 +107,7 @@
     <ClCompile Include="Heightmap.cpp" />
     <ClCompile Include="Icosahedron.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
+    <ClCompile Include="ImageBox.cpp" />
     <ClCompile Include="JargFont.cpp" />
     <ClCompile Include="JargShader.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
@@ -135,6 +136,7 @@
     <ClCompile Include="ColorExtender.cpp" />
     <ClCompile Include="VertexPositionTexture.cpp" />
     <ClCompile Include="Win.cpp" />
+    <ClCompile Include="WinGrid.cpp" />
     <ClCompile Include="WinS.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +160,7 @@
     <ClInclude Include="Heightmap.h" />
     <ClInclude Include="Icosahedron.h" />
     <ClInclude Include="ImageAtlas.h" />
+    <ClInclude Include="ImageBox.h" />
     <ClInclude Include="JargFont.h" />
     <ClInclude Include="JargShader.h" />
     <ClInclude Include="JButton.h" />
@@ -185,6 +188,7 @@
     <ClInclude Include="VertexPositionTexture.h" />
     <ClInclude Include="WComponent.h" />
     <ClInclude Include="Win.h" />
+    <ClInclude Include="WinGrid.h" />
     <ClInclude Include="WinS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

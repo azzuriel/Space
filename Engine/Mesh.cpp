@@ -3,6 +3,7 @@
 #include "VertexPositionTexture.h"
 #include <glew.h>
 #include <easylogging++.h>
+#include <math.h>
 
 #define OPENGL_CHECK_ERRORS() \
     while( unsigned int openGLError = glGetError()) \

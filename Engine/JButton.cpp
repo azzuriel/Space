@@ -68,3 +68,8 @@ glm::vec2 JButton::GlobalPos() const
 {
     return parent->GlobalPos() + pos;
 }
+
+void JButton::SetText(std::string s)
+{
+    text->setText(s);
+}

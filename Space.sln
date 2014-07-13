@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderTest", "ShaderTest\Sh
 		{A252726B-481C-4A2C-9DBB-22B55F2BE2AA} = {A252726B-481C-4A2C-9DBB-22B55F2BE2AA}
 	EndProjectSection
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PyCore", "PyCore\PyCore.pyproj", "{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,12 @@ Global
 		{42222524-3DE5-44CA-98AB-CD50B41AFE11}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{42222524-3DE5-44CA-98AB-CD50B41AFE11}.Release|Win32.ActiveCfg = Release|Win32
 		{42222524-3DE5-44CA-98AB-CD50B41AFE11}.Release|Win32.Build.0 = Release|Win32
+		{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3C6C42F9-4370-4D50-98BD-23AD67A11BF4}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

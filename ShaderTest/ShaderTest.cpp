@@ -51,6 +51,7 @@
 #include "WComponent.h"
 #include "../Engine/sparse_vector.h"
 #include "ShaderSelectWindow.h"
+#include "PerfomanceWindow.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -236,6 +237,33 @@ void Game::Run()
     TestShader->LocateVars("transform.model"); //var1
     TestShader->LocateVars("transform.normal"); //var2
 
+    auto DepthTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    DepthTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/depthtest.glsl");
+    DepthTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/depthtest.glsl");
+    DepthTestShader->Link();
+    DepthTestShader->UpdateUniforms();
+    DepthTestShader->LocateVars("transform.viewProjection"); //var0
+    DepthTestShader->LocateVars("transform.model"); //var1
+    DepthTestShader->LocateVars("transform.normal"); //var2
+
+    auto TangentspaceTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    TangentspaceTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/tangentspacetest.glsl");
+    TangentspaceTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/tangentspacetest.glsl");
+    TangentspaceTestShader->Link();
+    TangentspaceTestShader->UpdateUniforms();
+    TangentspaceTestShader->LocateVars("transform.viewProjection"); //var0
+    TangentspaceTestShader->LocateVars("transform.model"); //var1
+    TangentspaceTestShader->LocateVars("transform.normal"); //var2
+
+    auto NormalTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    NormalTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/normaltest.glsl");
+    NormalTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/normaltest.glsl");
+    NormalTestShader->Link();
+    NormalTestShader->UpdateUniforms();
+    NormalTestShader->LocateVars("transform.viewProjection"); //var0
+    NormalTestShader->LocateVars("transform.model"); //var1
+    NormalTestShader->LocateVars("transform.normal"); //var2
+
     auto MinimalShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     MinimalShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minimal.glsl");
     MinimalShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minimal.glsl");
@@ -270,9 +298,8 @@ void Game::Run()
     const glm::mat4 Identity = glm::mat4(1.0f);
 
     auto normal = std::shared_ptr<Texture>(new Texture());
-    normal->Load("normal.png");
-    auto m = new Model();
-    m->LoadBinary("testscene.m");
+    normal->Load("normal.png", true, true);
+    auto m = new Model("testscene.dae");
     m->Bind();
     for (int i = 0; i<m->meshes.size(); i++)
     {
@@ -280,7 +307,7 @@ void Game::Run()
         m->meshes[i]->material->normal = normal;
     }
 
-    Camera camera;
+    Camera camera; 
     camera.SetWindowSize(width, height);
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -298,8 +325,21 @@ void Game::Run()
     WinS *ws = new WinS(sb.get(), *font);
     ShaderSelectWindow *ssw = new ShaderSelectWindow();
     ws->windows.push_back(ssw);
-    ssw->apply1->onPress = [&cur_shader, BasicShader](){cur_shader = BasicShader;};
-    ssw->apply2->onPress = [&cur_shader, TestShader](){cur_shader = TestShader;};
+    ssw->apply1->onPress = [&](){cur_shader = BasicShader;};
+    ssw->apply1->SetText("Basic");
+    ssw->apply2->onPress = [&](){cur_shader = TestShader;};
+    ssw->apply2->SetText("Test");
+    ssw->apply3->onPress = [&](){cur_shader = DepthTestShader;};
+    ssw->apply3->SetText("Depth");
+    ssw->apply4->onPress = [&](){cur_shader = NormalTestShader;};
+    ssw->apply4->SetText("Normal");
+    ssw->apply5->onPress = [&](){cur_shader = TangentspaceTestShader;};
+    ssw->apply5->SetText("Tangent");
+    ssw->ibox->texture = normal;
+    ssw->ibox->border = true;
+
+    PerfomanceWindow *pw = new PerfomanceWindow();
+    ws->windows.push_back(pw);
 
     auto broadphase = std::unique_ptr<btDbvtBroadphase>(new btDbvtBroadphase());
     auto collisionConfiguration = std::unique_ptr<btDefaultCollisionConfiguration>(new btDefaultCollisionConfiguration());
@@ -347,6 +387,7 @@ void Game::Run()
         glEnable(GL_DEPTH_TEST);
         gt.Update(glfwGetTime());
         fps.Update(gt);
+            pw->UpdateFps(fps);
         dynamicsWorld->stepSimulation(gt.elapsed,10);
 
         //glfwSetWindowTitle(window, a.c_str());
@@ -454,7 +495,7 @@ void Game::Run()
         glDepthMask(GL_TRUE);
         glClear(GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_FRONT);
-        RenderScene(BasicShader, lightcam, *m, pl);
+        RenderScene(cur_shader, lightcam, *m, pl);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, width, height);

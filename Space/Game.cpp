@@ -254,7 +254,7 @@ void Game::Run()
     auto st = std::shared_ptr<Texture>(new Texture());
     st->Load("st.png");
 
-    BasicShader->BindProgram();
+    BasicShader->Use();
     auto mat = std::shared_ptr<Material>(new Material());
     mat->texture = test;
     mat->normal = hm;
@@ -622,7 +622,7 @@ void Game::Run()
 
         auto mpos = Mouse::GetCursorPos();
 
-        BasicShader->BindProgram();
+        BasicShader->Use();
 
         btTransform trans;
         sphere->fallRigidBody->getMotionState()->getWorldTransform(trans);
@@ -641,9 +641,9 @@ void Game::Run()
         //m->World = glm::scale(m->World, vec3(1,1,1));
         pl.position = glm::vec4(sin(rotated/20.f)*800, 2, cos(rotated/20.f)*800, 1);
 
-        lightcam.position = vec3(pl.position)/3.f;
+        lightcam.position = vec3(pl.position)/5.f;
         lightcam.SetLookAt(vec3(0,0,0));
-        
+        lightcam.position += vec3(camera.position);
 
         rotated+=gt.elapsed;
         for (int i=0;i<25;i++)
@@ -653,7 +653,7 @@ void Game::Run()
 
         camera.Update();
         lightcam.Update();
-        lightcam.projection = glm::ortho<float>(-100,100,-100,100,1,1000);
+        lightcam.projection = glm::ortho<float>(-100,100,-100,100,1,100);
 
         sec += gt.elapsed;
         if(sec > 0.2 && distance(camlast, camera.position) > 0) {
@@ -696,7 +696,7 @@ void Game::Run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_BACK);
 
-        BasicShader->BindProgram();
+        BasicShader->Use();
         glUniform1i(glGetUniformLocation(BasicShader->program, "depthTexture"), 2);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, depthtexture.textureId);
@@ -712,7 +712,7 @@ void Game::Run()
         RenderScene(BasicShader, *cur_cam, planet, cube, ss);
          
         if(wire == 2) {
-            LinesShader->BindProgram();
+            LinesShader->Use();
             glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
             dynamicsWorld->debugDrawWorld();
         }
@@ -724,9 +724,9 @@ void Game::Run()
 
         glDisable(GL_DEPTH_TEST);
         MVP = camera.GetOrthoProjection();
-        TextureShader->BindProgram();
+        TextureShader->Use();
         glUniformMatrix4fv(mvpTex, 1, GL_FALSE, &MVP[0][0]);
-        LinesShader->BindProgram();
+        LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
         sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
@@ -736,7 +736,7 @@ void Game::Run()
         ws->Update(gt);
         ws->Draw();
 
-        LinesShader->BindProgram();
+        LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
 
         dc += sb->RenderFinally();        

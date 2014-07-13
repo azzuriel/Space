@@ -33,6 +33,9 @@
     <ClCompile Include="ShaderSelectWindow.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
+    <ClCompile Include="PerfomanceWindow.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoVersion.h">
@@ -43,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="ShaderSelectWindow.h">
       <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="PerfomanceWindow.h">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

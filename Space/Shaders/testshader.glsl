@@ -44,39 +44,26 @@ layout(location = VERT_NORMAL) in vec3 normal;
 out Vertex {
         vec2  texcoord;
         vec3  normal;
-		vec3  tangent;
-		vec3  binormal;
         vec3  lightDir;
         vec3  viewDir;
         float distance;
 		vec4  smcoord;
-		vec4  position;
 } Vert;
 
 void main(void)
 {
-  vec4 vertex    = transform.model * vec4(position, 1.0);
-  vec4 lightDir  = light.position - vertex; // без вертекс?!
-  Vert.texcoord  = texcoord;
-  Vert.distance  = length(lightDir);
+  vec4 vertex   = transform.model * vec4(position, 1.0);
+
   
-  vec3 tangent;
-  vec3 v1 = cross(gl_Normal, vec3(1.0, 0.0, 0.0));
-  vec3 v2 = cross(gl_Normal, vec3(0.0, 1.0, 0.0));
-  if(length(v1)>length(v2))
-	tangent=v1;
-  else
-	tangent=v2;
-  Vert.normal = normalize(transform.normal * normal);
-  Vert.tangent = normalize(transform.normal * tangent);
-  Vert.binormal = cross(Vert.normal, Vert.tangent);
-  
+  vec4 lightDir = light.position - vertex; // без вертекс?!
+  Vert.texcoord = texcoord;
   Vert.viewDir  = transform.viewPosition - vec3(vertex);
+  Vert.normal   = transform.normal * normal;
+  Vert.distance = length(lightDir);
   Vert.lightDir = lightDir.xyz;
   
   Vert.smcoord  = transform.light * vertex;
-  Vert.position = transform.viewProjection * vertex;
-  gl_Position   = Vert.position;
+  gl_Position   = transform.viewProjection * vertex;
 }
 #endif
 
@@ -85,13 +72,10 @@ void main(void)
 in Vertex {
         vec2  texcoord;
         vec3  normal;
-		vec3  tangent;
-		vec3  binormal;
         vec3  lightDir;
         vec3  viewDir;
         float distance;
 		vec4  smcoord;
-		vec4  position;
 } Vert;
 
 layout(location = FRAG_OUTPUT0) out vec4 color;
@@ -115,12 +99,8 @@ float PCF(in vec4 smcoord)
 
 void main(void)
 {
-  vec3 t = Vert.tangent;
-  vec3 b = Vert.binormal;
-  vec3 n = Vert.normal;
-  mat3 mat = mat3(t.x,b.x,n.x,t.y,b.y,n.y,t.z,b.z,n.z);
-  vec3 norm = normalize(texture2D(material.normal, Vert.texcoord).xyz*2.0-1.0);
-  vec3 normal = normalize(norm * mat);
+  vec3 texcol = vec3(1,1,1);
+  vec3 normal = normalize(Vert.normal);
   vec4 smcoord = Vert.smcoord;
   vec3 lightDir = normalize(Vert.lightDir);
   vec3 viewDir = normalize(Vert.viewDir);
@@ -135,6 +115,7 @@ void main(void)
   color += material.specular * RdotVpow;
   
   float shadow = PCF(smcoord);
+  
   
   color *= shadow;
   color.w = 1;

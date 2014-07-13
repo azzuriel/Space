@@ -1,13 +1,12 @@
 #include "FPSCounter.h"
-
 #include <glfw3.h>
+#include "GameTimer.h"
 
 
 
 FPSCounter::FPSCounter(void)
 {
-    sm_fpsTime = 0;
-    sm_fpsC = 0;
+    fpsTime = 0;
 }
 
 
@@ -17,16 +16,19 @@ FPSCounter::~FPSCounter(void)
 
 void FPSCounter::Update(GameTimer gt)
 {
-    sm_fpsTime += gt.elapsed;
-    sm_fpsC++;
-    if(sm_fpsTime > 1.0){
-        sm_fpsTime -= 1.0;
-        sm_fps = sm_fpsC;
-        sm_fpsC = 0;
+    double frameTime = gt.elapsed;
+
+    fpsTime += frameTime;
+    fpsStack.push_back(frameTime);
+
+    while(fpsTime > 1)
+    {
+        fpsTime -= fpsStack.front();
+        fpsStack.pop_front();
     }
 }
 
-unsigned int FPSCounter::GetCount()
+unsigned int FPSCounter::GetCount() const
 {
-    return sm_fps;
+    	return fpsStack.size();
 }

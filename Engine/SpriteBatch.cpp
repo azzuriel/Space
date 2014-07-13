@@ -7,26 +7,27 @@
 #include <utf8\checked.h>
 #include "TextGeometry.h"
 #include <vector>
+#define SIZE 10000
 
 Batched::Batched()
 {
-    uv = new glm::vec2[1000*4];
-    vertex = new glm::vec3[1000*4];
-    color = new glm::vec4[1000*4];
-    index = new GLuint[1000*6];
+    uv = new glm::vec2[SIZE*4];
+    vertex = new glm::vec3[SIZE*4];
+    color = new glm::vec4[SIZE*4];
+    index = new GLuint[SIZE*6];
 
-    lines_2d_vertex = new VertexPositionColor[1000*4];
-    lines_2d_index = new GLuint[1000*6];
+    lines_2d_vertex = new VertexPositionColor[SIZE*4];
+    lines_2d_index = new GLuint[SIZE*6];
 
-    m_lineVertex = new glm::vec3[1000*4];
-    m_lineIndex = new GLuint[1000*6];
-    m_lineColor = new glm::vec4[1000*4];
+    m_lineVertex = new glm::vec3[SIZE*4];
+    m_lineIndex = new GLuint[SIZE*6];
+    m_lineColor = new glm::vec4[SIZE*4];
     m_textureBuffer = m_vertexBuffer = m_indecesBuffer = m_lineColorBuffer = m_lineVertexBuffer = m_lvao = m_vao = curn = lcurn = m_colorBuffer = lines_2d_curn = 0;
     dcurn = 0;
     dvao = 0; dvbo = nullptr;
     lines_2d_vao = 0; lines_2d_vbo = nullptr;
-    dvertex = new VertexPositionColor[1000*4];
-    dindex = new GLuint[1000*4];
+    dvertex = new VertexPositionColor[SIZE*4];
+    dindex = new GLuint[SIZE*4];
 
     curz = -1;
     m_blankTex = new Texture();
@@ -114,7 +115,7 @@ void Batched::DrawLines3d(std::vector<glm::vec3> a, glm::vec4 col){
 }
 
 void Batched::DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *l_vertex, glm::vec2 *l_uv, glm::vec4 *l_color, GLuint *l_index, int &size) {
-    if(curn > 1000 - size - 1){
+    if(curn > SIZE - size - 1){
         Render();
     }
     if(tex.textureId != m_currentTex->textureId){
@@ -249,7 +250,7 @@ glm::vec2 Batched::GetStringData(glm::vec2 pos, std::string text, vec4 col, int 
 }
 
 void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
-    if(curn > 1000 - text.length()*4 - 1){
+    if(curn > SIZE - text.length()*4 - 1){
         Render();
     }
     if(font.tex->textureId != m_currentTex->textureId){
@@ -263,7 +264,7 @@ void Batched::DrawString(glm::vec2 pos, std::string text, const Font& font){
 }
 
 void Batched::DrawString(glm::vec2 pos, std::string text, vec3 col, const Font& font){
-    if(curn > 1000 - text.length()*4 - 1){
+    if(curn > SIZE - text.length()*4 - 1){
         Render();
     }
     if(font.tex->textureId != m_currentTex->textureId){
@@ -277,7 +278,7 @@ void Batched::DrawString(glm::vec2 pos, std::string text, vec3 col, const Font& 
 }
 
 void Batched::DrawString(glm::vec2 pos, std::string text, vec4 col, const Font& font){
-    if(curn > 1000 - text.length()*4 - 1){
+    if(curn > SIZE - text.length()*4 - 1){
         Render();
     }
     if(font.tex->textureId != m_currentTex->textureId){
@@ -291,7 +292,7 @@ void Batched::DrawString(glm::vec2 pos, std::string text, vec4 col, const Font& 
 }
 
 inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub){
-    if(curn >= 1000 - 1){
+    if(curn >= SIZE - 1){
         Render();
     }
     if(tex.textureId != m_currentTex->textureId){
@@ -344,7 +345,7 @@ void Batched::DrawQuad(glm::vec2 pos, glm::vec2 size, const Texture& tex)
 }
 
 void Batched::DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col){
-    if(curn >= 1000){
+    if(curn >= SIZE){
         Render();
     }
 
@@ -371,7 +372,7 @@ void Batched::DrawLine(glm::vec2 from, glm::vec2 to, float w, glm::vec4 col){
 }
 
 void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col){
-    if(dcurn >= 1000){
+    if(dcurn >= SIZE){
         line3dRender();
     }
     auto t = 2*dcurn;
@@ -385,7 +386,7 @@ void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col){
 }
 
 void Batched::DrawLine2d(glm::vec2 from, glm::vec2 to, glm::vec4 col){
-    if(dcurn >= 1000){
+    if(dcurn >= SIZE){
         line2dRender();
     }
     auto t = 2*lines_2d_curn;
@@ -400,7 +401,7 @@ void Batched::DrawLine2d(glm::vec2 from, glm::vec2 to, glm::vec4 col){
 }
 
 void Batched::DrawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 col){
-    if(curn >= 1000 - 1){
+    if(curn >= SIZE - 1){
         Render();
     }
     // 	if(Batched::m_blankTex->textureId != m_currentTex->textureId){

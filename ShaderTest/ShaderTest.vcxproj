@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AutoVersion.cpp" />
+    <ClCompile Include="PerfomanceWindow.cpp" />
     <ClCompile Include="ShaderSelectWindow.cpp" />
     <ClCompile Include="ShaderTest.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
@@ -104,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoVersion.h" />
+    <ClInclude Include="PerfomanceWindow.h" />
     <ClInclude Include="ShaderSelectWindow.h" />
     <ClInclude Include="ShaderTest.h" />
   </ItemGroup>

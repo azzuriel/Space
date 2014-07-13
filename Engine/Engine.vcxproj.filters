@@ -150,6 +150,12 @@
     <ClCompile Include="GraphBox.cpp">
       <Filter>Ws</Filter>
     </ClCompile>
+    <ClCompile Include="ImageBox.cpp">
+      <Filter>Ws</Filter>
+    </ClCompile>
+    <ClCompile Include="WinGrid.cpp">
+      <Filter>Ws</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassicNoise.h">
@@ -290,11 +296,17 @@
     <ClInclude Include="BasicJargShader.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="sparse_vector.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
     <ClInclude Include="GraphBox.h">
       <Filter>Ws</Filter>
     </ClInclude>
-    <ClInclude Include="sparse_vector.h">
-      <Filter>Файлы исходного кода</Filter>
+    <ClInclude Include="ImageBox.h">
+      <Filter>Ws</Filter>
+    </ClInclude>
+    <ClInclude Include="WinGrid.h">
+      <Filter>Ws</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

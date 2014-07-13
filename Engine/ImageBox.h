@@ -2,12 +2,14 @@
 #include <vector>
 #include <glm.hpp>
 #include "WComponent.h"
-class GraphBox : public WComponent
+#include <memory>
+#include "TextureManager.h"
+class ImageBox : public WComponent
 {
 public:
-    GraphBox(void);
-    ~GraphBox(void);
-    GraphBox(glm::vec2 pos_, glm::vec2 size_);
+    ImageBox(void);
+    ~ImageBox(void);
+    ImageBox(glm::vec2 pos_, glm::vec2 size_);
 
     virtual void Draw() const;
 
@@ -15,10 +17,10 @@ public:
 
     virtual glm::vec2 GlobalPos() const;
 
-    std::vector<glm::vec2> points;
-    glm::vec2 scale;
+    std::shared_ptr<Texture> texture;
 
     WContainer* parent;
+    bool border;
 
 private:
     glm::vec2 pos;

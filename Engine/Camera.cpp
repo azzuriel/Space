@@ -31,13 +31,6 @@ void Camera::Reset() {
 }
 
 void Camera::Update() {
-    direction = glm::normalize(look_at - position);
-    //need to set the matrix state. this is only important because lighting doesn't work if this isn't done
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity();
-    //glViewport(viewport_x, viewport_y, window_width, window_height);
-
-
     auto yawq = glm::angleAxis(camera_pitch, vec3(1,0,0));
     auto pitchq = glm::angleAxis(camera_heading, vec3(0,1,0));
 

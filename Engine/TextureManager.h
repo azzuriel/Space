@@ -22,7 +22,7 @@ struct Texture {
     Texture(GLuint id);
     ~Texture();
 
-    void Load(std::string a);
+    void Load(std::string a, bool smooth = false, bool mip = false);
     void Empty(glm::vec2 size);
     void CreateDepth(glm::vec2 size);
 };

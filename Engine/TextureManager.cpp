@@ -169,13 +169,13 @@ void Texture::CreateDepth(glm::vec2 size)
 }
 
 
-void Texture::Load(std::string a)
+void Texture::Load(std::string a, bool smooth, bool mip)
 {
     name = a;
 
     Bitmap* b = new Bitmap();
     b->Load(a);
-    textureId = GenerateOpenglBitmap(*b, false, false);
+    textureId = GenerateOpenglBitmap(*b, smooth, mip);
     height = b->GetHeight();
     width = b->GetWidth();
     delete b;
