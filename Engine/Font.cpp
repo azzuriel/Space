@@ -5,8 +5,6 @@
 #include <utf8.h>
 #include <math.h>
 #include <algorithm>
-#include "JRectangle.h"
-#include <easylogging++.h>
 
 Font::Font()
 {
@@ -26,12 +24,12 @@ bool Font::Initialize()
 {
     if (FT_Init_FreeType( &library ))
     {
-        LOG(ERROR) << "FT_Init_FreeType ERROR";
+        //LOG(ERROR) << "FT_Init_FreeType ERROR";
         return false;
     }
     if(!GenerateEmptyGlyph())
     {
-        LOG(ERROR) << "GenerateEmptyGlyph ERROR";
+        //LOG(ERROR) << "GenerateEmptyGlyph ERROR";
         return false;
     }
 
@@ -282,7 +280,7 @@ bool Font::GenerateOpenglGlyphs( std::string configFileName)
     {
         if( !glyphAtlas.InsertImage( (*i).bitmap, rect ) )
         {
-            LOG(WARNING) << "font atlass ERROR";
+            //LOG(WARNING) << "font atlass ERROR";
             delete (*i).bitmap;
             (*i).bitmap = nullptr;
             continue;

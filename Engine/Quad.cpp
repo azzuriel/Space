@@ -2,7 +2,7 @@
 #include "Mesh.h"
 
 
-Mesh Quad::GetMesh()
+Mesh Quad::GetMesh(float scale)
 {
     if(sm_mesh != nullptr){
         return *sm_mesh;
@@ -12,7 +12,7 @@ Mesh Quad::GetMesh()
     m->Verteces.resize(4);
     m->Indeces.resize(6);
 
-    float s2 = 0.5;
+    float s2 = 0.5 *scale;
     m->Verteces[0].Position = glm::vec3(-s2,-s2,0);
     m->Verteces[1].Position = glm::vec3(s2,-s2,0);
     m->Verteces[2].Position = glm::vec3(-s2,s2,0);

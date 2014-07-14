@@ -1,5 +1,5 @@
 #include "SpriteBatch.h"
-#include "JRectangle.h"
+
 #include "ColorExtender.h"
 #include "TextureManager.h"
 #include "Font.h"

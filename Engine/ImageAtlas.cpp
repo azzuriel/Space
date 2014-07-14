@@ -1,6 +1,5 @@
 #include "ImageAtlas.h"
 #include <math.h>
-#include <easylogging++.h>
 
 
 ImageAtlas::ImageAtlas(void)
@@ -50,7 +49,7 @@ bool ImageAtlas::InsertImage()
         bool blitResult = image->Blit(&dstPoint, nullptr, imageTmp);
         if(!blitResult)
         {
-            LOG(ERROR) << "TextureAtlas. Image не добавлена.";
+            //LOG(ERROR) << "TextureAtlas. Image не добавлена.";
             return false;
         }
 

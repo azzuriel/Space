@@ -9,7 +9,7 @@
 _INITIALIZE_EASYLOGGINGPP 
 
 int main(int argc, char *argn[]) {
-        LOG(INFO) << "TESTS//////////////////////////////////////////////////////////////////////////";
+        //LOG(INFO) << "TESTS//////////////////////////////////////////////////////////////////////////";
         tester base;
         base.add(&sparse_vector_tester1());
         base.add(&sparse_vector_tester2());
@@ -20,8 +20,8 @@ int main(int argc, char *argn[]) {
         base.add(&sparse_vector_tester7());
         base.make_all(BREAK_ON_ERROR);
 
-        LOG(INFO) << "PASSED: " << base.passed();
-        LOG(INFO) << "FAILED: " << base.failed();
-        LOG(INFO) << "TOTAL: " << base.total();
+        //LOG(INFO) << "PASSED: " << base.passed();
+        //LOG(INFO) << "FAILED: " << base.failed();
+        //LOG(INFO) << "TOTAL: " << base.total();
         return 0;
 }

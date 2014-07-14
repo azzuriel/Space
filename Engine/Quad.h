@@ -6,7 +6,7 @@
 class Quad
 {
 public:
-    static Mesh GetMesh();
+    static Mesh GetMesh(float scale = 1.0f);
 private:
     static Mesh* sm_mesh;
 };

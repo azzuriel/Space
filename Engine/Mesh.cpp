@@ -2,13 +2,12 @@
 #include <vector>
 #include "VertexPositionTexture.h"
 #include <glew.h>
-#include <easylogging++.h>
 #include <math.h>
 
 #define OPENGL_CHECK_ERRORS() \
     while( unsigned int openGLError = glGetError()) \
 { \
-    LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError); \
+    /*LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError);*/ \
 };
 
 Mesh::Mesh(void) :
@@ -125,7 +124,7 @@ bool Mesh::loadOBJ(std::string path)
             int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
             if (matches != 9){
                 printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-                LOG(FATAL) << "Model ruined";
+                //LOG(FATAL) << "Model ruined";
                 return false;
             }
             vertexIndices.push_back(vertexIndex[0]);

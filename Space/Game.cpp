@@ -50,6 +50,7 @@
 #include "../Engine/GraphBox.h"
 #include "WComponent.h"
 #include "../Engine/sparse_vector.h"
+#include "../Engine/FrameBuffer.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -181,29 +182,6 @@ void RenderScene(std::shared_ptr<BasicJargShader> BasicShader, Camera camera, RO
     planet->Render(BasicShader);
     cube->Render();
     ss.m->Render();
-}
-
-GLuint FBO_Test(const Texture& depth) {
-    GLuint depthFBO = 0;
-    GLenum fboStatus;
-
-    glGenFramebuffers(1, &depthFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
-
-    // color out off
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth.textureId, 0);
-
-    if ((fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOG(ERROR) << string_format("glCheckFramebufferStatus error 0x%X\n", fboStatus);
-        return false;
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    return depthFBO;
 }
 
 void Game::Run()
@@ -412,7 +390,11 @@ void Game::Run()
 
     Texture depthtexture = Texture();
     depthtexture.CreateDepth(vec2(width*2, height*2));
-    auto test_fbo = FBO_Test(depthtexture);
+    auto test_fbo = FrameBuffer(true);
+    test_fbo.BindTexture(depthtexture);
+
+    auto test2_fbo = FrameBuffer();
+    test2_fbo.BindTexture(emptytex);
 
     SpaceSolver spso = SpaceSolver();
     GameObject star1;

@@ -52,6 +52,9 @@
 #include "../Engine/sparse_vector.h"
 #include "ShaderSelectWindow.h"
 #include "PerfomanceWindow.h"
+#include "../Engine/FrameBuffer.h"
+#include "../Engine/TextureGenerator.h"
+#pragma lib
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -255,6 +258,15 @@ void Game::Run()
     TangentspaceTestShader->LocateVars("transform.model"); //var1
     TangentspaceTestShader->LocateVars("transform.normal"); //var2
 
+    auto CellTextureTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    CellTextureTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/celltexture.glsl");
+    CellTextureTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/celltexture.glsl");
+    CellTextureTestShader->Link();
+    CellTextureTestShader->UpdateUniforms();
+    CellTextureTestShader->LocateVars("transform.viewProjection"); //var0
+    CellTextureTestShader->LocateVars("transform.model"); //var1
+    CellTextureTestShader->LocateVars("transform.normal"); //var2
+
     auto NormalTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     NormalTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/normaltest.glsl");
     NormalTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/normaltest.glsl");
@@ -321,6 +333,23 @@ void Game::Run()
         LOG(ERROR) << "failed to load\process font.json";
     }
 
+    std::shared_ptr<Texture> emptytex = std::shared_ptr<Texture>(new Texture());
+    emptytex->Empty(vec2(width,height));
+
+    auto noise = std::shared_ptr<Texture>(new Texture());
+    noise->Load("noise.png", true, true);
+
+    Texture depthtexture = Texture();
+    depthtexture.CreateDepth(vec2(width*2, height*2));
+    auto test_fbo = FrameBuffer(true);
+    test_fbo.BindTexture(depthtexture);
+
+    TextureGenerator tg1;
+    tg1.SetResultTexture(emptytex);
+    tg1.SetTextures(noise);
+    tg1.SetShader(CellTextureTestShader);
+    tg1.RenderOnTempFbo();
+
     auto cur_shader = BasicShader;
     WinS *ws = new WinS(sb.get(), *font);
     ShaderSelectWindow *ssw = new ShaderSelectWindow();
@@ -335,7 +364,7 @@ void Game::Run()
     ssw->apply4->SetText("Normal");
     ssw->apply5->onPress = [&](){cur_shader = TangentspaceTestShader;};
     ssw->apply5->SetText("Tangent");
-    ssw->ibox->texture = normal;
+    ssw->ibox->texture = emptytex;
     ssw->ibox->border = true;
 
     PerfomanceWindow *pw = new PerfomanceWindow();
@@ -363,15 +392,6 @@ void Game::Run()
     float sec = 0;
 
     float rotated = 0;
-
-    Texture emptytex = Texture();
-    emptytex.Empty(vec2(width,height));
-
-    Texture depthtexture = Texture();
-    depthtexture.CreateDepth(vec2(width*2, height*2));
-    auto test_fbo = FBO_Test(depthtexture);
-
-
 
     Camera* cur_cam = &camera;
     Camera lightcam;
@@ -488,8 +508,8 @@ void Game::Run()
         lightcam.projection = glm::ortho<float>(-100,100,-100,100,1,1000);
 
         PointLightSetup(BasicShader->program, pl);
-       
-        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo);
+     
+        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
         glViewport(0, 0, depthtexture.width, depthtexture.height);
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         glDepthMask(GL_TRUE);
@@ -517,6 +537,7 @@ void Game::Run()
         glUniformMatrix4fv(glGetUniformLocation(cur_shader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
 
         RenderScene(cur_shader, *cur_cam, *m, pl);
+
          
         if(wire == 2) {
             LinesShader->Use();
@@ -538,7 +559,7 @@ void Game::Run()
 
         sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
         sb->DrawString(vec2(20,20), camera.getFullDebugDescription(), Colors::Red, *font);
-        sb->DrawQuad(vec2(100,100), vec2(100,100), emptytex);
+        sb->DrawQuad(vec2(100,100), vec2(500,500), *emptytex);
 
         ws->Update(gt);
         ws->Draw();

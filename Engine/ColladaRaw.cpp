@@ -1,8 +1,7 @@
 #include "ColladaRaw.h"
 #include <rapidxml.hpp>
-#include <sstream>
 #include <fstream>
-#include <easylogging++.h>
+#include <sstream>
 
 ColladaRaw::ColladaRaw(void)
 {
@@ -27,7 +26,6 @@ ColladaRaw::ColladaRaw(std::string FileName)
         }
         file.close();
     } else {
-        LOG(ERROR) << "Failed to open file " << FileName;
         return;
     }
     auto str = ss.str();

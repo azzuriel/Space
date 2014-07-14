@@ -77,13 +77,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;libpng16.lib;zlib.lib;freetype252MT.lib;json_vc71_libmt.lib;glew32.lib;libglog.lib;BulletDynamics_vs2010.lib;BulletCollision_vs2010.lib;LinearMath_vs2010.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libpng16.lib;zlib.lib;freetype252MT.lib;json_vc71_libmt.lib;glew32.lib;BulletDynamics_vs2010.lib;BulletCollision_vs2010.lib;LinearMath_vs2010.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>
       </EntryPointSymbol>
     </Link>
@@ -101,6 +101,7 @@
     <ClCompile Include="DynamicObject.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GraphBox.cpp" />
@@ -110,11 +111,10 @@
     <ClCompile Include="ImageBox.cpp" />
     <ClCompile Include="JargFont.cpp" />
     <ClCompile Include="JargShader.cpp">
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <ClCompile Include="JButton.cpp" />
     <ClCompile Include="JLabel.cpp" />
-    <ClCompile Include="JRectangle.cpp" />
     <ClCompile Include="JTextBox.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -129,6 +129,7 @@
     <ClCompile Include="SphereTesselator.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="TextGeometry.cpp" />
+    <ClCompile Include="TextureGenerator.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TreeSphere.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
@@ -153,6 +154,7 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FPSCounter.h" />
+    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GameMath.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameTimer.h" />
@@ -166,7 +168,6 @@
     <ClInclude Include="JButton.h" />
     <ClInclude Include="JHelpers_inl.h" />
     <ClInclude Include="JLabel.h" />
-    <ClInclude Include="JRectangle.h" />
     <ClInclude Include="JTextBox.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Material.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="SpriteBatch.h" />
     <ClInclude Include="sparse_vector.h" />
     <ClInclude Include="TextGeometry.h" />
+    <ClInclude Include="TextureGenerator.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TreeSphere.h" />
     <ClInclude Include="ColorExtender.h" />

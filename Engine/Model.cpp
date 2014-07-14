@@ -3,8 +3,9 @@
 #include <vector>
 #include "VertexPositionTexture.h"
 #include <JHelpers_inl.h>
-#include <easylogging++.h>
 #include <io.h>
+#include <fstream>
+#include <sstream>
 
 Model::Model(void) :
     World(1),
@@ -181,7 +182,7 @@ void Model::SaveBinary(std::string name){
 
         file.close();
     } else {
-        LOG(ERROR) << "Failed to open file " << name;
+        //LOG(ERROR) << "Failed to open file " << name;
         return;
     }
 }
@@ -190,7 +191,7 @@ void Model::LoadBinary(std::string name){
     materials.clear();
     meshes.clear();
 
-    LOG(INFO) << name << " loading begin";
+    //LOG(INFO) << name << " loading begin";
 
     std::ifstream file(name.c_str(), std::ios::in | std::ios::binary);
     auto begin = file.tellg();
@@ -265,12 +266,12 @@ void Model::LoadBinary(std::string name){
 
         file.close();
     } else {
-        LOG(ERROR) << "Failed to open file " << name;
+        //LOG(ERROR) << "Failed to open file " << name;
         return;
     }
 
-    LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(file.tellg() - begin).c_str());
-    LOG(INFO) << name << " loading end";
+    //LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(file.tellg() - begin).c_str());
+    //LOG(INFO) << name << " loading end";
 }
 
 std::shared_ptr<Material> Model::findMaterialById(char* str){
@@ -288,7 +289,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
     ErrorMaterial()
 {
     auto c = new ColladaRaw(name);
-    LOG(INFO) << name << " parsing begin";
+    //LOG(INFO) << name << " parsing begin";
 
     //////////////////////////////////////////////////////////////////////////
     // Effects part
@@ -414,7 +415,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
             }
         }
     }
-    LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(c->size).c_str());
+    //LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(c->size).c_str());
 
     //////////////////////////////////////////////////////////////////////////
     // Scenes part
@@ -445,7 +446,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
 
     delete c;
 
-    LOG(INFO) << name << " parsing end";
+    //LOG(INFO) << name << " parsing end";
 }
 
 
