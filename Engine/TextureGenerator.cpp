@@ -4,6 +4,7 @@
 #include "Quad.h"
 #include "Mesh.h"
 #include "BasicJargShader.h"
+#include <functional>
 
 // TODO: наследуемые классы текстурного генератора, с перегрузкой функции OtherUniforms, которая вызывается перед рендером
 TextureGenerator::TextureGenerator(void)
@@ -37,7 +38,7 @@ void TextureGenerator::SetShader(std::shared_ptr<BasicJargShader> _shader)
     shader = _shader;
 }
 
-void TextureGenerator::RenderOnTempFbo() const
+void TextureGenerator::RenderOnTempFbo(std::function<void()> func) const
 {
     FrameBuffer fbo;
     fbo.BindTexture(*target);
@@ -56,6 +57,8 @@ void TextureGenerator::RenderOnTempFbo() const
         glUniform1i(glGetUniformLocation(shader->program, str.c_str()), 0);
     }
     
+    func();
+
     Mesh quad_mesh = Mesh(Quad::GetMesh(2));
     quad_mesh.shader = shader;
     quad_mesh.Bind();

@@ -1,7 +1,14 @@
 #include "BasicJargShader.h"
 
 
-BasicJargShader::BasicJargShader(void)
+BasicJargShader::BasicJargShader(void) :
+    ambient_location(GL_INVALID_VALUE),
+    diffuse_location(GL_INVALID_VALUE),
+    specular_location(GL_INVALID_VALUE),
+    emission_location(GL_INVALID_VALUE),
+    texture_location(GL_INVALID_VALUE),
+    shininess_location(GL_INVALID_VALUE),
+    normal_location(GL_INVALID_VALUE)
 {
     
 }

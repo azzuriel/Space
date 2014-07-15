@@ -7,7 +7,8 @@ class BasicJargShader :
 public:
     BasicJargShader(void);
     ~BasicJargShader(void);
-    GLuint ambient_location, diffuse_location, specular_location, emission_location, shininess_location, texture_location, normal_location;
+    GLint ambient_location, diffuse_location, specular_location, emission_location, shininess_location, texture_location, normal_location;
     void UpdateUniforms();
+    
 };
 

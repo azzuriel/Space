@@ -105,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoVersion.h" />
+    <ClInclude Include="common_gen_const.h" />
     <ClInclude Include="PerfomanceWindow.h" />
     <ClInclude Include="ShaderSelectWindow.h" />
     <ClInclude Include="ShaderTest.h" />

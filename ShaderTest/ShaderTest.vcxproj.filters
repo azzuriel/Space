@@ -50,5 +50,8 @@
     <ClInclude Include="PerfomanceWindow.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="common_gen_const.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

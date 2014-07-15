@@ -54,6 +54,7 @@
 #include "PerfomanceWindow.h"
 #include "../Engine/FrameBuffer.h"
 #include "../Engine/TextureGenerator.h"
+#include "common_gen_const.h"
 #pragma lib
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -262,10 +263,74 @@ void Game::Run()
     CellTextureTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/celltexture.glsl");
     CellTextureTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/celltexture.glsl");
     CellTextureTestShader->Link();
-    CellTextureTestShader->UpdateUniforms();
-    CellTextureTestShader->LocateVars("transform.viewProjection"); //var0
-    CellTextureTestShader->LocateVars("transform.model"); //var1
-    CellTextureTestShader->LocateVars("transform.normal"); //var2
+
+    auto TransmittanceShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    TransmittanceShader->GlobalHeader("common_gen_const.h");
+    TransmittanceShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    TransmittanceShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/transmittance.glsl");
+    TransmittanceShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/transmittance.glsl");
+    TransmittanceShader->Link();
+
+    auto Irradiance1Shader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    Irradiance1Shader->GlobalHeader("common_gen_const.h");
+    Irradiance1Shader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    Irradiance1Shader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/irradiance1.glsl");
+    Irradiance1Shader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/irradiance1.glsl");
+    Irradiance1Shader->Link();
+
+    auto Inscatter1Shader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    Inscatter1Shader->GlobalHeader("common_gen_const.h");
+    Inscatter1Shader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    Inscatter1Shader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/inscatter1.glsl");
+    Inscatter1Shader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/inscatter1.glsl");
+    Inscatter1Shader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/inscatter1.glsl");
+    Inscatter1Shader->Link();
+
+    auto InscatterNShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    InscatterNShader->GlobalHeader("common_gen_const.h");
+    InscatterNShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    InscatterNShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/inscatterN.glsl");
+    InscatterNShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/inscatterN.glsl");
+    InscatterNShader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/inscatterN.glsl");
+    InscatterNShader->Link();
+
+    auto InscatterSShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    InscatterSShader->GlobalHeader("common_gen_const.h");
+    InscatterSShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    InscatterSShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/inscatterS.glsl");
+    InscatterSShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/inscatterS.glsl");
+    InscatterSShader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/inscatterS.glsl");
+    InscatterSShader->Link();
+
+    auto IrradianceNShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    IrradianceNShader->GlobalHeader("common_gen_const.h");
+    IrradianceNShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    IrradianceNShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/irradianceN.glsl");
+    IrradianceNShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/irradianceN.glsl");
+    IrradianceNShader->Link();
+
+    auto CopyIrradianceShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    CopyIrradianceShader->GlobalHeader("common_gen_const.h");
+    CopyIrradianceShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    CopyIrradianceShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/copyIrradiance.glsl");
+    CopyIrradianceShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/copyIrradiance.glsl");
+    CopyIrradianceShader->Link();
+
+    auto CopyInscatterNShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    CopyInscatterNShader->GlobalHeader("common_gen_const.h");
+    CopyInscatterNShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    CopyInscatterNShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/copyInscatterN.glsl");
+    CopyInscatterNShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/copyInscatterN.glsl");
+    CopyInscatterNShader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/copyInscatterN.glsl");
+    CopyInscatterNShader->Link();
+
+    auto CopyInscatter1Shader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    CopyInscatter1Shader->GlobalHeader("common_gen_const.h");
+    CopyInscatter1Shader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    CopyInscatter1Shader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/copyInscatter1.glsl");
+    CopyInscatter1Shader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/copyInscatter1.glsl");
+    CopyInscatter1Shader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/copyInscatter1.glsl");
+    CopyInscatter1Shader->Link();
 
     auto NormalTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     NormalTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/normaltest.glsl");
@@ -334,7 +399,7 @@ void Game::Run()
     }
 
     std::shared_ptr<Texture> emptytex = std::shared_ptr<Texture>(new Texture());
-    emptytex->Empty(vec2(width,height));
+    emptytex->Empty(vec2(256,64));
 
     auto noise = std::shared_ptr<Texture>(new Texture());
     noise->Load("noise.png", true, true);
@@ -344,11 +409,200 @@ void Game::Run()
     auto test_fbo = FrameBuffer(true);
     test_fbo.BindTexture(depthtexture);
 
-    TextureGenerator tg1;
-    tg1.SetResultTexture(emptytex);
-    tg1.SetTextures(noise);
-    tg1.SetShader(CellTextureTestShader);
-    tg1.RenderOnTempFbo();
+    
+    const GLuint reflectanceUnit = 0;
+    const GLuint transmittanceUnit = 1;
+    const GLuint irradianceUnit = 2;
+    const GLuint inscatterUnit = 3;
+    const GLuint deltaEUnit = 4;
+    const GLuint deltaSRUnit = 5;
+    const GLuint deltaSMUnit = 6;
+    const GLuint deltaJUnit = 7;
+
+    auto reflectanceTexture = std::shared_ptr<Texture>(new Texture());
+    reflectanceTexture->Load("normal.png");
+    auto transmittanceTexture = std::shared_ptr<Texture>(new Texture());
+    transmittanceTexture->EmptyFloatSpace(vec3(TRANSMITTANCE_W, TRANSMITTANCE_H, 0), GL_TEXTURE_2D);
+    auto irradianceTexture = std::shared_ptr<Texture>(new Texture());
+    irradianceTexture->EmptyFloatSpace(vec3(SKY_W, SKY_H, 0), GL_TEXTURE_2D);
+    auto inscatterTexture = std::shared_ptr<Texture>(new Texture());
+    inscatterTexture->EmptyFloatSpace(vec3(RES_MU_S * RES_NU, RES_MU, RES_R), GL_TEXTURE_3D, GL_RGBA16F_ARB);
+    auto deltaETexture = std::shared_ptr<Texture>(new Texture());
+    deltaETexture->EmptyFloatSpace(vec3(SKY_W, SKY_H, 0), GL_TEXTURE_2D);
+    auto deltaSRTexture = std::shared_ptr<Texture>(new Texture());
+    deltaSRTexture->EmptyFloatSpace(vec3(RES_MU_S * RES_NU, RES_MU, RES_R), GL_TEXTURE_3D);
+    auto deltaSMTexture = std::shared_ptr<Texture>(new Texture());
+    deltaSMTexture->EmptyFloatSpace(vec3(RES_MU_S * RES_NU, RES_MU, RES_R), GL_TEXTURE_3D);
+    auto deltaJTexture = std::shared_ptr<Texture>(new Texture());
+    deltaJTexture->EmptyFloatSpace(vec3(RES_MU_S * RES_NU, RES_MU, RES_R), GL_TEXTURE_3D);
+
+    //////////////////////////////////////////////////////////////////////////
+    glActiveTexture(GL_TEXTURE0 + transmittanceUnit);
+    glBindTexture(GL_TEXTURE_2D, transmittanceTexture->textureId);
+
+    glActiveTexture(GL_TEXTURE0 + irradianceUnit);
+    glBindTexture(GL_TEXTURE_2D, irradianceTexture->textureId);
+
+    glActiveTexture(GL_TEXTURE0 + inscatterUnit);
+    glBindTexture(GL_TEXTURE_3D, inscatterTexture->textureId);
+
+    glActiveTexture(GL_TEXTURE0 + deltaEUnit);
+    glBindTexture(GL_TEXTURE_2D, deltaETexture->textureId);
+
+    glActiveTexture(GL_TEXTURE0 + deltaSRUnit);
+    glBindTexture(GL_TEXTURE_3D, deltaSRTexture->textureId);
+
+    glActiveTexture(GL_TEXTURE0 + deltaSMUnit);
+    glBindTexture(GL_TEXTURE_3D, deltaSMTexture->textureId);
+
+    glActiveTexture(GL_TEXTURE0 + deltaJUnit);
+    glBindTexture(GL_TEXTURE_3D, deltaJTexture->textureId);
+
+    auto drawQuad = []()
+    {
+        glBegin(GL_TRIANGLE_STRIP);
+        glVertex2f(-1.0, -1.0);
+        glVertex2f(+1.0, -1.0);
+        glVertex2f(-1.0, +1.0);
+        glVertex2f(+1.0, +1.0);
+        glEnd();
+    };
+
+    auto setLayer = [](unsigned int prog, int layer)
+    {
+        double r = layer / (RES_R - 1.0);
+        r = r * r;
+        r = sqrt(Rg * Rg + r * (Rt * Rt - Rg * Rg)) + (layer == 0 ? 0.01 : (layer == RES_R - 1 ? -0.001 : 0.0));
+        double dmin = Rt - r;
+        double dmax = sqrt(r * r - Rg * Rg) + sqrt(Rt * Rt - Rg * Rg);
+        double dminp = r - Rg;
+        double dmaxp = sqrt(r * r - Rg * Rg);
+        glUniform1f(glGetUniformLocation(prog, "r"), float(r));
+        glUniform4f(glGetUniformLocation(prog, "dhdH"), float(dmin), float(dmax), float(dminp), float(dmaxp));
+        glUniform1i(glGetUniformLocation(prog, "layer"), layer);
+    };
+
+    GLuint fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+    // computes transmittance texture T (line 1 in algorithm 4.1)
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, transmittanceTexture->textureId, 0);
+    glViewport(0, 0, TRANSMITTANCE_W, TRANSMITTANCE_H);
+    glUseProgram(TransmittanceShader->program);
+    drawQuad();
+
+    // computes irradiance texture deltaE (line 2 in algorithm 4.1)
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, deltaETexture->textureId, 0);
+    glViewport(0, 0, SKY_W, SKY_H);
+    glUseProgram(Irradiance1Shader->program);
+    glUniform1i(glGetUniformLocation(Irradiance1Shader->program, "transmittanceSampler"), transmittanceUnit);
+    drawQuad();
+
+    // computes single scattering texture deltaS (line 3 in algorithm 4.1)
+    // Rayleigh and Mie separated in deltaSR + deltaSM
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, deltaSRTexture->textureId, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, deltaSMTexture->textureId, 0);
+    unsigned int bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, bufs);
+    glViewport(0, 0, RES_MU_S * RES_NU, RES_MU);
+    glUseProgram(Inscatter1Shader->program);
+    glUniform1i(glGetUniformLocation(Inscatter1Shader->program, "transmittanceSampler"), transmittanceUnit);
+    for (int layer = 0; layer < RES_R; ++layer) {
+        setLayer(Inscatter1Shader->program, layer);
+        drawQuad();
+    }
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+    // copies deltaE into irradiance texture E (line 4 in algorithm 4.1)
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, irradianceTexture->textureId, 0);
+    glViewport(0, 0, SKY_W, SKY_H);
+    glUseProgram(CopyIrradianceShader->program);
+    glUniform1f(glGetUniformLocation(CopyIrradianceShader->program, "k"), 0.0);
+    glUniform1i(glGetUniformLocation(CopyIrradianceShader->program, "deltaESampler"), deltaEUnit);
+    drawQuad();
+
+    // copies deltaS into inscatter texture S (line 5 in algorithm 4.1)
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, inscatterTexture->textureId, 0);
+    glViewport(0, 0, RES_MU_S * RES_NU, RES_MU);
+    glUseProgram(CopyInscatter1Shader->program);
+    glUniform1i(glGetUniformLocation(CopyInscatter1Shader->program, "deltaSRSampler"), deltaSRUnit);
+    glUniform1i(glGetUniformLocation(CopyInscatter1Shader->program, "deltaSMSampler"), deltaSMUnit);
+    for (int layer = 0; layer < RES_R; ++layer) {
+        setLayer(CopyInscatter1Shader->program, layer);
+        drawQuad();
+    }
+
+    // loop for each scattering order (line 6 in algorithm 4.1)
+    for (int order = 2; order <= 4; ++order) {
+
+        // computes deltaJ (line 7 in algorithm 4.1)
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, deltaJTexture->textureId, 0);
+        glViewport(0, 0, RES_MU_S * RES_NU, RES_MU);
+        glUseProgram(InscatterSShader->program);
+        glUniform1f(glGetUniformLocation(InscatterSShader->program, "first"), order == 2 ? 1.0 : 0.0);
+        glUniform1i(glGetUniformLocation(InscatterSShader->program, "transmittanceSampler"), transmittanceUnit);
+        glUniform1i(glGetUniformLocation(InscatterSShader->program, "deltaESampler"), deltaEUnit);
+        glUniform1i(glGetUniformLocation(InscatterSShader->program, "deltaSRSampler"), deltaSRUnit);
+        glUniform1i(glGetUniformLocation(InscatterSShader->program, "deltaSMSampler"), deltaSMUnit);
+        for (int layer = 0; layer < RES_R; ++layer) {
+            setLayer(InscatterSShader->program, layer);
+            drawQuad();
+        }
+
+        // computes deltaE (line 8 in algorithm 4.1)
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, deltaETexture->textureId, 0);
+        glViewport(0, 0, SKY_W, SKY_H);
+        glUseProgram(IrradianceNShader->program);
+        glUniform1f(glGetUniformLocation(IrradianceNShader->program, "first"), order == 2 ? 1.0 : 0.0);
+        glUniform1i(glGetUniformLocation(IrradianceNShader->program, "transmittanceSampler"), transmittanceUnit);
+        glUniform1i(glGetUniformLocation(IrradianceNShader->program, "deltaSRSampler"), deltaSRUnit);
+        glUniform1i(glGetUniformLocation(IrradianceNShader->program, "deltaSMSampler"), deltaSMUnit);
+        drawQuad();
+
+        // computes deltaS (line 9 in algorithm 4.1)
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, deltaSRTexture->textureId, 0);
+        glViewport(0, 0, RES_MU_S * RES_NU, RES_MU);
+        glUseProgram(InscatterNShader->program);
+        glUniform1f(glGetUniformLocation(InscatterNShader->program, "first"), order == 2 ? 1.0 : 0.0);
+        glUniform1i(glGetUniformLocation(InscatterNShader->program, "transmittanceSampler"), transmittanceUnit);
+        glUniform1i(glGetUniformLocation(InscatterNShader->program, "deltaJSampler"), deltaJUnit);
+        for (int layer = 0; layer < RES_R; ++layer) {
+            setLayer(InscatterNShader->program, layer);
+            drawQuad();
+        }
+
+        glEnable(GL_BLEND);
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+
+        // adds deltaE into irradiance texture E (line 10 in algorithm 4.1)
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, irradianceTexture->textureId, 0);
+        glViewport(0, 0, SKY_W, SKY_H);
+        glUseProgram(CopyIrradianceShader->program);
+        glUniform1f(glGetUniformLocation(CopyIrradianceShader->program, "k"), 1.0);
+        glUniform1i(glGetUniformLocation(CopyIrradianceShader->program, "deltaESampler"), deltaEUnit);
+        drawQuad();
+
+        // adds deltaS into inscatter texture S (line 11 in algorithm 4.1)
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, inscatterTexture->textureId, 0);
+        glViewport(0, 0, RES_MU_S * RES_NU, RES_MU);
+        glUseProgram(CopyInscatterNShader->program);
+        glUniform1i(glGetUniformLocation(CopyInscatterNShader->program, "deltaSSampler"), deltaSRUnit);
+        for (int layer = 0; layer < RES_R; ++layer) {
+            setLayer(CopyInscatterNShader->program, layer);
+            drawQuad();
+        }
+
+        glDisable(GL_BLEND);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glFinish();
+    //////////////////////////////////////////////////////////////////////////
 
     auto cur_shader = BasicShader;
     WinS *ws = new WinS(sb.get(), *font);

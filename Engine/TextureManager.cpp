@@ -116,14 +116,16 @@ Texture::Texture() :
     textureId(0),
     name("empty"),
     height(0),
-    width(0)
+    width(0),
+    zsize(0)
 {
 }
 
 Texture::Texture(GLuint id) :
     textureId(id),
     height(0),
-    width(0)
+    width(0),
+    zsize(0)
 {
     std::string s = "fromID ";
     name = s.append(std::to_string(id));
@@ -137,27 +139,56 @@ Texture::~Texture()
     }
 }
 
-void Texture::Empty(glm::vec2 size)
+void Texture::Empty(glm::vec2 size, GLuint dim /*= GL_TEXTURE_2D*/)
 {
     width = size.x;
     height = size.y;
-    name = "emptytexture";
+    name = "empty_texture";
 
     glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(dim, textureId);
+    glTexImage2D(dim, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(dim, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(dim, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(dim, 0);
+}
+
+void Texture::EmptyFloatSpace(glm::vec3 size, GLuint dim /*= GL_TEXTURE_2D*/, GLuint color /* = GL_RGB16F*/)
+{
+    width = size.x;
+    height = size.y;
+    zsize = size.z;
+
+    name = "empty_float_space_texture";
+
+    glGenTextures(1, &textureId);
+    glBindTexture(dim, textureId);
+
+    glTexParameteri(dim, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(dim, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(dim, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    if(dim == GL_TEXTURE_2D || dim == GL_TEXTURE_3D)
+        glTexParameteri(dim, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        if(dim == GL_TEXTURE_3D)
+            glTexParameteri(dim, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    if(dim == GL_TEXTURE_2D)
+    glTexImage2D(GL_TEXTURE_2D, 0, color, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+    else if(dim == GL_TEXTURE_3D)
+        glTexImage3D(GL_TEXTURE_3D, 0, color, width, height, zsize, 0, GL_RGB, GL_FLOAT, NULL);
+        else if(dim == GL_TEXTURE_1D)
+            glTexImage1D(GL_TEXTURE_1D, 0, color, width, 0, GL_RGB, GL_FLOAT, NULL);
 }
 
 void Texture::CreateDepth(glm::vec2 size)
 {
     width = size.x;
     height = size.y;
-    name = "emptydepth";
+    name = "empty_depth";
 
     glGenTextures(1, &textureId);
 

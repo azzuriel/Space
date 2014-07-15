@@ -5,6 +5,8 @@
 #include "JargShader.h"
 #include "BasicJargShader.h"
 #include <memory>
+#include <functional>
+
 class TextureGenerator
 {
 public:
@@ -13,7 +15,7 @@ public:
     void SetTextures(std::shared_ptr<Texture> tex, ...);
     void SetResultTexture(std::shared_ptr<Texture> _tex);
     void SetShader(std::shared_ptr<BasicJargShader> _shader);
-    void RenderOnTempFbo() const;
+    void RenderOnTempFbo(std::function<void()> func = [](){}) const;
 private:
     std::vector<std::shared_ptr<Texture>> texes;
     std::shared_ptr<BasicJargShader> shader;

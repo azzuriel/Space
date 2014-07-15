@@ -218,20 +218,29 @@ inline void Mesh::Render(mat4 Model)
     }
     if(shader != nullptr) {
         shader->Use();
-        auto mult = Model*World;
-        glUniformMatrix4fv(shader->vars[1], 1, GL_FALSE, &mult[0][0]);
-        mat3 normal = transpose(mat3(inverse(mult)));
-        glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
+        if(shader->vars.size() > 0) {
+            auto mult = Model*World;
+            glUniformMatrix4fv(shader->vars[1], 1, GL_FALSE, &mult[0][0]);
+            mat3 normal = transpose(mat3(inverse(mult)));
+            glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
+        }
 
-        auto werw = shader->ambient_location;
-        glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
-        glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
-        glUniform4fv(shader->specular_location,  1, &material->specular[0]);
-        glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
-        glUniform1fv(shader->shininess_location, 1, &material->shininess);
 
-        glUniform1i(shader->texture_location, 0);
-        glUniform1i(shader->normal_location, 1);
+        if(shader->ambient_location != GL_INVALID_VALUE)
+            glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
+        if(shader->diffuse_location != GL_INVALID_VALUE)
+            glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
+        if(shader->specular_location != GL_INVALID_VALUE)
+            glUniform4fv(shader->specular_location,  1, &material->specular[0]);
+        if(shader->emission_location != GL_INVALID_VALUE)
+            glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
+        if(shader->shininess_location != GL_INVALID_VALUE)
+            glUniform1fv(shader->shininess_location, 1, &material->shininess);
+
+        if(shader->texture_location != GL_INVALID_VALUE)
+            glUniform1i(shader->texture_location, 0);
+        if(shader->normal_location != GL_INVALID_VALUE)
+            glUniform1i(shader->normal_location, 1);
     }
     if(material != nullptr) {
         if(material->texture != nullptr) {

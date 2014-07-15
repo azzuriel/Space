@@ -18,13 +18,15 @@ struct Texture {
     std::string name;
     unsigned int height;
     unsigned int width;
+    unsigned int zsize;
     Texture();
     Texture(GLuint id);
     ~Texture();
 
     void Load(std::string a, bool smooth = false, bool mip = false);
-    void Empty(glm::vec2 size);
+    void Empty(glm::vec2 size, GLuint dim = GL_TEXTURE_2D);
     void CreateDepth(glm::vec2 size);
+    void EmptyFloatSpace(glm::vec3 size, GLuint dim = GL_TEXTURE_2D,  GLuint color = GL_RGB16F);
 };
 
 struct Rect{

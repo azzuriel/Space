@@ -19,7 +19,8 @@ else \
     LOG(INFO) << "     no errors"; \
     } }
 
-JargShader::JargShader()
+JargShader::JargShader() :
+    has_header(false)
 {
     program = glCreateProgram();
 }
@@ -52,7 +53,9 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
     std::stringstream ss;
     name = source;
     std::string part_name;
-    ss << "#version 330 core" << std::endl;
+    if(!has_header){
+        ss << "#version 330 core" << std::endl;
+    }
     if(type == GL_FRAGMENT_SHADER) {
         part_name = "#define _FRAGMENT_";
         ss << part_name << std::endl;
@@ -72,6 +75,9 @@ void JargShader::loadShaderFromSource(GLenum type, std::string source) {
     else if(type == GL_TESS_CONTROL_SHADER) {
         part_name = "#define _TESSCONTROL_";
         ss << part_name << std::endl;
+    }
+    if(has_header) {
+        ss << global_header;
     }
     std::ifstream file(source.c_str());
     std::string line;
@@ -103,4 +109,30 @@ bool JargShader::Link() {
     printLog(program);
     LOG(INFO) << "--------------------";
     return true;
+}
+
+void JargShader::GlobalHeader(std::string source)
+{
+    std::stringstream ss;
+    name = source;
+    std::string part_name;
+    if(!has_header) {
+        ss << "#version 330 core" << std::endl;
+    } else {
+        ss << global_header;
+    }
+    std::ifstream file(source.c_str());
+    std::string line;
+    if (file.is_open()) {
+        while (file.good()) {
+            getline(file, line);
+            ss << line << std::endl;
+        }
+        file.close();
+    } else {
+        LOG(ERROR) << string_format("%s %s", "Failed to open file ", source.c_str());
+        return;
+    }
+    global_header = ss.str();
+    has_header = true;
 }

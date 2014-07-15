@@ -13,9 +13,12 @@ public:
     std::vector<int> vars;
     void Use() const;
     int LocateVars(std::string s);
+    void GlobalHeader(std::string s);
     void loadShaderFromSource(GLenum type, std::string source);
     bool Link();
     int program;
-    std::vector<GLuint> shaders_;
+    bool has_header;
+    std::vector<GLint> shaders_;
+    std::string global_header;
 };
 #endif // JargShader_h__
