@@ -15,7 +15,6 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing, bool mipmap)
     unsigned int glBitmap = 0;
     glGenTextures(1, &glBitmap);
     glBindTexture(GL_TEXTURE_2D, glBitmap);
-
     // Когда картинка будет увеличиваться(нет большей Мипмапы), используем LINEAR фильтрацию
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smoothing ? GL_LINEAR : GL_NEAREST);
 

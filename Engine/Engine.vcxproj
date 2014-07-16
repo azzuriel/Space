@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\libs\sqlite;..\libs\easylogging;..\libs\rapidxml-1.13;C:\local\boost_1_55_0;..\libs\glew-1.10.0\include\GL\;..\libs\jsoncpp-src-0.5.0\include;..\libs\utf8_v2_3_4\source\;..\libs\freetype-2.5.2\include\;..\libs\glm\glm\;..\libs\glfw-3.0.4\include\GLFW\;..\libs\glog-0.3.3\src\windows;..\libs\libpng-1.6.8;..\libs\bullet3-master\src;..\Engine;$(IncludePath)</IncludePath>
+    <IncludePath>..\libs\sqlite;..\libs\easylogging;..\libs\rapidxml-1.13;..\libs\boost_1_55_0;..\libs\glew-1.10.0\include\GL\;..\libs\jsoncpp-src-0.5.0\include;..\libs\utf8_v2_3_4\source\;..\libs\freetype-2.5.2\include\;..\libs\glm\glm\;..\libs\glfw-3.0.4\include\GLFW\;..\libs\glog-0.3.3\src\windows;..\libs\libpng-1.6.8;..\libs\bullet3-master\src;..\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>..\libs\sqlite;C:\local\boost_1_55_0\lib32-msvc-10.0;..\lib\Release\Win32\;..\libs\jsoncpp-src-0.5.0\build\vs71\release\lib_json\;..\libs\freetype-2.5.2\objs\win32\vc2010\;..\libs\libpng-1.6.8\projects\vstudio\Release Library\;..\libs\glog-0.3.3\Release;..\libs\glew-1.10.0\lib\Release\Win32;..\libs\glfw-3.0.4\lib\;..\libs\bullet3-master\lib;$(LibraryPath)</LibraryPath>

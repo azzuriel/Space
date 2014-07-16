@@ -3,6 +3,7 @@
 #include "VertexPositionTexture.h"
 #include <glew.h>
 #include <math.h>
+#include <easylogging++.h>
 
 #define OPENGL_CHECK_ERRORS() \
     while( unsigned int openGLError = glGetError()) \
@@ -123,8 +124,7 @@ bool Mesh::loadOBJ(std::string path)
             unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
             int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
             if (matches != 9){
-                printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-                //LOG(FATAL) << "Model ruined";
+                LOG(FATAL) << "Model ruined";
                 return false;
             }
             vertexIndices.push_back(vertexIndex[0]);
@@ -226,20 +226,20 @@ inline void Mesh::Render(mat4 Model)
         }
 
 
-        if(shader->ambient_location != GL_INVALID_VALUE)
+        if(shader->ambient_location != -1)
             glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
-        if(shader->diffuse_location != GL_INVALID_VALUE)
+        if(shader->diffuse_location != -1)
             glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
-        if(shader->specular_location != GL_INVALID_VALUE)
+        if(shader->specular_location != -1)
             glUniform4fv(shader->specular_location,  1, &material->specular[0]);
-        if(shader->emission_location != GL_INVALID_VALUE)
+        if(shader->emission_location != -1)
             glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
-        if(shader->shininess_location != GL_INVALID_VALUE)
+        if(shader->shininess_location != -1)
             glUniform1fv(shader->shininess_location, 1, &material->shininess);
 
-        if(shader->texture_location != GL_INVALID_VALUE)
+        if(shader->texture_location != -1)
             glUniform1i(shader->texture_location, 0);
-        if(shader->normal_location != GL_INVALID_VALUE)
+        if(shader->normal_location != -1)
             glUniform1i(shader->normal_location, 1);
     }
     if(material != nullptr) {
@@ -250,6 +250,9 @@ inline void Mesh::Render(mat4 Model)
         if(material->normal != nullptr) {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, material->normal->textureId);
+            glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 1);
+        } else {
+            glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 0);
         }
     }
     glBindVertexArray(m_vao);

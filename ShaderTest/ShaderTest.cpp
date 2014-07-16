@@ -92,7 +92,7 @@ int Game::Initialize()
         return glfwErrorCode;
     }
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_SAMPLES, 16);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Game::MAJOR_GL);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Game::MINOR_GL);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -250,6 +250,11 @@ void Game::Run()
     DepthTestShader->LocateVars("transform.model"); //var1
     DepthTestShader->LocateVars("transform.normal"); //var2
 
+    auto FXAAShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    FXAAShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/fxaa.glsl");
+    FXAAShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/fxaa.glsl");
+    FXAAShader->Link();
+
     auto TangentspaceTestShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     TangentspaceTestShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/tangentspacetest.glsl");
     TangentspaceTestShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/tangentspacetest.glsl");
@@ -352,7 +357,7 @@ void Game::Run()
 
     PointLight pl;
     pl.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
-    pl.ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    pl.ambient = vec4(0.5f, 0.5f, 0.5f, 1.0f);
     pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     pl.attenuation = vec3(0.000f, 0.0f, 0.00000f);
@@ -369,21 +374,88 @@ void Game::Run()
     TextureShader->Link();
     auto mvpTex = TextureShader->LocateVars("MVP");
 
+    auto fullscreen_Tex = std::shared_ptr<Texture>(new Texture());
+    fullscreen_Tex->Empty(vec2(width, height));
+
+    FrameBuffer fullscreen;
+    fullscreen.BindTexture(*fullscreen_Tex);
+
     auto sb = std::unique_ptr<Batched>(new Batched());
     sb->Initialize(TextureShader.get(), LinesShader.get());
 
     const glm::mat4 Identity = glm::mat4(1.0f);
 
+    auto floor = std::shared_ptr<Texture>(new Texture());
+    floor->Load("sponza_ceiling_a_diff.png", true, true);
+
+    auto fabric = std::shared_ptr<Texture>(new Texture());
+    fabric->Load("sponza_fabric_diff.png", true, true);
+
+    auto thorn = std::shared_ptr<Texture>(new Texture());
+    thorn->Load("sponza_thorn_diff.png");
+
+    auto bricks = std::shared_ptr<Texture>(new Texture());
+    bricks->Load("spnza_bricks_a_diff.png", true, true);
+    
+    auto column_a = std::shared_ptr<Texture>(new Texture());
+    column_a->Load("sponza_column_a_diff.png", true, true);
+
+    auto column_b = std::shared_ptr<Texture>(new Texture());
+    column_b->Load("sponza_column_b_diff.png", true, true);
+
+    auto column_c = std::shared_ptr<Texture>(new Texture());
+    column_c->Load("sponza_column_ñ_diff.png", true, true);
+
+    auto vase = std::shared_ptr<Texture>(new Texture());
+    vase->Load("vase_diff.png", true, true);
+
+    auto hanging = std::shared_ptr<Texture>(new Texture());
+    hanging->Load("vase_hanging.png", true, true);
+
+    auto arc = std::shared_ptr<Texture>(new Texture());
+    arc->Load("sponza_arch_diff.png", true, true);
+
+    auto chain = std::shared_ptr<Texture>(new Texture());
+    chain->Load("chain_texture.png");
+
+    auto lion = std::shared_ptr<Texture>(new Texture());
+    lion->Load("lion.png", true, true);
+
     auto normal = std::shared_ptr<Texture>(new Texture());
     normal->Load("normal.png", true, true);
-    auto m = new Model("testscene.dae");
+    auto m = new Model();
+    m->LoadBinary("untitled.m");
     m->Bind();
     for (int i = 0; i<m->meshes.size(); i++)
     {
         m->meshes[i]->shader = BasicShader;
-        m->meshes[i]->material->normal = normal;
     }
 
+    for (int i =0; i< m->materials.size(); i++)
+    {
+        m->materials[i]->texture = bricks;
+    }
+    m->materials[0]->texture = thorn;
+    m->findMaterialById("fabric_a-material")->texture = fabric;
+    m->findMaterialById("fabric_c-material")->texture = fabric;
+    m->findMaterialById("fabric_f-material")->texture = fabric;
+    m->findMaterialById("fabric_d-material")->texture = fabric;
+    m->findMaterialById("fabric_e-material")->texture = fabric;
+    m->findMaterialById("fabric_g-material")->texture = fabric;
+    m->findMaterialById("floor-material")->texture = floor;
+    m->findMaterialById("floor-material")->normal = normal;
+    m->findMaterialById("bricks-material")->texture = bricks;
+    m->findMaterialById("column_a-material")->texture = column_a;
+    m->findMaterialById("column_b-material")->texture = column_b;
+    m->findMaterialById("column_c-material")->texture = column_c;
+    m->findMaterialById("arch-material")->texture = arc;
+    m->findMaterialById("vase_round-material")->texture = thorn;
+    m->findMaterialById("vase_hanging-material")->texture = hanging;
+    m->findMaterialById("chain-material")->texture = chain;
+    m->findMaterialById("ceiling-material")->texture = bricks;
+    m->findMaterialById("Material__25-material")->texture = lion;
+    m->findMaterialById("Material__57-material")->texture = thorn;
+    
     Camera camera; 
     camera.SetWindowSize(width, height);
 
@@ -410,6 +482,288 @@ void Game::Run()
     test_fbo.BindTexture(depthtexture);
 
     
+    //PAS(TransmittanceShader.get(),  \
+        Irradiance1Shader.get(), \
+        CopyIrradianceShader.get(),\
+        InscatterSShader.get(),\
+        CopyInscatterNShader.get(),\
+        InscatterNShader.get(),\
+        Inscatter1Shader.get(),\
+        CopyInscatter1Shader.get(), \
+        IrradianceNShader.get());
+
+
+    auto cur_shader = BasicShader;
+    WinS *ws = new WinS(sb.get(), *font);
+    ShaderSelectWindow *ssw = new ShaderSelectWindow();
+    ws->windows.push_back(ssw);
+    ssw->apply1->onPress = [&](){cur_shader = BasicShader;};
+    ssw->apply1->SetText("Basic");
+    ssw->apply2->onPress = [&](){cur_shader = TestShader;};
+    ssw->apply2->SetText("Test");
+    ssw->apply3->onPress = [&](){cur_shader = DepthTestShader;};
+    ssw->apply3->SetText("Depth");
+    ssw->apply4->onPress = [&](){cur_shader = NormalTestShader;};
+    ssw->apply4->SetText("Normal");
+    ssw->apply5->onPress = [&](){cur_shader = TangentspaceTestShader;};
+    ssw->apply5->SetText("Tangent");
+    ssw->ibox->texture = emptytex;
+    ssw->ibox->border = true;
+
+    PerfomanceWindow *pw = new PerfomanceWindow();
+    ws->windows.push_back(pw);
+
+    auto broadphase = std::unique_ptr<btDbvtBroadphase>(new btDbvtBroadphase());
+    auto collisionConfiguration = std::unique_ptr<btDefaultCollisionConfiguration>(new btDefaultCollisionConfiguration());
+    auto dispatcher = std::unique_ptr<btCollisionDispatcher>(new btCollisionDispatcher(collisionConfiguration.get()));
+    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher.get());
+    auto solver = std::unique_ptr<btSequentialImpulseConstraintSolver>(new btSequentialImpulseConstraintSolver);
+    auto dynamicsWorld = std::unique_ptr<btDiscreteDynamicsWorld>(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
+    dynamicsWorld->setGravity(btVector3(0,0,0));
+    auto drawer = std::unique_ptr<GLDebugDrawer>(new GLDebugDrawer());
+    drawer->setDebugMode(true);
+    dynamicsWorld->setDebugDrawer(drawer.get());
+    drawer->SetBatched(sb.get());
+
+    //auto c = std::unique_ptr<Model>(new Model("untitled2.dae"));
+
+
+    auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
+    sphere->bpRegister(dynamicsWorld.get());
+
+    int iters = 0;
+    float sec = 0;
+
+    float rotated = 0;
+
+    Camera* cur_cam = &camera;
+    Camera lightcam;
+    lightcam.SetWindowSize(width, height);
+    lightcam.SetPosition(vec3(50,0,-200));
+    lightcam.SetLookAt(vec3(50,0,50));
+
+    Mouse::SetFixedPosState(true);
+    glCullFace(GL_BACK);
+    vec3 camlast;
+
+    Mesh fullquad = Mesh(Quad::GetMesh(2));
+    fullquad.shader = FXAAShader;
+    fullquad.Bind();
+
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    while(Running && !glfwWindowShouldClose(window)) 
+    {
+        glEnable(GL_DEPTH_TEST);
+        gt.Update(glfwGetTime());
+        fps.Update(gt);
+            pw->UpdateFps(fps);
+       // dynamicsWorld->stepSimulation(gt.elapsed,10);
+
+        //glfwSetWindowTitle(window, a.c_str());
+
+        // Clear the screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.2,0.1, 0.3, 1.0f);
+
+
+        if(Keyboard::isKeyPress(GLFW_KEY_LEFT_CONTROL)){
+            Mouse::SetFixedPosState(!Mouse::GetFixedPosState());
+        }
+        if(Keyboard::isKeyDown(GLFW_KEY_W)){
+            camera.Move(FORWARD);
+        }
+        if(Keyboard::isKeyDown(GLFW_KEY_S)){
+            camera.Move(BACK);
+        }
+        if(Keyboard::isKeyDown(GLFW_KEY_A)){
+            camera.Move(LEFT);
+        }
+        if(Keyboard::isKeyDown(GLFW_KEY_D)){
+            camera.Move(RIGHT);
+        }
+
+        std::vector<int> a;
+
+        if(Keyboard::isKeyPress(GLFW_KEY_F2)){
+            switch(wire){
+            case 0:
+                glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+                glDisable(GL_CULL_FACE);
+                wire = 1;
+                break;	
+            case 1:
+                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+                wire = 2;
+                break;
+            case 2:
+                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+                wire = 0;
+                break;
+            }
+        }
+
+
+        if(Keyboard::isKeyDown(GLFW_KEY_F5)){
+            camera.SetLookAt(vec3(0,0,0.0F));
+        }
+
+        if(Keyboard::isKeyDown(GLFW_KEY_F10)){
+            pl.position = vec4(camera.position, 1);
+            lightcam.position = vec3(pl.position);
+            lightcam.rotation_quaternion = camera.rotation_quaternion;
+        }
+
+        if(Keyboard::isKeyPress(GLFW_KEY_F11)){
+            if(cur_cam == &camera){
+                cur_cam = &lightcam;
+            } else {
+                cur_cam = &camera;
+            }
+        }
+
+        camera.move_camera = true;
+        camera.camera_scale = gt.elapsed/10.0F;
+        if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT)){
+            camera.camera_scale = gt.elapsed*10.0F;
+        }
+
+
+        if(Mouse::GetFixedPosState())
+            camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
+
+        auto mpos = Mouse::GetCursorPos();
+
+        BasicShader->Use();
+
+        
+
+
+        m->World = glm::rotate(Identity, (float)-M_PI_2, vec3(1.0,0.0,0.0));
+        m->World = glm::scale(m->World, vec3(10.0,10.0,10.0));
+
+        rotated+=gt.elapsed;
+
+
+        camera.Update();
+        lightcam.Update();
+        //lightcam.projection = glm::ortho<float>(-100,100,-100,100,0.01,1000);
+
+        PointLightSetup(BasicShader->program, pl);
+     
+        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
+        glViewport(0, 0, depthtexture.width, depthtexture.height);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glDepthMask(GL_TRUE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
+        RenderScene(MinimalShader, lightcam, *m, pl);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, width, height);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glClearColor(0.0, 0.0, 0.0, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_BACK);
+
+        cur_shader->Use();
+        glUniform1i(glGetUniformLocation(cur_shader->program, "depthTexture"), 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthtexture.textureId);
+
+        static const mat4 bias(
+            0.5, 0.0, 0.0, 0.0,
+            0.0, 0.5, 0.0, 0.0,
+            0.0, 0.0, 0.5, 0.0,
+            0.5, 0.5, 0.5, 1.0);
+        auto mult = bias * lightcam.projection * lightcam.view;
+        glUniformMatrix4fv(glGetUniformLocation(cur_shader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
+        RenderScene(cur_shader, *cur_cam, *m, pl);
+
+//         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//         Textured->Use();
+//         glActiveTexture(GL_TEXTURE0);
+//         glBindTexture(GL_TEXTURE_2D, fullscreen_Tex->textureId);
+//         glUniform1i(glGetUniformLocation(FXAAShader->program, "Tex"), 0);
+//         glUniform2f(glGetUniformLocation(FXAAShader->program, "RcpFrame"), 1.f, 1.f);
+//         glUniform3f(glGetUniformLocation(FXAAShader->program, "QualityParams"), 0.75f, 0.166f, 0.0833f);
+//         fullquad.Render();
+        
+         
+        if(wire == 2) {
+            LinesShader->Use();
+            glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
+            dynamicsWorld->debugDrawWorld();
+        }
+        
+
+        int dc = sb->RenderFinallyWorld();
+
+        ////////////////////////////////////////////////////////////////////////// WORLD PLACE
+
+        glDisable(GL_DEPTH_TEST);
+        MVP = camera.GetOrthoProjection();
+        TextureShader->Use();
+        glUniformMatrix4fv(mvpTex, 1, GL_FALSE, &MVP[0][0]);
+        LinesShader->Use();
+        glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
+
+        sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()+10).append(" fps"), Colors::Red, *font);		
+        //sb->DrawString(vec2(20,20), camera.getFullDebugDescription(), Colors::Red, *font);
+        //sb->DrawQuad(vec2(100,100), vec2(500,500), *emptytex);
+
+        //ws->Update(gt);
+        //ws->Draw();
+
+        LinesShader->Use();
+        glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
+
+        dc += sb->RenderFinally();        
+
+        Mouse::Update();
+
+        //glFlush();
+        glfwSwapBuffers(window);
+
+        glfwPollEvents();
+
+        //std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
+
+    delete m;
+
+    delete ws;
+
+    sphere->bpUnregister(dynamicsWorld.get());
+}
+
+void Game::Destroy(){
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
+void Game::Resize(int a, int b)
+{
+    width = a;
+    height = b;
+    glViewport(0,0,a,b);
+}
+
+void Game::PAS(JargShader* TransmittanceShader, 
+               JargShader* Irradiance1Shader, 
+               JargShader* CopyIrradianceShader,
+               JargShader* InscatterSShader,
+               JargShader* CopyInscatterNShader,
+               JargShader* InscatterNShader,
+               JargShader* Inscatter1Shader,
+               JargShader* CopyInscatter1Shader, 
+               JargShader* IrradianceNShader)
+{
     const GLuint reflectanceUnit = 0;
     const GLuint transmittanceUnit = 1;
     const GLuint irradianceUnit = 2;
@@ -603,253 +957,6 @@ void Game::Run()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glFinish();
     //////////////////////////////////////////////////////////////////////////
-
-    auto cur_shader = BasicShader;
-    WinS *ws = new WinS(sb.get(), *font);
-    ShaderSelectWindow *ssw = new ShaderSelectWindow();
-    ws->windows.push_back(ssw);
-    ssw->apply1->onPress = [&](){cur_shader = BasicShader;};
-    ssw->apply1->SetText("Basic");
-    ssw->apply2->onPress = [&](){cur_shader = TestShader;};
-    ssw->apply2->SetText("Test");
-    ssw->apply3->onPress = [&](){cur_shader = DepthTestShader;};
-    ssw->apply3->SetText("Depth");
-    ssw->apply4->onPress = [&](){cur_shader = NormalTestShader;};
-    ssw->apply4->SetText("Normal");
-    ssw->apply5->onPress = [&](){cur_shader = TangentspaceTestShader;};
-    ssw->apply5->SetText("Tangent");
-    ssw->ibox->texture = emptytex;
-    ssw->ibox->border = true;
-
-    PerfomanceWindow *pw = new PerfomanceWindow();
-    ws->windows.push_back(pw);
-
-    auto broadphase = std::unique_ptr<btDbvtBroadphase>(new btDbvtBroadphase());
-    auto collisionConfiguration = std::unique_ptr<btDefaultCollisionConfiguration>(new btDefaultCollisionConfiguration());
-    auto dispatcher = std::unique_ptr<btCollisionDispatcher>(new btCollisionDispatcher(collisionConfiguration.get()));
-    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher.get());
-    auto solver = std::unique_ptr<btSequentialImpulseConstraintSolver>(new btSequentialImpulseConstraintSolver);
-    auto dynamicsWorld = std::unique_ptr<btDiscreteDynamicsWorld>(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
-    dynamicsWorld->setGravity(btVector3(0,0,0));
-    auto drawer = std::unique_ptr<GLDebugDrawer>(new GLDebugDrawer());
-    drawer->setDebugMode(true);
-    dynamicsWorld->setDebugDrawer(drawer.get());
-    drawer->SetBatched(sb.get());
-
-    //auto c = std::unique_ptr<Model>(new Model("untitled2.dae"));
-
-
-    auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
-    sphere->bpRegister(dynamicsWorld.get());
-
-    int iters = 0;
-    float sec = 0;
-
-    float rotated = 0;
-
-    Camera* cur_cam = &camera;
-    Camera lightcam;
-    lightcam.SetWindowSize(width, height);
-    lightcam.SetPosition(vec3(50,0,-200));
-    lightcam.SetLookAt(vec3(50,0,50));
-
-    Mouse::SetFixedPosState(true);
-    glCullFace(GL_BACK);
-    vec3 camlast;
-    while(Running && !glfwWindowShouldClose(window)) 
-    {
-        glEnable(GL_DEPTH_TEST);
-        gt.Update(glfwGetTime());
-        fps.Update(gt);
-            pw->UpdateFps(fps);
-        dynamicsWorld->stepSimulation(gt.elapsed,10);
-
-        //glfwSetWindowTitle(window, a.c_str());
-
-        // Clear the screen
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.2,0.1, 0.3, 1.0f);
-
-
-        if(Keyboard::isKeyPress(GLFW_KEY_LEFT_CONTROL)){
-            Mouse::SetFixedPosState(!Mouse::GetFixedPosState());
-        }
-        if(Keyboard::isKeyDown(GLFW_KEY_W)){
-            camera.Move(FORWARD);
-        }
-        if(Keyboard::isKeyDown(GLFW_KEY_S)){
-            camera.Move(BACK);
-        }
-        if(Keyboard::isKeyDown(GLFW_KEY_A)){
-            camera.Move(LEFT);
-        }
-        if(Keyboard::isKeyDown(GLFW_KEY_D)){
-            camera.Move(RIGHT);
-        }
-
-        std::vector<int> a;
-
-        if(Keyboard::isKeyPress(GLFW_KEY_F2)){
-            switch(wire){
-            case 0:
-                glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-                glDisable(GL_CULL_FACE);
-                wire = 1;
-                break;	
-            case 1:
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-                glEnable(GL_CULL_FACE);
-                glCullFace(GL_BACK);
-                wire = 2;
-                break;
-            case 2:
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-                glEnable(GL_CULL_FACE);
-                glCullFace(GL_BACK);
-                wire = 0;
-                break;
-            }
-        }
-
-
-        if(Keyboard::isKeyDown(GLFW_KEY_F5)){
-            camera.SetLookAt(vec3(0,0,0.0F));
-        }
-
-        if(Keyboard::isKeyPress(GLFW_KEY_F11)){
-            if(cur_cam == &camera){
-                cur_cam = &lightcam;
-            } else {
-                cur_cam = &camera;
-            }
-        }
-
-        camera.move_camera = true;
-        camera.camera_scale = gt.elapsed/10.0F;
-        if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT)){
-            camera.camera_scale = gt.elapsed*10.0F;
-        }
-
-
-        if(Mouse::GetFixedPosState())
-            camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);
-
-        auto mpos = Mouse::GetCursorPos();
-
-        BasicShader->Use();
-
-        btTransform trans;
-        sphere->fallRigidBody->getMotionState()->getWorldTransform(trans);
-        auto q = trans.getRotation();
-        auto t = trans.getOrigin();
-        auto vect = vec3(t.getX(),t.getY(),t.getZ());
-
-        auto orient = btVector3(0,1,0).rotate(sphere->fallRigidBody->getOrientation().getAxis(), sphere->fallRigidBody->getOrientation().getAngle());
-        auto vecor = vec3(orient.getX(), orient.getY(), orient.getZ());
-
-        m->World = glm::rotate(Identity, (float)-M_PI_2, vec3(1.0,0.0,0.0));
-        m->World = glm::scale(m->World, vec3(10.0,10.0,10.0));
-
-        auto vecc = vec3(q.getAxis().x(), q.getAxis().y(), q.getAxis().z());
-        rotated+=gt.elapsed;
-        pl.position = glm::vec4(sin(rotated/20.f)*800, 400, cos(rotated/20.f)*800, 1);
-
-        lightcam.position = vec3(pl.position)/3.f;
-        lightcam.SetLookAt(vec3(0,0,0));
-
-        camera.Update();
-        lightcam.Update();
-        lightcam.projection = glm::ortho<float>(-100,100,-100,100,1,1000);
-
-        PointLightSetup(BasicShader->program, pl);
-     
-        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
-        glViewport(0, 0, depthtexture.width, depthtexture.height);
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glDepthMask(GL_TRUE);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glCullFace(GL_FRONT);
-        RenderScene(cur_shader, lightcam, *m, pl);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, width, height);
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glCullFace(GL_BACK);
-
-        cur_shader->Use();
-        glUniform1i(glGetUniformLocation(cur_shader->program, "depthTexture"), 2);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, depthtexture.textureId);
-
-        static const mat4 bias(
-            0.5, 0.0, 0.0, 0.0,
-            0.0, 0.5, 0.0, 0.0,
-            0.0, 0.0, 0.5, 0.0,
-            0.5, 0.5, 0.5, 1.0);
-        auto mult = bias * lightcam.projection * lightcam.view;
-        glUniformMatrix4fv(glGetUniformLocation(cur_shader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
-
-        RenderScene(cur_shader, *cur_cam, *m, pl);
-
-         
-        if(wire == 2) {
-            LinesShader->Use();
-            glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
-            dynamicsWorld->debugDrawWorld();
-        }
-        
-
-        int dc = sb->RenderFinallyWorld();
-
-        ////////////////////////////////////////////////////////////////////////// WORLD PLACE
-
-        glDisable(GL_DEPTH_TEST);
-        MVP = camera.GetOrthoProjection();
-        TextureShader->Use();
-        glUniformMatrix4fv(mvpTex, 1, GL_FALSE, &MVP[0][0]);
-        LinesShader->Use();
-        glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
-
-        sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()), vec3(0,0,0), *font);		
-        sb->DrawString(vec2(20,20), camera.getFullDebugDescription(), Colors::Red, *font);
-        sb->DrawQuad(vec2(100,100), vec2(500,500), *emptytex);
-
-        ws->Update(gt);
-        ws->Draw();
-
-        LinesShader->Use();
-        glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
-
-        dc += sb->RenderFinally();        
-
-        Mouse::Update();
-
-        //glFlush();
-        glfwSwapBuffers(window);
-
-        glfwPollEvents();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(15));
-    }
-
-    delete m;
-
-    delete ws;
-
-    sphere->bpUnregister(dynamicsWorld.get());
-}
-
-void Game::Destroy(){
-    glfwDestroyWindow(window);
-    glfwTerminate();
-}
-
-void Game::Resize(int a, int b)
-{
-    width = a;
-    height = b;
-    glViewport(0,0,a,b);
 }
 
 int Game::width = 0;

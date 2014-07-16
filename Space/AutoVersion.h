@@ -1,8 +1,8 @@
 #ifndef AutoVersion_h__ 
 #define AutoVersion_h__ 
 #include <string>
-#define Ver "0.1-14-g3eb2c66";
-#define Time "1405281663";
+#define Ver "0.1-16-g53e23fa";
+#define Time "1405398920";
 class AutoVersion { 
 public: 
 	static std::string GetTitle();

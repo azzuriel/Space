@@ -109,7 +109,7 @@ void parseMat4(char *str, mat4 &target){
     sscanf(str, "%f %f %f %f %f %f %f %f %f %f %f %f", &target[0][0], &target[1][0], &target[2][0], &target[3][0], &target[0][1], &target[1][1], &target[2][1], &target[3][1], &target[0][2], &target[1][2], &target[2][2], &target[3][2], &target[0][3], &target[1][3], &target[2][3], &target[3][3]);
 }
 
-std::shared_ptr<Mesh> Model::findMeshById(char* str){
+std::shared_ptr<Mesh> Model::findMeshById(const char* str){
     for (int i=0;i<meshes.size();i++)
     {
         if(strcmp(meshes[i]->id.c_str(), str) == 0){
@@ -394,7 +394,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
                 parseGLuintArray(allpolylists->first_node("p")->value(), indexes);
                 mesh->Verteces.resize(indexes.size()/datacount);
                 mesh->Indeces.resize(indexes.size()/datacount);
-                for (int i=0; i<indexes.size(); i+=datacount)
+                for (int i=0; i<indexes.size()-datacount+1; i+=datacount)
                 {
                     switch(datacount){
                     case 1:
@@ -437,7 +437,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
                 geometry_url++;
 
                 auto url_ref = findMeshById(geometry_url);
-                if(geometry_url != nullptr){
+                if(url_ref != nullptr){
                     url_ref->World = t;
                 }
             }

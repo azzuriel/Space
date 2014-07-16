@@ -205,7 +205,7 @@ glm::vec2 Batched::GetStringData(glm::vec2 pos, std::string text, vec4 col, int 
     for(unsigned int i = 0; i < utf32text.size(); i++)
     {
         fontTexture = font.GetGlyphTexture(utf32text[i]);
-        fontTexture.width = stringWidth;
+       // fontTexture.width = stringWidth;
         if(utf32text[i] == 32){
             glyphX += stringWidth/2;
             continue;

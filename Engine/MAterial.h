@@ -7,6 +7,7 @@
 struct Material	
 {
     Material(void);
+    std::string id;
     std::shared_ptr<Texture> texture, normal;
     glm::vec4 emission;
     glm::vec4 ambient;
@@ -14,7 +15,6 @@ struct Material
     glm::vec4 specular;
     float shininess;
     float index_of_refraction;
-    std::string id;
 };	
 
 

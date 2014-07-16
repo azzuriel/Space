@@ -2,13 +2,13 @@
 
 
 BasicJargShader::BasicJargShader(void) :
-    ambient_location(GL_INVALID_VALUE),
-    diffuse_location(GL_INVALID_VALUE),
-    specular_location(GL_INVALID_VALUE),
-    emission_location(GL_INVALID_VALUE),
-    texture_location(GL_INVALID_VALUE),
-    shininess_location(GL_INVALID_VALUE),
-    normal_location(GL_INVALID_VALUE)
+    ambient_location(-1),
+    diffuse_location(-1),
+    specular_location(-1),
+    emission_location(-1),
+    texture_location(-1),
+    shininess_location(-1),
+    normal_location(-1)
 {
     
 }

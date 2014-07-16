@@ -8,6 +8,8 @@
 #include "..\Engine\FPSCounter.h"
 #include "..\Engine\SkySphere.h"
 
+void PAS();
+
 class Game
 {
 public:
@@ -26,6 +28,15 @@ public:
 
     static void Resize(int a, int b);
     void Destroy();
+    void PAS(JargShader* TransmittanceShader, 
+        JargShader* Irradiance1Shader, 
+        JargShader* CopyIrradianceShader,
+        JargShader* InscatterSShader,
+        JargShader* CopyInscatterNShader,
+        JargShader* InscatterNShader,
+        JargShader* Inscatter1Shader,
+        JargShader* CopyInscatter1Shader, 
+        JargShader* IrradianceNShader);
     int wire;
 
     static const int MAJOR_GL = 3, MINOR_GL = 3;
