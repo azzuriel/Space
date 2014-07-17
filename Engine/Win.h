@@ -14,7 +14,7 @@ public:
     Win(glm::vec2 p, glm::vec2 s);
     Win(glm::vec2 p, glm::vec2 s, glm::vec4 col);
     ~Win(void);
-    void Draw() const;
+    virtual void Draw() const;
     void Update();
     glm::vec2 GlobalPos() const;
 

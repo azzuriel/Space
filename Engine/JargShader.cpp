@@ -111,7 +111,7 @@ bool JargShader::Link() {
     return true;
 }
 
-void JargShader::GlobalHeader(std::string source)
+void JargShader::PushGlobalHeader(std::string source)
 {
     std::stringstream ss;
     name = source;

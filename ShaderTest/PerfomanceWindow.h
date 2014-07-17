@@ -10,8 +10,9 @@ public:
     PerfomanceWindow(void);
     ~PerfomanceWindow(void);
     GraphBox *gb;
-    void UpdateFps(const FPSCounter &fps);
-    int cur_hist;
-    int max;
+    void UpdateValue(int value);
+    float avg;
+    int cur;
+    void Draw() const;
 };
 

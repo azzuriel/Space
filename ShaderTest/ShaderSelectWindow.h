@@ -9,6 +9,6 @@ public:
     ShaderSelectWindow(void);
     ~ShaderSelectWindow(void);
     JButton *apply1, *apply2, *apply3, *apply4, *apply5;
-    ImageBox *ibox;
+    ImageBox *ibox,*ibox1,*ibox2,*ibox3;
 };
 

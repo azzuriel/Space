@@ -391,10 +391,10 @@ void Game::Run()
     Texture depthtexture = Texture();
     depthtexture.CreateDepth(vec2(width*2, height*2));
     auto test_fbo = FrameBuffer(true);
-    test_fbo.BindTexture(depthtexture);
+    test_fbo.bindTexture(depthtexture);
 
     auto test2_fbo = FrameBuffer();
-    test2_fbo.BindTexture(emptytex);
+    test2_fbo.bindTexture(emptytex);
 
     SpaceSolver spso = SpaceSolver();
     GameObject star1;
@@ -664,7 +664,7 @@ void Game::Run()
         //plane->Render();
        
 
-        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
         glViewport(0, 0, depthtexture.width, depthtexture.height);
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         glDepthMask(GL_TRUE);

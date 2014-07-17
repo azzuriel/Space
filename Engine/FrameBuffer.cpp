@@ -10,11 +10,6 @@ FrameBuffer::FrameBuffer(bool _depth)
     glGenFramebuffers(1, &FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-    if(depth){
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-    }
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -24,9 +19,9 @@ FrameBuffer::~FrameBuffer(void)
     glDeleteFramebuffers(1, &FBO);
 }
 
-void FrameBuffer::BindTexture(const Texture& tex)
+void FrameBuffer::bindTexture(const Texture& tex, GLuint attach/*GL_COLOR_ATTACHMENT0*/)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glFramebufferTexture(GL_FRAMEBUFFER, depth ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, tex.textureId, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, attach, tex.textureId, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

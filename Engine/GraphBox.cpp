@@ -32,10 +32,12 @@ void GraphBox::Draw() const
     sb.DrawLine(glm::vec2(Pos.x, Pos.y + size.y), Pos + size, 2, col);
     sb.DrawLine(glm::vec2(Pos.x + size.x, Pos.y), Pos + size, 2, col);
     
-    if(points.size() > 1)
-    for (int i=0; i< points.size() - 1; i++)
-    {
-        sb.DrawLine2d(points[i] * scale * vec2(1,-1) + Pos + vec2(0, size.y), points[i+1] * scale * vec2(1,-1) + Pos + vec2(0, size.y), Colors::Red);
+    if(points.size() > 1) {
+        auto t = points.begin();
+        for (int i=0; i< points.size() - 1; i++)
+        {
+            sb.DrawLine2d(*t * scale * vec2(0,-1) + Pos + vec2(i, size.y), *(t++) * scale * vec2(0,-1) + Pos + vec2(i+1, size.y), Colors::Red);
+        }
     }
 }
 

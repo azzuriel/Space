@@ -1,18 +1,20 @@
 #include "PerfomanceWindow.h"
 #include "..\Engine\FPSCounter.h"
-
+#include "..\Engine\JHelpers_inl.h"
+#include "..\Engine\WinS.h"
+#include "..\Engine\ColorExtender.h"
+#define SIZE 100
 
 PerfomanceWindow::PerfomanceWindow(void) :
-    cur_hist(0),
-    max(0)
+    avg(0)
 {
-    size = vec2(200,200);
-    gb = new GraphBox(vec2(20,20), vec2(100,100));
-    gb->points.resize(100);
+    size = vec2(200, 200);
+    gb = new GraphBox(vec2(20, 20), vec2(SIZE, 100));
+    gb->points.resize(SIZE);
     gb->parent = this;
-    for (int i=0;i<gb->points.size();i++)
+    for (auto point: gb->points)
     {
-        gb->points[i] = vec2(i,0);
+        point = 0;
     }
 
     Items.push_back(gb);
@@ -23,18 +25,19 @@ PerfomanceWindow::~PerfomanceWindow(void)
 {
 }
 
-void PerfomanceWindow::UpdateFps(const FPSCounter &fps)
+void PerfomanceWindow::UpdateValue(int value)
 {
-    int cur = fps.GetCount();
-    if(max < cur){
-        max = cur;
-        gb->scale.y = 1.0 / (max / 90.0);
-    }
-    gb->points[cur_hist].y = cur;
-    cur_hist++;
-    if(cur_hist > gb->points.size()-1){
-        cur_hist = 0;
-        max = gb->points[0].y;
-        gb->scale.y = 1.0 / (gb->points[0].y / 90.0);
-    } 
+    cur = value;
+    gb->scale.y = 1.0 / (cur / 50.0);
+    gb->points.erase(gb->points.begin());
+    gb->points.push_back(cur);
+    avg = (avg * (SIZE-1) + cur)/ (float) SIZE;
+}
+
+void PerfomanceWindow::Draw() const
+{
+    Win::Draw();
+    auto pos = Win::GlobalPos();
+    WinS::sb->DrawString(vec2(22,22)+pos, string_format("cur: %i", cur), Colors::Red, *WinS::font);
+    WinS::sb->DrawString(vec2(22,22+9)+pos, string_format("avg: %f", avg), Colors::Red, *WinS::font);
 }

@@ -292,6 +292,7 @@ void Batched::DrawString(glm::vec2 pos, std::string text, vec4 col, const Font& 
 }
 
 inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub){
+    if (&tex == nullptr) return;
     if(curn >= SIZE - 1){
         Render();
     }
@@ -404,10 +405,10 @@ void Batched::DrawRectangle(glm::vec2 pos, glm::vec2 size, glm::vec4 col){
     if(curn >= SIZE - 1){
         Render();
     }
-    // 	if(Batched::m_blankTex->textureId != m_currentTex->textureId){
-    // 		Render();
-    // 		m_currentTex = (const Texture *)Batched::m_blankTex;
-    // 	}
+    if(Batched::m_blankTex->textureId != m_currentTex->textureId){
+        Render();
+        m_currentTex = (const Texture *)Batched::m_blankTex;
+    }
     vertex[4*curn+0] = glm::vec3(pos.x, pos.y, curz);
     vertex[4*curn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
     vertex[4*curn+2] = glm::vec3(pos.x, pos.y + size.y, curz);

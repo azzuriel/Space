@@ -13,7 +13,7 @@ public:
     std::vector<int> vars;
     void Use() const;
     int LocateVars(std::string s);
-    void GlobalHeader(std::string s);
+    void PushGlobalHeader(std::string s);
     void loadShaderFromSource(GLenum type, std::string source);
     bool Link();
     int program;

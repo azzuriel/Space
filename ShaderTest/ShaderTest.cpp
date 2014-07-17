@@ -270,68 +270,68 @@ void Game::Run()
     CellTextureTestShader->Link();
 
     auto TransmittanceShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    TransmittanceShader->GlobalHeader("common_gen_const.h");
-    TransmittanceShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    TransmittanceShader->PushGlobalHeader("common_gen_const.h");
+    TransmittanceShader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     TransmittanceShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/transmittance.glsl");
     TransmittanceShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/transmittance.glsl");
     TransmittanceShader->Link();
 
     auto Irradiance1Shader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    Irradiance1Shader->GlobalHeader("common_gen_const.h");
-    Irradiance1Shader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    Irradiance1Shader->PushGlobalHeader("common_gen_const.h");
+    Irradiance1Shader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     Irradiance1Shader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/irradiance1.glsl");
     Irradiance1Shader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/irradiance1.glsl");
     Irradiance1Shader->Link();
 
     auto Inscatter1Shader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    Inscatter1Shader->GlobalHeader("common_gen_const.h");
-    Inscatter1Shader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    Inscatter1Shader->PushGlobalHeader("common_gen_const.h");
+    Inscatter1Shader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     Inscatter1Shader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/inscatter1.glsl");
     Inscatter1Shader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/inscatter1.glsl");
     Inscatter1Shader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/inscatter1.glsl");
     Inscatter1Shader->Link();
 
     auto InscatterNShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    InscatterNShader->GlobalHeader("common_gen_const.h");
-    InscatterNShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    InscatterNShader->PushGlobalHeader("common_gen_const.h");
+    InscatterNShader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     InscatterNShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/inscatterN.glsl");
     InscatterNShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/inscatterN.glsl");
     InscatterNShader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/inscatterN.glsl");
     InscatterNShader->Link();
 
     auto InscatterSShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    InscatterSShader->GlobalHeader("common_gen_const.h");
-    InscatterSShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    InscatterSShader->PushGlobalHeader("common_gen_const.h");
+    InscatterSShader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     InscatterSShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/inscatterS.glsl");
     InscatterSShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/inscatterS.glsl");
     InscatterSShader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/inscatterS.glsl");
     InscatterSShader->Link();
 
     auto IrradianceNShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    IrradianceNShader->GlobalHeader("common_gen_const.h");
-    IrradianceNShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    IrradianceNShader->PushGlobalHeader("common_gen_const.h");
+    IrradianceNShader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     IrradianceNShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/irradianceN.glsl");
     IrradianceNShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/irradianceN.glsl");
     IrradianceNShader->Link();
 
     auto CopyIrradianceShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    CopyIrradianceShader->GlobalHeader("common_gen_const.h");
-    CopyIrradianceShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    CopyIrradianceShader->PushGlobalHeader("common_gen_const.h");
+    CopyIrradianceShader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     CopyIrradianceShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/copyIrradiance.glsl");
     CopyIrradianceShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/copyIrradiance.glsl");
     CopyIrradianceShader->Link();
 
     auto CopyInscatterNShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    CopyInscatterNShader->GlobalHeader("common_gen_const.h");
-    CopyInscatterNShader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    CopyInscatterNShader->PushGlobalHeader("common_gen_const.h");
+    CopyInscatterNShader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     CopyInscatterNShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/copyInscatterN.glsl");
     CopyInscatterNShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/copyInscatterN.glsl");
     CopyInscatterNShader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/copyInscatterN.glsl");
     CopyInscatterNShader->Link();
 
     auto CopyInscatter1Shader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    CopyInscatter1Shader->GlobalHeader("common_gen_const.h");
-    CopyInscatter1Shader->GlobalHeader("Shaders/pas/common_gen.glsl");
+    CopyInscatter1Shader->PushGlobalHeader("common_gen_const.h");
+    CopyInscatter1Shader->PushGlobalHeader("Shaders/pas/common_gen.glsl");
     CopyInscatter1Shader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/pas/copyInscatter1.glsl");
     CopyInscatter1Shader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/pas/copyInscatter1.glsl");
     CopyInscatter1Shader->loadShaderFromSource(GL_GEOMETRY_SHADER, "Shaders/pas/copyInscatter1.glsl");
@@ -357,7 +357,7 @@ void Game::Run()
 
     PointLight pl;
     pl.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
-    pl.ambient = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    pl.ambient = vec4(0.2f, 0.2f, 0.2f, 1.0f);
     pl.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     pl.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     pl.attenuation = vec3(0.000f, 0.0f, 0.00000f);
@@ -374,11 +374,16 @@ void Game::Run()
     TextureShader->Link();
     auto mvpTex = TextureShader->LocateVars("MVP");
 
+    auto FullscreenShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
+    FullscreenShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/textured_no_matrix.glsl");
+    FullscreenShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/textured_no_matrix.glsl");
+    FullscreenShader->Link();
+
     auto fullscreen_Tex = std::shared_ptr<Texture>(new Texture());
     fullscreen_Tex->Empty(vec2(width, height));
 
     FrameBuffer fullscreen;
-    fullscreen.BindTexture(*fullscreen_Tex);
+    fullscreen.bindTexture(*fullscreen_Tex);
 
     auto sb = std::unique_ptr<Batched>(new Batched());
     sb->Initialize(TextureShader.get(), LinesShader.get());
@@ -443,7 +448,7 @@ void Game::Run()
     m->findMaterialById("fabric_e-material")->texture = fabric;
     m->findMaterialById("fabric_g-material")->texture = fabric;
     m->findMaterialById("floor-material")->texture = floor;
-    m->findMaterialById("floor-material")->normal = normal;
+    //m->findMaterialById("floor-material")->normal = normal;
     m->findMaterialById("bricks-material")->texture = bricks;
     m->findMaterialById("column_a-material")->texture = column_a;
     m->findMaterialById("column_b-material")->texture = column_b;
@@ -472,15 +477,30 @@ void Game::Run()
 
     std::shared_ptr<Texture> emptytex = std::shared_ptr<Texture>(new Texture());
     emptytex->Empty(vec2(256,64));
+    std::shared_ptr<Texture> wp = std::shared_ptr<Texture>(new Texture());
+    wp->Load("wp.png");
+
 
     auto noise = std::shared_ptr<Texture>(new Texture());
     noise->Load("noise.png", true, true);
 
-    Texture depthtexture = Texture();
-    depthtexture.CreateDepth(vec2(width*2, height*2));
-    auto test_fbo = FrameBuffer(true);
-    test_fbo.BindTexture(depthtexture);
+    auto depthtexture = std::shared_ptr<Texture>(new Texture());
+    depthtexture->CreateDepth(vec2(width, height));
 
+    auto diffusetexture = std::shared_ptr<Texture>(new Texture());
+    diffusetexture->Empty(vec2(width, height));
+
+    auto normaltexture = std::shared_ptr<Texture>(new Texture());
+    normaltexture->Empty(vec2(width, height));
+
+    auto speculartexture = std::shared_ptr<Texture>(new Texture());
+    speculartexture->Empty(vec2(width, height));
+
+    auto test_fbo = FrameBuffer(true);
+    test_fbo.bindTexture(*depthtexture, GL_DEPTH_ATTACHMENT);
+    test_fbo.bindTexture(*diffusetexture, GL_COLOR_ATTACHMENT0);
+    test_fbo.bindTexture(*speculartexture, GL_COLOR_ATTACHMENT1);
+    test_fbo.bindTexture(*normaltexture, GL_COLOR_ATTACHMENT2);
     
     //PAS(TransmittanceShader.get(),  \
         Irradiance1Shader.get(), \
@@ -507,8 +527,10 @@ void Game::Run()
     ssw->apply4->SetText("Normal");
     ssw->apply5->onPress = [&](){cur_shader = TangentspaceTestShader;};
     ssw->apply5->SetText("Tangent");
-    ssw->ibox->texture = emptytex;
-    ssw->ibox->border = true;
+    ssw->ibox->texture = diffusetexture;
+    ssw->ibox1->texture = depthtexture;
+    ssw->ibox2->texture = speculartexture;
+    ssw->ibox3->texture = normaltexture;
 
     PerfomanceWindow *pw = new PerfomanceWindow();
     ws->windows.push_back(pw);
@@ -524,8 +546,6 @@ void Game::Run()
     drawer->setDebugMode(true);
     dynamicsWorld->setDebugDrawer(drawer.get());
     drawer->SetBatched(sb.get());
-
-    //auto c = std::unique_ptr<Model>(new Model("untitled2.dae"));
 
 
     auto sphere = std::unique_ptr<DynamicObject>(new DynamicObject());
@@ -547,21 +567,19 @@ void Game::Run()
     vec3 camlast;
 
     Mesh fullquad = Mesh(Quad::GetMesh(2));
-    fullquad.shader = FXAAShader;
+    fullquad.shader = TextureShader;
     fullquad.Bind();
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    wire = 1;
     while(Running && !glfwWindowShouldClose(window)) 
     {
         glEnable(GL_DEPTH_TEST);
         gt.Update(glfwGetTime());
         fps.Update(gt);
-            pw->UpdateFps(fps);
-       // dynamicsWorld->stepSimulation(gt.elapsed,10);
-
-        //glfwSetWindowTitle(window, a.c_str());
+        pw->UpdateValue(fps.GetCount());
 
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -587,25 +605,25 @@ void Game::Run()
         std::vector<int> a;
 
         if(Keyboard::isKeyPress(GLFW_KEY_F2)){
-            switch(wire){
-            case 0:
-                glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-                glDisable(GL_CULL_FACE);
-                wire = 1;
-                break;	
-            case 1:
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-                glEnable(GL_CULL_FACE);
-                glCullFace(GL_BACK);
-                wire = 2;
-                break;
-            case 2:
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-                glEnable(GL_CULL_FACE);
-                glCullFace(GL_BACK);
-                wire = 0;
-                break;
-            }
+            wire++; if(wire >2) wire = 0;
+        }
+
+        switch(wire){
+        case 0:
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+            glDisable(GL_CULL_FACE);
+            
+            break;	
+        case 1:
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            break;
+        case 2:
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            break;
         }
 
 
@@ -630,6 +648,8 @@ void Game::Run()
         camera.move_camera = true;
         camera.camera_scale = gt.elapsed/10.0F;
         if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT)){
+            camera.camera_scale = gt.elapsed*50.0F;
+        } else {
             camera.camera_scale = gt.elapsed*10.0F;
         }
 
@@ -655,44 +675,27 @@ void Game::Run()
         //lightcam.projection = glm::ortho<float>(-100,100,-100,100,0.01,1000);
 
         PointLightSetup(BasicShader->program, pl);
-     
-        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
-        glViewport(0, 0, depthtexture.width, depthtexture.height);
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glDepthMask(GL_TRUE);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glCullFace(GL_FRONT);
-        RenderScene(MinimalShader, lightcam, *m, pl);
+//      
+//         glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
+//         glViewport(0, 0, depthtexture->width, depthtexture->height);
+//         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+//         glDepthMask(GL_TRUE);
+//         glClear(GL_DEPTH_BUFFER_BIT);
+//         glCullFace(GL_FRONT);
+//         RenderScene(MinimalShader, lightcam, *m, pl);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, test_fbo.FBO);
         glViewport(0, 0, width, height);
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         glClearColor(0.0, 0.0, 0.0, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_BACK);
-
-        cur_shader->Use();
-        glUniform1i(glGetUniformLocation(cur_shader->program, "depthTexture"), 2);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, depthtexture.textureId);
-
-        static const mat4 bias(
-            0.5, 0.0, 0.0, 0.0,
-            0.0, 0.5, 0.0, 0.0,
-            0.0, 0.0, 0.5, 0.0,
-            0.5, 0.5, 0.5, 1.0);
-        auto mult = bias * lightcam.projection * lightcam.view;
-        glUniformMatrix4fv(glGetUniformLocation(cur_shader->program, "transform.light"), 1, GL_FALSE, &mult[0][0]);
         RenderScene(cur_shader, *cur_cam, *m, pl);
 
-//         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//         Textured->Use();
-//         glActiveTexture(GL_TEXTURE0);
-//         glBindTexture(GL_TEXTURE_2D, fullscreen_Tex->textureId);
-//         glUniform1i(glGetUniformLocation(FXAAShader->program, "Tex"), 0);
-//         glUniform2f(glGetUniformLocation(FXAAShader->program, "RcpFrame"), 1.f, 1.f);
-//         glUniform3f(glGetUniformLocation(FXAAShader->program, "QualityParams"), 0.75f, 0.166f, 0.0833f);
-//         fullquad.Render();
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        sb->DrawQuad(vec2(0,0), vec2(width, height), *diffusetexture);
         
          
         if(wire == 2) {
@@ -702,10 +705,11 @@ void Game::Run()
         }
         
 
-        int dc = sb->RenderFinallyWorld();
+        
 
         ////////////////////////////////////////////////////////////////////////// WORLD PLACE
-
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, wp->textureId);
         glDisable(GL_DEPTH_TEST);
         MVP = camera.GetOrthoProjection();
         TextureShader->Use();
@@ -713,18 +717,19 @@ void Game::Run()
         LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &MVP[0][0]);
 
-        sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()+10).append(" fps"), Colors::Red, *font);		
+        sb->DrawString(vec2(10,10), std::to_string(fps.GetCount()+310).append(" fps"), Colors::Red, *font);		
         //sb->DrawString(vec2(20,20), camera.getFullDebugDescription(), Colors::Red, *font);
         //sb->DrawQuad(vec2(100,100), vec2(500,500), *emptytex);
 
-        //ws->Update(gt);
-        //ws->Draw();
+        ws->Update(gt);
+        ws->Draw();
 
+        
+
+        int dc = sb->RenderFinally();   
         LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
-
-        dc += sb->RenderFinally();        
-
+        dc += sb->RenderFinallyWorld();
         Mouse::Update();
 
         //glFlush();

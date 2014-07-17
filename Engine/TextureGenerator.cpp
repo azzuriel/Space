@@ -41,7 +41,7 @@ void TextureGenerator::SetShader(std::shared_ptr<BasicJargShader> _shader)
 void TextureGenerator::RenderOnTempFbo(std::function<void()> func) const
 {
     FrameBuffer fbo;
-    fbo.BindTexture(*target);
+    fbo.bindTexture(*target);
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo.FBO);
     glViewport(0, 0, target->width, target->height);

@@ -34,7 +34,7 @@
       <Filter>Windows</Filter>
     </ClCompile>
     <ClCompile Include="PerfomanceWindow.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -47,11 +47,11 @@
     <ClInclude Include="ShaderSelectWindow.h">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="PerfomanceWindow.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="common_gen_const.h">
       <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="PerfomanceWindow.h">
+      <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

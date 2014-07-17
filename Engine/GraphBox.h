@@ -2,6 +2,7 @@
 #include <vector>
 #include <glm.hpp>
 #include "WComponent.h"
+#include <list>
 class GraphBox : public WComponent
 {
 public:
@@ -15,7 +16,7 @@ public:
 
     virtual glm::vec2 GlobalPos() const;
 
-    std::vector<glm::vec2> points;
+    std::list<float> points;
     glm::vec2 scale;
 
     WContainer* parent;
