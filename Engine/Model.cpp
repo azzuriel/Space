@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <easylogging++.h>
+#include "Frustum.h"
 
 Model::Model(void) :
     World(1),
@@ -188,6 +189,13 @@ void Model::SaveBinary(std::string name){
     }
 }
 
+void Model::BuildBounding(){
+    for (auto i: meshes)
+    {
+        i->BuildBounding();
+    }
+}
+
 void Model::LoadBinary(std::string name){
     materials.clear();
     meshes.clear();
@@ -271,8 +279,17 @@ void Model::LoadBinary(std::string name){
         return;
     }
 
+    BuildBounding();
+
     LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(file.tellg() - begin).c_str());
     LOG(INFO) << name << " loading end";
+}
+
+void Model::RenderBounding(Batched &sb)
+{
+    for(auto i: meshes){
+        i->RenderBounding(sb, World);
+    }
 }
 
 std::shared_ptr<Material> Model::findMaterialById(char* str){
@@ -447,6 +464,9 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
 
     delete c;
 
+
+    BuildBounding();
+
     LOG(INFO) << name << " parsing end";
 }
 
@@ -467,10 +487,10 @@ void Model::Bind()
     }
 }
 
-void Model::Render() const
+void Model::Render(const Frustum &frust) const
 {
     for (int i=0;i<meshes.size();i++)
     {
-        meshes[i]->Render(World);
+        meshes[i]->Render(World, frust);
     }
 }

@@ -26,8 +26,8 @@ Batched::Batched()
     dcurn = 0;
     dvao = 0; dvbo = nullptr;
     lines_2d_vao = 0; lines_2d_vbo = nullptr;
-    dvertex = new VertexPositionColor[SIZE*4];
-    dindex = new GLuint[SIZE*4];
+    dvertex = new VertexPositionColor[SIZE*2];
+    dindex = new GLuint[SIZE*2];
 
     curz = -1;
     m_blankTex = new Texture();
@@ -563,4 +563,32 @@ void Batched::line2dRender()
     //glDrawElements(GL_POINTS, dcurn*2, GL_UNSIGNED_INT, NULL);
     dc++; //dc++;
     lines_2d_curn = 0;
+}
+
+static const GLuint __vertexIndex[12*2] =
+{
+    0, 1, 1, 2, 2, 3, 3, 0, //top
+    4, 5, 5, 6, 6, 7, 7, 4, //bottom
+    0, 5, 1, 4, 2, 7, 3, 6  //top to bottom
+};
+
+void Batched::DrawCube3d(glm::vec3 tempmax, glm::vec3 tempmin, glm::vec4 color)
+{
+    if(dcurn + 12 >= SIZE){
+        line3dRender();
+    }
+    const vec3 verts[] = {
+        glm::vec3(tempmin.x, tempmax.y, tempmin.z), glm::vec3(tempmin.x, tempmax.y, tempmax.z), glm::vec3(tempmax.x, tempmax.y, tempmax.z), glm::vec3(tempmax.x, tempmax.y, tempmin.z), // top
+        glm::vec3(tempmin.x, tempmin.y, tempmax.z), glm::vec3(tempmin.x, tempmin.y, tempmin.z), glm::vec3(tempmax.x, tempmin.y, tempmin.z), glm::vec3(tempmax.x, tempmin.y, tempmax.z) // bottom
+    };
+
+    auto t = 2*dcurn;
+
+    for (int i = 0; i < 12*2; i++)
+    {
+        dvertex[t + i].pos = verts[__vertexIndex[i]];
+        dvertex[t + i].col = color;
+        dindex[t + i] = t + i;
+    }
+    dcurn+= 12;
 }

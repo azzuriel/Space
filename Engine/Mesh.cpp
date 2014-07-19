@@ -4,6 +4,8 @@
 #include <glew.h>
 #include <math.h>
 #include <easylogging++.h>
+#include "SpriteBatch.h"
+#include "Frustum.h"
 
 #define OPENGL_CHECK_ERRORS() \
     while( unsigned int openGLError = glGetError()) \
@@ -16,7 +18,9 @@ Mesh::Mesh(void) :
     shader(nullptr),
     material(nullptr),
     m_vao(0),
-    m_vbo(nullptr)
+    m_vbo(nullptr),
+    minBound(0),
+    maxBound(0)
 {
 }
 
@@ -206,9 +210,80 @@ void Mesh::Bind(int type /* = 0 */)
     OPENGL_CHECK_ERRORS();
 }
 
+void Mesh::Render(const Frustum &frust)
+{
+    Render(mat4(1), frust);
+}
+
 void Mesh::Render()
 {
     Render(mat4(1));
+}
+
+void Mesh::RenderBounding(Batched &sb, mat4 Model)
+{
+    auto tempmax = vec3(vec4(maxBound, 1.f) * Model * World);
+    auto tempmin = vec3(vec4(minBound, 1.f) * Model * World);
+
+    sb.DrawCube3d(tempmax, tempmin, Colors::Green);
+}
+
+inline void Mesh::Render(mat4 Model, const Frustum &frust)
+{
+    if(Verteces.size() == 0){
+        return;
+    }
+
+    auto mult = mat3(Model*World);
+    mat3 normal = transpose(inverse(mult));
+
+    auto tempmax = maxBound * mult;
+    auto tempmin = minBound * mult;
+
+    if(frust.Contains(tempmax, tempmin) != INERSECT_OUT) {
+
+        if(shader != nullptr) {
+            shader->Use();
+            if(shader->vars.size() > 0) {
+                
+                glUniformMatrix4fv(shader->vars[1], 1, GL_FALSE, &mult[0][0]);
+                
+                glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
+            }
+
+
+            if(shader->ambient_location != -1)
+                glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
+            if(shader->diffuse_location != -1)
+                glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
+            if(shader->specular_location != -1)
+                glUniform4fv(shader->specular_location,  1, &material->specular[0]);
+            if(shader->emission_location != -1)
+                glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
+            if(shader->shininess_location != -1)
+                glUniform1fv(shader->shininess_location, 1, &material->shininess);
+
+            if(shader->texture_location != -1)
+                glUniform1i(shader->texture_location, 0);
+            if(shader->normal_location != -1)
+                glUniform1i(shader->normal_location, 1);
+        }
+        if(material != nullptr) {
+            if(material->texture != nullptr) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
+            }
+            if(material->normal != nullptr) {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, material->normal->textureId);
+                glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 1);
+            } else {
+                glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 0);
+            }
+        }
+        glBindVertexArray(m_vao);
+        glDrawElements(GL_TRIANGLES, Indeces.size(), GL_UNSIGNED_INT, NULL);
+    }
 }
 
 inline void Mesh::Render(mat4 Model)
@@ -277,5 +352,34 @@ void Mesh::Combine(Mesh* com)
     {
         Indeces[t] = com->Indeces[i] + lastIndex;
         t++;
+    }
+}
+
+void Mesh::BuildBounding()
+{
+    if(Verteces.size() > 0){
+        maxBound = minBound = Verteces[0].Position;
+        for(auto i: Verteces){
+            if(i.Position.x > maxBound.x){
+                maxBound.x = i.Position.x;
+            }
+            if(i.Position.x < minBound.x){
+                minBound.x = i.Position.x;
+            }
+
+            if(i.Position.z > maxBound.z){
+                maxBound.z = i.Position.z;
+            }
+            if(i.Position.z < minBound.z){
+                minBound.z = i.Position.z;
+            }
+
+            if(i.Position.y > maxBound.y){
+                maxBound.y = i.Position.y;
+            }
+            if(i.Position.y < minBound.y){
+                minBound.y = i.Position.y;
+            }
+        }
     }
 }

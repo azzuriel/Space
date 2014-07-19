@@ -55,7 +55,7 @@
 #include "../Engine/FrameBuffer.h"
 #include "../Engine/TextureGenerator.h"
 #include "common_gen_const.h"
-#pragma lib
+#include "../Engine/Frustum.h"
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -169,7 +169,7 @@ void CameraSetup(GLuint program, const Camera &camera)
     glUniform3fv(glGetUniformLocation(program, "transform.viewPosition"), 1, &camera.position[0]);
 }
 
-void RenderScene(std::shared_ptr<BasicJargShader> current_shader, const Camera &camera, const Model &model, const PointLight &light)
+void RenderScene(std::shared_ptr<BasicJargShader> current_shader, const Camera &camera, const Model &model, const PointLight &light, const Frustum & frust)
 {
     current_shader->Use();
     CameraSetup(current_shader->program, camera);
@@ -178,7 +178,7 @@ void RenderScene(std::shared_ptr<BasicJargShader> current_shader, const Camera &
     {
         model.meshes[i]->shader = current_shader;
     }
-    model.Render();
+    model.Render(frust);
 }
 
 GLuint FBO_Test(const Texture& depth) {
@@ -462,7 +462,7 @@ void Game::Run()
     m->findMaterialById("Material__57-material")->texture = thorn;
     
     Camera camera; 
-    camera.SetWindowSize(width, height);
+    camera.SetViewport(0, 0, width, height);
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 MVP = camera.VP() * model;
@@ -558,7 +558,7 @@ void Game::Run()
 
     Camera* cur_cam = &camera;
     Camera lightcam;
-    lightcam.SetWindowSize(width, height);
+    lightcam.SetViewport(0,0,width, height);
     lightcam.SetPosition(vec3(50,0,-200));
     lightcam.SetLookAt(vec3(50,0,50));
 
@@ -569,6 +569,8 @@ void Game::Run()
     Mesh fullquad = Mesh(Quad::GetMesh(2));
     fullquad.shader = TextureShader;
     fullquad.Bind();
+
+    Frustum frustum;
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -673,6 +675,7 @@ void Game::Run()
         camera.Update();
         lightcam.Update();
         //lightcam.projection = glm::ortho<float>(-100,100,-100,100,0.01,1000);
+        frustum.Build(camera.view, camera.aspect, camera.field_of_view, camera.far_clip, camera.near_clip);
 
         PointLightSetup(BasicShader->program, pl);
 //      
@@ -690,7 +693,7 @@ void Game::Run()
         glClearColor(0.0, 0.0, 0.0, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_BACK);
-        RenderScene(cur_shader, *cur_cam, *m, pl);
+        RenderScene(cur_shader, *cur_cam, *m, pl, frustum);
 
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
@@ -702,9 +705,11 @@ void Game::Run()
             LinesShader->Use();
             glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
             dynamicsWorld->debugDrawWorld();
+
+            m->RenderBounding(*sb);
         }
         
-
+        m->meshes[123]->World = rotate(m->meshes[123]->World, 0.01f, vec3(0,1,0));
         
 
         ////////////////////////////////////////////////////////////////////////// WORLD PLACE
@@ -723,13 +728,14 @@ void Game::Run()
 
         ws->Update(gt);
         ws->Draw();
-
         
-
-        int dc = sb->RenderFinally();   
         LinesShader->Use();
         glUniformMatrix4fv(mvpLine, 1, GL_FALSE, &camera.VP()[0][0]);
-        dc += sb->RenderFinallyWorld();
+        int dc = sb->RenderFinallyWorld();
+
+        dc += sb->RenderFinally();   
+       
+        
         Mouse::Update();
 
         //glFlush();

@@ -7,6 +7,7 @@
 #include "Material.h"
 #include <vector>
 #include <string>
+#include "Frustum.h"
 class Model
 {
 public:
@@ -17,11 +18,13 @@ public:
     std::vector<std::shared_ptr<Material>> materials;
     mat4 World;
     void Bind();
-    void Render() const;
+    void Render(const Frustum &frust) const;
     std::shared_ptr<Mesh> findMeshById(const char* str);
     std::shared_ptr<Material> findMaterialById(char* str);
     void SaveBinary(std::string name);
     void LoadBinary(std::string name);
+    void BuildBounding();
+    void RenderBounding(Batched &sb);
     std::shared_ptr<Material> ErrorMaterial;
 };
 #endif // Model_h__

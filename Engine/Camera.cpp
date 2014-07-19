@@ -223,10 +223,3 @@ const mat4 OrthoProjection(float left, float right,
         0, 0, -2 / (zFar - zNear), tz,
         0, 0, 0, 1);
 }
-
-void Camera::SetWindowSize(int l_width, int l_height)
-{
-    window_height = l_height;
-    window_width = l_width;
-    aspect = double(l_width) / double(l_height);
-}

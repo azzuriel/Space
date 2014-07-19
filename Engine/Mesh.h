@@ -11,6 +11,8 @@
 #include <Material.h>
 #include "BasicJargShader.h"
 #include <memory>
+#include "SpriteBatch.h"
+#include "Frustum.h"
 class Mesh
 {
 public:
@@ -20,11 +22,17 @@ public:
     void Bind(int type = 0);
     void Render();
     void Render(mat4 Model);
+    void Render(const Frustum &frust);
+    inline void Render(mat4 Model, const Frustum &frust);
     void Combine(Mesh* com);
     bool loadOBJ(std::string path);
     void computeNormal();
     void Unindex();
     void MergeVerteces();
+    void BuildBounding();
+    void RenderBounding(Batched &sb, mat4 Model);
+    vec3 minBound, maxBound;
+
     std::vector<VertexPositionNormalTexture> Verteces;
     std::vector<GLuint> Indeces;
     std::shared_ptr<BasicJargShader> shader;

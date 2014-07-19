@@ -67,7 +67,7 @@ public:
     void DrawStored(glm::vec2 pos, const Texture& tex, glm::vec3 *vertex, glm::vec2 *uv, glm::vec4 *color, GLuint *index, int &size);
     int RenderFinally();
     int RenderFinallyWorld();
-
+    void DrawCube3d(glm::vec3 maxCoord, glm::vec3 minCoord, glm::vec4 color);
 
 private:
     inline void innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, const Texture& tex, Rect sub);
@@ -75,6 +75,6 @@ private:
     void Render();
     void line3dRender();
     void line2dRender();
-
+    
 };
 #endif // SpriteBatch_h__
