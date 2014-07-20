@@ -53,7 +53,7 @@ void WinS::ToTop(Win* w) {
     }
 }
 
-void WinS::Update(GameTimer gt) {
+void WinS::Update(const GameTimer &gt) {
     MouseHooked = false;
 
     KeyboardHooked = false;

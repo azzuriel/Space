@@ -37,7 +37,6 @@
 #include "../Engine/ColladaRaw.h"
 #include <gtc/matrix_transform.hpp>
 #include <Model.h>
-#include <easylogging++.h>
 #include "LodSphere.h"
 #include "../Engine/ROAMgrid.h"
 #include "../Engine/ROAMSurface.h"
@@ -59,7 +58,7 @@
 
 void errorCallbackGLFW3(int error, const char* description)
 {
-    LOG(ERROR) << description;
+    LOG(error) << description;
 }
 
 
@@ -82,13 +81,13 @@ Game::~Game(void)
 
 int Game::Initialize()
 {
-    LOG(INFO) << "Jarg initialization start";
+    LOG(info) << "Jarg initialization start";
     glfwSetErrorCallback(errorCallbackGLFW3);
 
     int glfwErrorCode = glfwInit();
     if (!glfwErrorCode)
     {
-        LOG(ERROR) << "glfwInit error " << glfwErrorCode;
+        LOG(error) << "glfwInit error " << glfwErrorCode;
         return glfwErrorCode;
     }
 
@@ -107,7 +106,7 @@ int Game::Initialize()
     if (!window)
     {
         glfwTerminate();
-        LOG(FATAL) << "Ошибка создания окна GLFW.";
+        LOG(fatal) << "Ошибка создания окна GLFW.";
         return false;
     }
     glfwMakeContextCurrent(window);
@@ -119,7 +118,7 @@ int Game::Initialize()
 
     if (glewInit() != GLEW_OK) 
     {
-        LOG(ERROR) << "GLEW не инициализирован.";
+        LOG(error) << "GLEW не инициализирован.";
         return false;
     }
 
@@ -127,12 +126,12 @@ int Game::Initialize()
     glGetIntegerv(GL_MAJOR_VERSION, &glVersion[0]); 
     glGetIntegerv(GL_MINOR_VERSION, &glVersion[1]); 
     
-    LOG(INFO) << "Renderer: " << glGetString(GL_RENDERER);
-    LOG(INFO) << "Vendor: " <<  glGetString(GL_VENDOR);
-    LOG(INFO) << "Version: " <<  glGetString(GL_VERSION);
-    LOG(INFO) << "GLSL version: " <<  glGetString(GL_SHADING_LANGUAGE_VERSION);
-    LOG(INFO) << "using OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
-    LOG(INFO) << "glfw: " << glfwGetVersionString();
+    LOG(info) << "Renderer: " << glGetString(GL_RENDERER);
+    LOG(info) << "Vendor: " <<  glGetString(GL_VENDOR);
+    LOG(info) << "Version: " <<  glGetString(GL_VERSION);
+    LOG(info) << "GLSL version: " <<  glGetString(GL_SHADING_LANGUAGE_VERSION);
+    LOG(info) << "using OpenGL: " << std::to_string(glVersion[0]) << "." << std::to_string(glVersion[1]);
+    LOG(info) << "glfw: " << glfwGetVersionString();
 
     Keyboard::Initialize();
     glfwSetKeyCallback(window, [](GLFWwindow *win, int key, int scancode, int action, int mods){Keyboard::SetKey(key, scancode, action, mods);});
@@ -178,7 +177,7 @@ void RenderScene(std::shared_ptr<BasicJargShader> current_shader, const Camera &
     {
         model.meshes[i]->shader = current_shader;
     }
-    model.Render(frust);
+    model.Render();
 }
 
 GLuint FBO_Test(const Texture& depth) {
@@ -196,7 +195,7 @@ GLuint FBO_Test(const Texture& depth) {
 
     if ((fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
     {
-        LOG(ERROR) << string_format("glCheckFramebufferStatus error 0x%X\n", fboStatus);
+        LOG(error) << string_format("glCheckFramebufferStatus error 0x%X\n", fboStatus);
         return false;
     }
 
@@ -472,7 +471,7 @@ void Game::Run()
     auto font = std::unique_ptr<Font>(new Font());
     font->Initialize();
     if(!font->Create("font.json")){
-        LOG(ERROR) << "failed to load\process font.json";
+        LOG(error) << "failed to load\process font.json";
     }
 
     std::shared_ptr<Texture> emptytex = std::shared_ptr<Texture>(new Texture());
@@ -591,6 +590,7 @@ void Game::Run()
         if(Keyboard::isKeyPress(GLFW_KEY_LEFT_CONTROL)){
             Mouse::SetFixedPosState(!Mouse::GetFixedPosState());
         }
+
         if(Keyboard::isKeyDown(GLFW_KEY_W)){
             camera.Move(FORWARD);
         }
@@ -654,7 +654,6 @@ void Game::Run()
         } else {
             camera.camera_scale = gt.elapsed*10.0F;
         }
-
 
         if(Mouse::GetFixedPosState())
             camera.Move2D(Mouse::GetCursorDelta().x, Mouse::GetCursorDelta().y);

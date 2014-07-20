@@ -6,7 +6,7 @@
 #include <io.h>
 #include <fstream>
 #include <sstream>
-#include <easylogging++.h>
+
 #include "Frustum.h"
 
 Model::Model(void) :
@@ -184,7 +184,7 @@ void Model::SaveBinary(std::string name){
 
         file.close();
     } else {
-        //LOG(ERROR) << "Failed to open file " << name;
+        //LOG(error) << "Failed to open file " << name;
         return;
     }
 }
@@ -200,7 +200,7 @@ void Model::LoadBinary(std::string name){
     materials.clear();
     meshes.clear();
 
-    LOG(INFO) << name << " loading begin";
+    LOG(info) << name << " loading begin";
 
     std::ifstream file(name.c_str(), std::ios::in | std::ios::binary);
     auto begin = file.tellg();
@@ -275,14 +275,14 @@ void Model::LoadBinary(std::string name){
 
         file.close();
     } else {
-        LOG(ERROR) << "Failed to open file " << name;
+        LOG(error) << "Failed to open file " << name;
         return;
     }
 
     BuildBounding();
 
-    LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(file.tellg() - begin).c_str());
-    LOG(INFO) << name << " loading end";
+    LOG(info) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(file.tellg() - begin).c_str());
+    LOG(info) << name << " loading end";
 }
 
 void Model::RenderBounding(Batched &sb)
@@ -307,7 +307,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
     ErrorMaterial()
 {
     auto c = new ColladaRaw(name);
-    LOG(INFO) << name << " parsing begin";
+    LOG(info) << name << " parsing begin";
 
     //////////////////////////////////////////////////////////////////////////
     // Effects part
@@ -433,7 +433,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
             }
         }
     }
-    LOG(INFO) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(c->size).c_str());
+    LOG(info) << string_format("     %i meshes, %i materials (%s)", meshes.size(), materials.size(), to_traf_string(c->size).c_str());
 
     //////////////////////////////////////////////////////////////////////////
     // Scenes part
@@ -467,7 +467,7 @@ Model::Model(std::string name, int model_type /*= COLLADA_MODEL*/) :
 
     BuildBounding();
 
-    LOG(INFO) << name << " parsing end";
+    LOG(info) << name << " parsing end";
 }
 
 
@@ -484,6 +484,14 @@ void Model::Bind()
     for (int i=0;i<meshes.size();i++)
     {
         meshes[i]->Bind();
+    }
+}
+
+void Model::Render() const
+{
+    for (int i=0;i<meshes.size();i++)
+    {
+        meshes[i]->Render(World);
     }
 }
 

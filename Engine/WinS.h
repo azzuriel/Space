@@ -19,7 +19,7 @@ public:
     static bool KeyboardHooked;
 
     void Draw();
-    void Update(GameTimer gt);
+    void Update(const GameTimer &gt);
     static void ToTop(Win* w);
     static Batched* sb;
     static Texture* bp;

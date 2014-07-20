@@ -13,6 +13,7 @@
 #include <memory>
 #include "SpriteBatch.h"
 #include "Frustum.h"
+
 class Mesh
 {
 public:

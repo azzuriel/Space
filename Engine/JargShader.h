@@ -12,11 +12,11 @@ public:
     std::string name;
     std::vector<int> vars;
     void Use() const;
-    int LocateVars(std::string s);
+    GLint LocateVars(std::string s);
     void PushGlobalHeader(std::string s);
     void loadShaderFromSource(GLenum type, std::string source);
     bool Link();
-    int program;
+    GLint program;
     bool has_header;
     std::vector<GLint> shaders_;
     std::string global_header;

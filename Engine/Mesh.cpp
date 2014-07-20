@@ -3,14 +3,14 @@
 #include "VertexPositionTexture.h"
 #include <glew.h>
 #include <math.h>
-#include <easylogging++.h>
 #include "SpriteBatch.h"
 #include "Frustum.h"
+#include "JHelpers_inl.h"
 
 #define OPENGL_CHECK_ERRORS() \
     while( unsigned int openGLError = glGetError()) \
 { \
-    /*LOG(ERROR) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError);*/ \
+    LOG(error) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError); \
 };
 
 Mesh::Mesh(void) :
@@ -128,7 +128,7 @@ bool Mesh::loadOBJ(std::string path)
             unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
             int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
             if (matches != 9){
-                LOG(FATAL) << "Model ruined";
+                LOG(error) << "Model ruined";
                 return false;
             }
             vertexIndices.push_back(vertexIndex[0]);
@@ -228,6 +228,7 @@ void Mesh::RenderBounding(Batched &sb, mat4 Model)
     sb.DrawCube3d(tempmax, tempmin, Colors::Green);
 }
 
+//don't work
 inline void Mesh::Render(mat4 Model, const Frustum &frust)
 {
     if(Verteces.size() == 0){
@@ -240,7 +241,8 @@ inline void Mesh::Render(mat4 Model, const Frustum &frust)
     auto tempmax = maxBound * mult;
     auto tempmin = minBound * mult;
 
-    if(frust.Contains(tempmax, tempmin) != INERSECT_OUT) {
+    if(frust.Contains(tempmax, tempmin) != INERSECT_OUT) 
+    {
 
         if(shader != nullptr) {
             shader->Use();
@@ -300,34 +302,34 @@ inline void Mesh::Render(mat4 Model)
             glUniformMatrix3fv(shader->vars[2], 1, GL_FALSE, &normal[0][0]);
         }
 
+        if(material != nullptr) {
+            if(shader->ambient_location != -1)
+                glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
+            if(shader->diffuse_location != -1)
+                glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
+            if(shader->specular_location != -1)
+                glUniform4fv(shader->specular_location,  1, &material->specular[0]);
+            if(shader->emission_location != -1)
+                glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
+            if(shader->shininess_location != -1)
+                glUniform1fv(shader->shininess_location, 1, &material->shininess);
 
-        if(shader->ambient_location != -1)
-            glUniform4fv(shader->ambient_location,   1, &material->ambient[0]);
-        if(shader->diffuse_location != -1)
-            glUniform4fv(shader->diffuse_location,   1, &material->diffuse[0]);
-        if(shader->specular_location != -1)
-            glUniform4fv(shader->specular_location,  1, &material->specular[0]);
-        if(shader->emission_location != -1)
-            glUniform4fv(shader->emission_location,  1, &material->emission[0]);																			  
-        if(shader->shininess_location != -1)
-            glUniform1fv(shader->shininess_location, 1, &material->shininess);
+            if(shader->texture_location != -1)
+                glUniform1i(shader->texture_location, 0);
+            if(shader->normal_location != -1)
+                glUniform1i(shader->normal_location, 1);
 
-        if(shader->texture_location != -1)
-            glUniform1i(shader->texture_location, 0);
-        if(shader->normal_location != -1)
-            glUniform1i(shader->normal_location, 1);
-    }
-    if(material != nullptr) {
-        if(material->texture != nullptr) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
-        }
-        if(material->normal != nullptr) {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, material->normal->textureId);
-            glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 1);
-        } else {
-            glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 0);
+            if(material->texture != nullptr) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, material->texture->textureId);
+            }
+            if(material->normal != nullptr) {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, material->normal->textureId);
+                glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 1);
+            } else {
+                glUniform1i(glGetUniformLocation(shader->program, "NoTangent"), 0);
+            }
         }
     }
     glBindVertexArray(m_vao);

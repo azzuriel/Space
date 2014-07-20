@@ -78,6 +78,9 @@ Batched::~Batched()
     delete m_blankTex;
 }
 
+/*
+//  Должны быть вызвана перед использованием батча
+*/
 void Batched::Initialize(const JargShader* tex, const JargShader* col){
     m_texturedShader = tex;
     m_coloredShader = col;
@@ -241,7 +244,7 @@ glm::vec2 Batched::GetStringData(glm::vec2 pos, std::string text, vec4 col, int 
         index[6*size+5] = 4*size+2;
         size++;
 
-        glyphX += fontTexture.width + 1;
+        glyphX += stringWidth;//fontTexture.width + 1;
         if (glyphX > maxx){
             maxx = glyphX;
         }
@@ -387,7 +390,7 @@ void Batched::DrawLine3d(glm::vec3 from, glm::vec3 to, glm::vec4 col){
 }
 
 void Batched::DrawLine2d(glm::vec2 from, glm::vec2 to, glm::vec4 col){
-    if(dcurn >= SIZE){
+    if(lines_2d_curn > SIZE){
         line2dRender();
     }
     auto t = 2*lines_2d_curn;
@@ -456,6 +459,10 @@ int Batched::RenderFinally()
 
 void Batched::Render()
 {
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     if(curn == 0) {
         return;
     }

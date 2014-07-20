@@ -49,3 +49,5 @@ ShaderTest/fonts/
 ShaderTest/Shaders/
 ShaderTest/*.png
 ShaderTest/data/
+Game/Shaders/
+Game/*.png

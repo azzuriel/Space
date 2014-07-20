@@ -1,3 +1,10 @@
+/*******************************************************************************
+	Copyright (C) 2014 Samsonov Andrey
+
+	This software is distributed freely under the terms of the MIT License.
+	See "license.txt" or "http://copyfree.org/licenses/mit/license.txt".
+*******************************************************************************/
+
 //version inserted here by programm
 #define VERT_POSITION 0
 #define VERT_TEXCOORD 1
@@ -14,6 +21,8 @@ uniform struct Transform
 		mat4 light;
 } transform;
 
+uniform int NoTangent;
+
 uniform struct PointLight
 {
         vec4 position;
@@ -23,7 +32,8 @@ uniform struct PointLight
         vec3 attenuation;
 } light;
 
-uniform sampler2DShadow depthTexture;
+uniform sampler2D depthTexture;
+uniform sampler2D noise;
 uniform struct Material
 {
         sampler2D texture;
@@ -44,8 +54,6 @@ layout(location = VERT_NORMAL) in vec3 normal;
 out Vertex {
         vec2  texcoord;
         vec3  normal;
-		vec3  tangent;
-		vec3  binormal;
         vec3  lightDir;
         vec3  viewDir;
         float distance;
@@ -59,17 +67,6 @@ void main(void)
   vec4 lightDir  = light.position - vertex; // без вертекс?!
   Vert.texcoord  = texcoord;
   Vert.distance  = length(lightDir);
-  
-  vec3 tangent;
-  vec3 v1 = cross(gl_Normal, vec3(1.0, 0.0, 0.0));
-  vec3 v2 = cross(gl_Normal, vec3(0.0, 1.0, 0.0));
-  if(length(v1)>length(v2))
-	tangent=v1;
-  else
-	tangent=v2;
-  Vert.normal = normalize(transform.normal * normal);
-  Vert.tangent = normalize(transform.normal * tangent);
-  Vert.binormal = cross(Vert.normal, Vert.tangent);
   
   Vert.viewDir  = transform.viewPosition - vec3(vertex);
   Vert.lightDir = lightDir.xyz;
@@ -85,8 +82,6 @@ void main(void)
 in Vertex {
         vec2  texcoord;
         vec3  normal;
-		vec3  tangent;
-		vec3  binormal;
         vec3  lightDir;
         vec3  viewDir;
         float distance;
@@ -94,49 +89,45 @@ in Vertex {
 		vec4  position;
 } Vert;
 
-layout(location = FRAG_OUTPUT0) out vec4 color;
-
 float PCF(in vec4 smcoord)
 {
-        float res = 0.0;
+        //float res = 0.0;
 
-        res += textureProjOffset(depthTexture, smcoord, ivec2(-1,-1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 0,-1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 1,-1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2(-1, 0));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 0, 0));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 1, 0));
-        res += textureProjOffset(depthTexture, smcoord, ivec2(-1, 1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 0, 1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 1, 1));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2(-1,-1));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2( 0,-1));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2( 1,-1));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2(-1, 0));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2( 0, 0));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2( 1, 0));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2(-1, 1));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2( 0, 1));
+        //res += textureProjOffset(depthTexture, smcoord, ivec2( 1, 1));
         
-		return (res / 9.0);
+		//return (res / 9.0);
+		return 1.0f;
 }
+
+const float cutoff = 0.9f;
 
 void main(void)
 {
-  vec3 t = Vert.tangent;
-  vec3 b = Vert.binormal;
-  vec3 n = Vert.normal;
-  mat3 mat = mat3(t.x,b.x,n.x,t.y,b.y,n.y,t.z,b.z,n.z);
-  vec3 norm = normalize(texture2D(material.normal, Vert.texcoord).xyz*2.0-1.0);
-  vec3 normal = normalize(norm * mat);
-  vec4 smcoord = Vert.smcoord;
+  vec4 Texcol = texture2D(material.texture, Vert.texcoord);
+  if (Texcol.a < cutoff)
+  {
+    discard;
+  }
   vec3 lightDir = normalize(Vert.lightDir);
   vec3 viewDir = normalize(Vert.viewDir);
   
-  color = vec4(0,0,0,1);
+  vec3 normal = normalize(Vert.normal);
+  vec3 origin = viewDir * Vert.position.z/1000.0;
+  vec3 rvec = texture(noise, Vert.texcoord * 1.0).xyz * 2.0 - 1.0;
+  vec3 tangent = normalize(rvec - normal * dot(rvec, normal));
+  vec3 bitangent = cross(normal, tangent);
+  mat3 tbn = mat3(tangent, bitangent, normal);
   
-
-  color += material.ambient;
-  float NdotL = max(dot(normal, lightDir), 0.0);
-  color += material.diffuse * NdotL;
-  float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess), 0.0);
-  color += material.specular * RdotVpow;
-  
-  float shadow = PCF(smcoord);
-  
-  color *= shadow;
-  color.w = 1;
+  gl_FragData[1] = vec4(0,0.5,1,1);
+  gl_FragData[2] = vec4(normal, 1.0);
+  gl_FragData[0] = Texcol;
 }
 #endif

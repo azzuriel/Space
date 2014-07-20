@@ -1,5 +1,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
+#define GLM_FORCE_RADIANS
+#define GLM_SWIZZLE
 #include <glm.hpp>
 #include <gtx/quaternion.hpp>
 #include <memory>
@@ -7,12 +9,18 @@
 #include <stdarg.h>
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btQuaternion.h>
-#include <glm.hpp>
 #include <math.h>
+
+#include <boost/log/trivial.hpp>
+
+
+#define LOG(level) BOOST_LOG_TRIVIAL(level)
 
 #define G 6.671919999999999999999e-11
 #define Pc 3.0856776e+16
 #define Ae 149597870.7
+#define Ss 299792458
+#define Sy 9.46073047+15
 
 inline double getExcentricity(double a, double b){
     return sqrt(1 - ((b*b)/(a*a)));
@@ -107,16 +115,23 @@ inline std::string string_format(const std::string fmt_str, ...) {
     return std::string(formatted.get());
 }
 
+inline std::string to_string_helper(double speed, bool is_speed)
+{
+    if(speed > Pc/100) {
+        return string_format(is_speed ? "%f pc/s (FTL)" : "%f pc", speed/Pc);
+    }
+    if(speed > Ae/100) {
+        return string_format(is_speed ?  speed > Ss ? "%f ae/s (FTL)" : "%f ae/s" : "%f ae", speed/Ae);
+    }
+    if(speed > 1000) {
+        return string_format(is_speed ? "%f Km/s" : "%f Km", speed/1000.0);
+    }
+    return string_format(is_speed ? "%f m/s" : "%f m", speed);
+}
+
 
 inline std::string MetersSpeedString(double speed){
-    auto mspeed = Ae * speed;
-    if(mspeed > Pc) {
-        return string_format("%f pc/s", mspeed/Pc);
-    }
-    if(mspeed > 1000) {
-        return string_format("%f Km/s", mspeed/1000.0);
-    }
-    return string_format("%f m/s", mspeed);
+    return to_string_helper(speed, true);
 }
 
 inline std::string to_traf_string(double traf){

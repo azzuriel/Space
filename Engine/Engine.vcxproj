@@ -110,7 +110,6 @@
     <ClCompile Include="Icosahedron.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
     <ClCompile Include="ImageBox.cpp" />
-    <ClCompile Include="JargFont.cpp" />
     <ClCompile Include="JargShader.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
@@ -165,7 +164,6 @@
     <ClInclude Include="Icosahedron.h" />
     <ClInclude Include="ImageAtlas.h" />
     <ClInclude Include="ImageBox.h" />
-    <ClInclude Include="JargFont.h" />
     <ClInclude Include="JargShader.h" />
     <ClInclude Include="JButton.h" />
     <ClInclude Include="JHelpers_inl.h" />
@@ -180,6 +178,7 @@
     <ClInclude Include="ROAMgrid.h" />
     <ClInclude Include="ROAMSurface.h" />
     <ClInclude Include="SkySphere.h" />
+    <ClInclude Include="SpaceGenerator.h" />
     <ClInclude Include="SpaceSolver.h" />
     <ClInclude Include="SphereTesselator.h" />
     <ClInclude Include="SpriteBatch.h" />

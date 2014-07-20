@@ -5,6 +5,7 @@
 #include <utf8.h>
 #include <math.h>
 #include <algorithm>
+#include <JHelpers_inl.h>
 
 Font::Font()
 {
@@ -24,12 +25,12 @@ bool Font::Initialize()
 {
     if (FT_Init_FreeType( &library ))
     {
-        //LOG(ERROR) << "FT_Init_FreeType ERROR";
+        LOG(error) << "FT_Init_FreeType ERROR";
         return false;
     }
     if(!GenerateEmptyGlyph())
     {
-        //LOG(ERROR) << "GenerateEmptyGlyph ERROR";
+        LOG(error) << "GenerateEmptyGlyph ERROR";
         return false;
     }
 

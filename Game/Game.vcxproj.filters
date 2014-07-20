@@ -14,43 +14,28 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Windows">
-      <UniqueIdentifier>{7f348480-b8ac-424d-8aa8-76aaf44414f9}</UniqueIdentifier>
+      <UniqueIdentifier>{65c6925c-f318-4710-8d3d-211b45487bb1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="notepad.cpp">
+    <ClCompile Include="Game_Init.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="AutoVersion.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderTest.cpp">
+    <ClCompile Include="Game_Main.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="PerfomanceWindow.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderSelectWindow.cpp">
-      <Filter>Windows</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AutoVersion.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderTest.h">
+    <ClInclude Include="Game_Main.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="common_gen_const.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
     <ClInclude Include="PerfomanceWindow.h">
-      <Filter>Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderSelectWindow.h">
       <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>

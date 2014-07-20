@@ -130,6 +130,7 @@ void Mouse::CursorClientArea( int entered )
     }
 }
 
+//  reset mouse delta
 void Mouse::Update(){
     sm_deltaypos = 0;
     sm_deltaxpos = 0;
