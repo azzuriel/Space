@@ -125,6 +125,7 @@
     <ClCompile Include="ROAMgrid.cpp" />
     <ClCompile Include="ROAMSurface.cpp" />
     <ClCompile Include="SkySphere.cpp" />
+    <ClCompile Include="SpaceGenerator.cpp" />
     <ClCompile Include="SpaceSolver.cpp" />
     <ClCompile Include="SphereTesselator.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />

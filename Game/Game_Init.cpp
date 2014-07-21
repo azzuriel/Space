@@ -1,4 +1,6 @@
 #include "Game_Main.h"
+#include "..\Engine\GameObject.h"
+#include "..\Engine\SpaceGenerator.h"
 
 int Game::Initialize(){
     
@@ -39,6 +41,13 @@ int Game::Initialize(){
     {
         LOG(fatal) << "GLEW не инициализирован.";
         return false;
+    }
+
+    GameObject go;
+    go.seed = 123;
+    for (int i =0; i<100; i++)
+    {
+        GenerateStar(&go);
     }
 
     int glVersion[2] = {-1, -1};

@@ -54,6 +54,17 @@ void SpaceSolver::MakeOrbits() {
     }
 }
 
+void SpaceSolver::SolveTree(GameTimer gt, const GameObject &root) {
+    if(root.childrens.size() == 0){
+
+    } else {
+        for (auto i: root.childrens)
+        {
+
+        }
+    }
+}
+
 void SpaceSolver::Solve(GameTimer gt) {
     for (unsigned int i = 0; i < objects.size(); i++) {
 

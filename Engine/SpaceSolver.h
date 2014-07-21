@@ -9,6 +9,7 @@ public:
     ~SpaceSolver(void);
     void Solve(GameTimer gt);
     void MakeOrbits(void);
+    void SolveTree(GameTimer gt, const GameObject &root);
     std::vector<GameObject*> objects;
 };
 

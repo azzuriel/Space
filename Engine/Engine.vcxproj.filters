@@ -159,6 +159,9 @@
     <ClCompile Include="SpaceSolver.cpp">
       <Filter>Space</Filter>
     </ClCompile>
+    <ClCompile Include="SpaceGenerator.cpp">
+      <Filter>Space</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassicNoise.h">

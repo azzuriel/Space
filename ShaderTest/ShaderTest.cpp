@@ -214,8 +214,8 @@ void Game::Run()
     glBindTexture(GL_TEXTURE_2D, 1);
 
     auto BasicShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
-    BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minnaert.glsl");
-    BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minnaert.glsl");
+    BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/shadowmap_normal_tangent.glsl");
+    BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/shadowmap_normal_tangent.glsl");
     BasicShader->Link();
     BasicShader->UpdateUniforms();
     auto mvpBasic = BasicShader->LocateVars("transform.viewProjection"); //var0

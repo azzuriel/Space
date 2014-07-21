@@ -1,29 +1,4 @@
 #pragma once
-#include <stdint.h>
-class Galaxy
-{
+#include "GameObject.h"
 
-};
-
-
-class StarSystem
-{
-    //millimeters
-    uint64_t a;
-};
-
-class SpaceGenerator
-{
-    SpaceGenerator();
-    ~SpaceGenerator();
-};
-
-SpaceGenerator::SpaceGenerator()
-{
-
-}
-
-SpaceGenerator::~SpaceGenerator()
-{
-
-}
+GameObject* GenerateStar(GameObject *root);

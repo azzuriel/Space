@@ -12,6 +12,8 @@
 #include <math.h>
 
 #include <boost/log/trivial.hpp>
+#include "ColorExtender.h"
+#include <GameObject.h>
 
 
 #define LOG(level) BOOST_LOG_TRIVIAL(level)
@@ -21,6 +23,112 @@
 #define Ae 149597870.7
 #define Ss 299792458
 #define Sy 9.46073047+15
+
+inline std::string GetLumClass(int lumclass){
+    switch (lumclass)
+    {
+    case ST_CLASS_Zero:   return "0";     break;
+    case ST_CLASS_IaPlus: return "Ia+";   break;
+    case ST_CLASS_I:      return "I";     break;
+    case ST_CLASS_Ia:     return "Ia";    break;
+    case ST_CLASS_Iab:    return "Iab";   break;
+    case ST_CLASS_Ib:     return "Ib";    break;
+    case ST_CLASS_II:     return "II";    break;
+    case ST_CLASS_IIa:    return "IIa";   break;
+    case ST_CLASS_IIb:    return "IIb";   break;
+    case ST_CLASS_III:    return "III";   break;
+    case ST_CLASS_IIIa:   return "IIIa";  break;
+    case ST_CLASS_IIIab:  return "IIIab"; break;
+    case ST_CLASS_IIIb:   return "IIIa";  break;
+    case ST_CLASS_IV:     return "IV";    break;
+    case ST_CLASS_V:      return "V";     break;
+    case ST_CLASS_Va:     return "Va";    break;
+    case ST_CLASS_Vb:     return "Vb";    break;
+    case ST_CLASS_VI:     return "VI";    break;
+    case ST_CLASS_VII:    return "VII";   break;
+    default:              return "Err";   break;
+    }
+}
+
+inline std::string TempClass(int tempclass){
+    switch (tempclass)
+    {
+    case SPT_O: return "O"; break;
+    case SPT_B: return "B"; break;
+    case SPT_A: return "A"; break;
+    case SPT_F: return "F"; break;
+    case SPT_G: return "G"; break;
+    case SPT_K: return "K"; break;
+    case SPT_M: return "M"; break;
+    default:    return "%"; break;
+    }
+}
+
+inline std::string GetStarClass(const GameObject &star){
+    std::string temp;
+    temp += TempClass(star.spec);
+    temp += std::to_string(star.spec2);
+    temp += GetLumClass(star.lumclass);
+    
+    return temp;
+}
+
+inline glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float a_percent){
+    return a_percent * a + (1.0f - a_percent) * b;
+}
+
+inline glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float a_percent){
+    return a_percent * a + (1.0f - a_percent) * b;
+}
+
+inline glm::vec4 TempToCol(double temp){
+    if(temp > 6000) {
+        return lerp(Colors::Blue, Colors::White, temp/30000);
+    }
+    if(temp > 5000) {
+        return lerp(Colors::White, Colors::Yellow, temp/6000);
+    }
+    if(temp > 2000) {
+        return lerp(Colors::Yellow, Colors::Red, temp/5000);
+    }
+    return lerp(Colors::Red, Colors::DarkBrown, temp/2000);
+}
+
+inline double triangular(double min, double max, double mean) {
+    double U = rand() / (double) RAND_MAX;
+    double F = (mean - min) / (max - min);
+    if (U <= F)
+        return min + sqrt(U * (max - min) * (mean - min));
+    else
+        return max - sqrt((1 - U) * (max - min) * (max - mean));
+}
+
+inline double uniform(double min, double max) {
+    double U = rand() / (double) RAND_MAX;
+    return min + U*(max - min);
+}
+
+inline double triangular(double min, double max) {
+    double U = rand() / (double) RAND_MAX;
+    double mean = (max + min) / 2.0;
+    double F = (mean - min) / (max - min);
+    if (U <= F)
+        return min + sqrt(U * (max - min) * (mean - min));
+    else
+        return max - sqrt((1 - U) * (max - min) * (max - mean));
+}
+
+inline double triangular() {
+    double U = rand() / (double) RAND_MAX;
+    static const double mean = 0.5;
+    static const double max = 1;
+    static const double min = 0;
+    double F = (mean - min) / (max - min);
+    if (U <= F)
+        return min + sqrt(U * (max - min) * (mean - min));
+    else
+        return max - sqrt((1 - U) * (max - min) * (max - mean));
+}
 
 inline double getExcentricity(double a, double b){
     return sqrt(1 - ((b*b)/(a*a)));

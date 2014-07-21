@@ -4,6 +4,6 @@
 #include <glm.hpp>
 class Colors {
 public:
-    static glm::vec4 Red, Blue, Green, Yellow, Black, White;
+    static glm::vec4 Red, Blue, Green, Yellow, Black, White, DarkBrown;
 };
 #endif // Vector_h__
