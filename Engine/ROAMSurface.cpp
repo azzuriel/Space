@@ -6,15 +6,20 @@
 #include <math.h>
 #include "BasicJargShader.h"
 
-ROAMSurface::ROAMSurface(void)
+ROAMSurface::ROAMSurface(void) :
+    Loaded(false)
 {
     for (int i=0;i<6;i++)
     {
         auto a = new ROAMSurfaceCell();
+        auto m = std::shared_ptr<Material>(new Material());
+        //m->normal = a.
+        //a->tp->m->material = m;
         a->offset = glm::vec3(0,0,0);
         cells.push_back(a);
     }
     i = 0;
+    Loaded = true;
 }
 
 ROAMSurface::~ROAMSurface(void)
@@ -82,7 +87,7 @@ ROAMSurfaceCell::ROAMSurfaceCell(float x, float y)
 {
     tp = new TerrainPatch(x, y);
 
-    tp->computeVariance(18);
+    tp->computeVariance(20);
     tp->m->World = glm::mat4(1.0f);
     //patch->m->Shader = BasicShader.get();
     auto m_poolSize = tp->poolSize();
@@ -100,9 +105,11 @@ ROAMSurfaceCell::ROAMSurfaceCell(float x, float y)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, map->width, map->height, 0, GL_RGB, GL_FLOAT, map->normal_map);
     auto tempt = std::shared_ptr<Texture>(new Texture());
     tempt->textureId = normalTexture;
+    tempt->width = map->width;
+    tempt->height = map->height;
     tp->m->material = std::shared_ptr<Material>(new Material());
     tp->m->material->normal = tempt;
-    //tp->m->material->texture = tempt;
+    tp->m->material->texture = tempt;
 }
 
 ROAMSurfaceCell::~ROAMSurfaceCell()

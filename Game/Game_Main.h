@@ -12,6 +12,8 @@
 
 #include <Engine.h>
 #include "PerfomanceWindow.h"
+#include "..\Engine\ROAMSurface.h"
+#include <thread>
 
 class Game
 {
@@ -21,6 +23,9 @@ public:
     int Initialize();
     int Run();
     int Destroy();
+
+    ROAMSurface *rs;
+    std::thread Thread;
 
     static bool fullscreen;
     static int width; static int height;
@@ -44,6 +49,9 @@ public:
     }
     void Update();
     void Draw();
+
+    void MyMethod();
+
     void WindowsDesigner();
     static const int MAJOR_GL = 3, MINOR_GL = 3;
 

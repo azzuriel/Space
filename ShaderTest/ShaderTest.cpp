@@ -56,6 +56,13 @@
 #include "common_gen_const.h"
 #include "../Engine/Frustum.h"
 
+class functor_1{
+public:
+    void operator ()(int, int, int, int){
+
+    }
+};
+
 void errorCallbackGLFW3(int error, const char* description)
 {
     LOG(error) << description;
@@ -135,6 +142,7 @@ int Game::Initialize()
 
     Keyboard::Initialize();
     glfwSetKeyCallback(window, [](GLFWwindow *win, int key, int scancode, int action, int mods){Keyboard::SetKey(key, scancode, action, mods);});
+    glfwSetCharCallback(window, [](GLFWwindow* win,unsigned int ch){});
 
     Mouse::Initialize(window);
     Mouse::SetWindowSize(width, height);

@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include <GameObject.h>
 #include <SpaceGenerator.h>
+#include "..\Engine\SpaceSolver.h"
 
 
 int main(){

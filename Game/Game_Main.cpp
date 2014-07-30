@@ -19,7 +19,7 @@ int Game::Run(){
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
+    delete rs;
     return true;
 }
 
@@ -125,11 +125,20 @@ void Game::Draw()
     BasicShader->Use();
     CameraSetup(BasicShader->program, *camera);
     PointLightSetup(BasicShader->program, light);
+    light.position = glm::vec4(sin(gt->current/20.f)*800, 2, cos(gt->current/20.f)*800, 1);
 
     icos->Render();
     test.World = glm::rotate(mat4(1), (float)-M_PI_2, vec3(1.0,0.0,0.0));
     test.World = glm::scale(test.World, vec3(10.0,10.0,10.0));
     test.Render();
+
+    if(!rs->Loaded) {
+        rs->Bind();
+        rs->Loaded = true;
+    }
+
+    rs->Render(BasicShader);
+    
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );

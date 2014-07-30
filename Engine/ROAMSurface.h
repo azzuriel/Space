@@ -28,4 +28,5 @@ public:
     void Render(std::shared_ptr<BasicJargShader> active);
     void Test();
     int i;
+    bool Loaded;
 };

@@ -22,7 +22,7 @@ TerrainPatch::TerrainPatch(int offset_x, int offset_y)
     , m_leftLeaves(0)
     , m_rightLeaves(0)
     , m_triPool(0)
-    , m_poolSize(200000)
+    , m_poolSize(500000)
     , m_poolNext(0)
 {
     //m_map = Heightmap_read(fn);
@@ -345,8 +345,9 @@ void TerrainPatch::Bind(float *vertices, float *colors, float *normalTexels)
 
     for (int i=0; i<leaves*3; i++)
     {
-        m->Verteces[i].Position = normalize(glm::vec3(vertices[i*3]-0.5, vertices[i*3+1]-0.5, -0.5)) * ((97+vertices[i*3+2]*3)/100.0f);
-        m->Verteces[i].Normal = m->Verteces[i].Position;
+        m->Verteces[i].Position = normalize(glm::vec3(vertices[i*3]-0.5, vertices[i*3+1]-0.5, -0.5));
+        m->Verteces[i].Position.z *= ((99+vertices[i*3+2])/100.0f);
+        m->Verteces[i].Normal = normalize(m->Verteces[i].Position);
         m->Indeces[i] = i;
         m->Verteces[i].Uv = glm::vec2(normalTexels[i*2], normalTexels[i*2+1]);
     }
