@@ -46,9 +46,7 @@ lastlog.txt
 *.m
 *.db
 ShaderTest/fonts/
-ShaderTest/Shaders/
 ShaderTest/*.png
 ShaderTest/data/
-Game/Shaders/
 Game/*.png
 StarGenTest/Shaders/
