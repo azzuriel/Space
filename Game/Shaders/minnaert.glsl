@@ -67,7 +67,7 @@ void main(void)
   vec4 vertex    = transform.model * vec4(position, 1.0);
   vec4 lightDir  = light.position - vertex; // без вертекс?!
   Vert.texcoord  = texcoord;
-  Vert.distance  = length(lightDir);
+  Vert.distance  = length(transform.viewPosition - vec3(vertex));
   
   Vert.normal = normalize(transform.normal * normal);
   if(NoTangent != 0) {
@@ -124,6 +124,7 @@ float PCF(in vec4 smcoord)
 		return (res / 9.0);
 }
 
+
 const float cutoff = 0.9f;
 
 void main(void)
@@ -157,10 +158,7 @@ void main(void)
   float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess/2.f), 0.0);
   color += material.specular * RdotVpow;
   
-  //float shadow = PCF(smcoord);
-  
- // color *= shadow;
-  color += (material.ambient + light.ambient)*material.diffuse;
+  color += (material.ambient + light.ambient)*material.diffuse;  
   
   color *= Texcol;
   //luma

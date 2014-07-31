@@ -138,7 +138,7 @@ Texture::~Texture()
     }
 }
 
-void Texture::Empty(glm::vec2 size, GLuint dim /*= GL_TEXTURE_2D*/)
+void Texture::Empty(glm::vec2 size, GLuint dim /*= GL_TEXTURE_2D*/, GLuint format /*= GL_RGBA*/)
 {
     width = size.x;
     height = size.y;
@@ -146,7 +146,7 @@ void Texture::Empty(glm::vec2 size, GLuint dim /*= GL_TEXTURE_2D*/)
 
     glGenTextures(1, &textureId);
     glBindTexture(dim, textureId);
-    glTexImage2D(dim, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(dim, 0, format, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, NULL);
 
     glTexParameteri(dim, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(dim, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -3,6 +3,7 @@
 #include "..\Engine\SpaceGenerator.h"
 #include "..\Engine\ROAMSurface.h"
 #include <thread>
+#include "..\Engine\Generation.h"
 
 int Game::Initialize(){
     
@@ -106,6 +107,8 @@ int Game::Initialize(){
     BasicShader->LocateVars("transform.normal"); //var2
     BasicShader->LocateVars("material.texture");
 
+    Generation gen;
+
     //////////////////////////////////////////////////////////////////////////
 
     light.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
@@ -125,13 +128,15 @@ int Game::Initialize(){
     }
 
     WindowsDesigner();
-    rs = new ROAMSurface();
 
     camera = std::unique_ptr<Camera>(new Camera());
     camera->SetViewport(0, 0, width, height);
     camera->SetPosition(vec3(2,2,2));
     camera->SetLookAt(vec3(0));
     gt = std::unique_ptr<GameTimer>(new GameTimer);
+
+    rs = new QuadTreePlane();
+    rs->Init(BasicShader, *camera);
 
     auto tex = std::shared_ptr<Texture>(new Texture());
     tex->Load("normal.png");
@@ -141,17 +146,6 @@ int Game::Initialize(){
     icos->shader = BasicShader;
     icos->material = std::shared_ptr<Material>(new Material());
     icos->material->texture = tex;
-
-    Thread = std::thread([&](){ 
-        while(true) {
-        if(rs->Loaded) {
-            rs->UpdateCells(camera->position);
-            rs->Loaded = false;
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        }
-        }
-    });
 
     //test.LoadBinary("untitled.m");
     test.Bind();

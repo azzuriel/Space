@@ -24,7 +24,7 @@ struct Texture {
     ~Texture();
 
     void Load(std::string a, bool smooth = false, bool mip = false);
-    void Empty(glm::vec2 size, GLuint dim = GL_TEXTURE_2D);
+    void Empty(glm::vec2 size, GLuint dim = GL_TEXTURE_2D, GLuint format = GL_RGBA);
     void CreateDepth(glm::vec2 size);
     void EmptyFloatSpace(glm::vec3 size, GLuint dim = GL_TEXTURE_2D,  GLuint color = GL_RGB16F);
 };

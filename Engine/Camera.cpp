@@ -16,7 +16,7 @@ Camera::Camera() {
     max_pitch_rate = 5;
     max_heading_rate = 5;
     move_camera = false;
-    near_clip = 0.1f;
+    near_clip = 0.01f;
     far_clip = 1000;
     auto windowWidth = 1;
     auto windowHeight = 1;

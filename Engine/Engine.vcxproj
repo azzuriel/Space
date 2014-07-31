@@ -89,7 +89,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Space\LodSphere.cpp" />
     <ClCompile Include="BasicJargShader.cpp" />
     <ClCompile Include="binary_triangle_tree.c" />
     <ClCompile Include="Bitmap.cpp" />
@@ -105,6 +104,7 @@
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="Generation.cpp" />
     <ClCompile Include="GraphBox.cpp" />
     <ClCompile Include="Heightmap.cpp" />
     <ClCompile Include="Icosahedron.cpp" />
@@ -122,6 +122,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Quad.cpp" />
+    <ClCompile Include="QuadTreePlane.cpp" />
     <ClCompile Include="ROAMgrid.cpp" />
     <ClCompile Include="ROAMSurface.cpp" />
     <ClCompile Include="SkySphere.cpp" />
@@ -132,9 +133,6 @@
     <ClCompile Include="TextGeometry.cpp" />
     <ClCompile Include="TextureGenerator.cpp" />
     <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="TreeSphere.cpp">
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
-    </ClCompile>
     <ClCompile Include="ColorExtender.cpp" />
     <ClCompile Include="VertexPositionTexture.cpp" />
     <ClCompile Include="Win.cpp" />
@@ -142,7 +140,6 @@
     <ClCompile Include="WinS.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Space\LodSphere.h" />
     <ClInclude Include="BasicJargShader.h" />
     <ClInclude Include="binary_triangle_tree.h" />
     <ClInclude Include="Bitmap.h" />
@@ -160,6 +157,7 @@
     <ClInclude Include="GameMath.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="Generation.h" />
     <ClInclude Include="GraphBox.h" />
     <ClInclude Include="Heightmap.h" />
     <ClInclude Include="Icosahedron.h" />
@@ -176,6 +174,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Quad.h" />
+    <ClInclude Include="QuadTreePlane.h" />
     <ClInclude Include="ROAMgrid.h" />
     <ClInclude Include="ROAMSurface.h" />
     <ClInclude Include="SkySphere.h" />
@@ -187,7 +186,6 @@
     <ClInclude Include="TextGeometry.h" />
     <ClInclude Include="TextureGenerator.h" />
     <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="TreeSphere.h" />
     <ClInclude Include="ColorExtender.h" />
     <ClInclude Include="VertexPositionTexture.h" />
     <ClInclude Include="WComponent.h" />

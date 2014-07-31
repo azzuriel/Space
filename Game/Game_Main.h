@@ -12,8 +12,8 @@
 
 #include <Engine.h>
 #include "PerfomanceWindow.h"
-#include "..\Engine\ROAMSurface.h"
 #include <thread>
+#include "..\Engine\QuadTreePlane.h"
 
 class Game
 {
@@ -24,7 +24,7 @@ public:
     int Run();
     int Destroy();
 
-    ROAMSurface *rs;
+    QuadTreePlane *rs;
     std::thread Thread;
 
     static bool fullscreen;

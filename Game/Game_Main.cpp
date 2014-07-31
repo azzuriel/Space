@@ -79,9 +79,9 @@ void Game::Update()
 
     camera->move_camera = true;
     if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT)){
-        camera->camera_scale = gt->elapsed*50.0F;
+        camera->camera_scale = gt->elapsed*20.0F;
     } else {
-        camera->camera_scale = gt->elapsed*10.0F;
+        camera->camera_scale = gt->elapsed;
     }
 
     if(Keyboard::isKeyDown(GLFW_KEY_F5)){
@@ -120,24 +120,26 @@ void Game::Draw()
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.2,0.1, 0.3, 1.0f);
-
+    glDisable(GL_CULL_FACE);
 
     BasicShader->Use();
     CameraSetup(BasicShader->program, *camera);
     PointLightSetup(BasicShader->program, light);
     light.position = glm::vec4(sin(gt->current/20.f)*800, 2, cos(gt->current/20.f)*800, 1);
 
+    icos->World = glm::scale(mat4(1), vec3(0.0,0.0,0.0));
     icos->Render();
-    test.World = glm::rotate(mat4(1), (float)-M_PI_2, vec3(1.0,0.0,0.0));
-    test.World = glm::scale(test.World, vec3(10.0,10.0,10.0));
-    test.Render();
+    //test.World = glm::rotate(mat4(1), (float)-M_PI_2, vec3(1.0,0.0,0.0));
+    //test.World = glm::scale(test.World, vec3(10.0,10.0,10.0));
+    //test.Render();
 
-    if(!rs->Loaded) {
-        rs->Bind();
-        rs->Loaded = true;
-    }
+    //if(!rs->Loaded) {
+        rs->Update(camera->position);
+        glViewport(0, 0, width, height);
+    //    rs->Loaded = true;
+    //}//
 
-    rs->Render(BasicShader);
+    rs->Draw();
     
 
     glDisable(GL_DEPTH_TEST);
