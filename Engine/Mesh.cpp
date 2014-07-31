@@ -215,9 +215,9 @@ void Mesh::Render(const Frustum &frust)
     Render(mat4(1), frust);
 }
 
-void Mesh::Render()
+void Mesh::Render( bool patches /* = false*/)
 {
-    Render(mat4(1));
+    Render(mat4(1), patches);
 }
 
 void Mesh::RenderBounding(Batched &sb, mat4 Model)
@@ -288,7 +288,7 @@ inline void Mesh::Render(mat4 Model, const Frustum &frust)
     }
 }
 
-inline void Mesh::Render(mat4 Model)
+inline void Mesh::Render(mat4 Model, bool patches /* = false*/)
 {
     if(Verteces.size() == 0){
         return;
@@ -333,7 +333,13 @@ inline void Mesh::Render(mat4 Model)
         }
     }
     glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, Indeces.size(), GL_UNSIGNED_INT, NULL);
+    if(!patches) {
+        glDrawElements(GL_TRIANGLES, Indeces.size(), GL_UNSIGNED_INT, NULL);
+    } else
+    {
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
+        glDrawElements(GL_PATCHES, Indeces.size(), GL_UNSIGNED_INT, NULL);
+    }
 }
 
 void Mesh::Combine(Mesh* com)

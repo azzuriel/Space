@@ -53,7 +53,7 @@ public:
     void MyMethod();
 
     void WindowsDesigner();
-    static const int MAJOR_GL = 3, MINOR_GL = 3;
+    static const int MAJOR_GL = 4, MINOR_GL = 1;
 
     GLint mvpTex, mvpLine;
 

@@ -63,5 +63,5 @@ void TextureGenerator::RenderOnTempFbo(std::function<void()> func) const
     quad_mesh.shader = shader;
     quad_mesh.Bind();
     quad_mesh.Render();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

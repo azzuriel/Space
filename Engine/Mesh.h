@@ -21,8 +21,8 @@ public:
     ~Mesh(void);
     void Create(std::vector<VertexPositionNormalTexture> verteces, std::vector<GLuint> indeces);
     void Bind(int type = 0);
-    void Render();
-    void Render(mat4 Model);
+    void Render( bool patches = false);
+    void Render(mat4 Model, bool patches = false);
     void Render(const Frustum &frust);
     inline void Render(mat4 Model, const Frustum &frust);
     void Combine(Mesh* com);

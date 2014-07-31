@@ -44,6 +44,80 @@ uniform struct Material
         float shininess;
 } material;
 
+#ifdef _TESSEVAL_
+layout(quads, fractional_odd_spacing) in;
+
+in TCS_OUT
+{
+    vec2 tc;
+} tes_in[];
+
+out TES_OUT
+{
+    vec2 tc;
+} tes_out;
+
+void main(void)
+{
+
+    vec4 p1 = mix(gl_in[0].gl_Position,
+                  gl_in[1].gl_Position,
+                  gl_TessCoord.x);
+
+    vec4 p2 = mix(gl_in[2].gl_Position,
+                  gl_in[3].gl_Position,
+                  gl_TessCoord.x);
+
+    gl_Position = mix(p1, p2, gl_TessCoord.y);
+}
+#endif
+
+#ifdef _TESSCONTROL_
+layout ( vertices = 4 ) out;    
+
+in VS_OUT
+{
+    vec2 tc;
+} tcs_in[];
+
+out TCS_OUT
+{
+    vec2 tc;
+} tcs_out[]; 
+
+void main ()
+{             
+    
+	if (gl_InvocationID == 0)
+    {
+	    mat4 mvp = transform.viewProjection * transform.model;
+        vec4 p0 = mvp * gl_in[0].gl_Position;
+        vec4 p1 = mvp * gl_in[1].gl_Position;
+        vec4 p2 = mvp * gl_in[2].gl_Position;
+        vec4 p3 = mvp * gl_in[3].gl_Position;
+        p0 /= p0.w;
+        p1 /= p1.w;
+        p2 /= p2.w;
+        p3 /= p3.w;
+        {
+            float l0 = length(p2.xy - p0.xy) * 16.0 + 1.0;
+            float l1 = length(p3.xy - p2.xy) * 16.0 + 1.0;
+            float l2 = length(p3.xy - p1.xy) * 16.0 + 1.0;
+            float l3 = length(p1.xy - p0.xy) * 16.0 + 1.0;
+            gl_TessLevelOuter[0] = l0;
+            gl_TessLevelOuter[1] = l1;
+            gl_TessLevelOuter[2] = l2;
+            gl_TessLevelOuter[3] = l3;
+            gl_TessLevelInner[0] = min(l1, l3);
+            gl_TessLevelInner[1] = min(l0, l2);
+        }
+    }
+
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    tcs_out[gl_InvocationID].tc = tcs_in[gl_InvocationID].tc;
+}
+#endif
+
 #ifdef _VERTEX_
 
 layout(location = VERT_POSITION) in vec3 position;
@@ -53,8 +127,6 @@ layout(location = VERT_NORMAL) in vec3 normal;
 out Vertex {
         vec2  texcoord;
         vec3  normal;
-		vec3  tangent;
-		vec3  binormal;
         vec3  lightDir;
         vec3  viewDir;
         float distance;
@@ -67,20 +139,7 @@ void main(void)
   vec4 vertex    = transform.model * vec4(position, 1.0);
   vec4 lightDir  = light.position - vertex; // без вертекс?!
   Vert.texcoord  = texcoord;
-  Vert.distance  = length(transform.viewPosition - vec3(vertex));
-  
-  Vert.normal = normalize(transform.normal * normal);
-  if(NoTangent != 0) {
-	vec3 tangent;
-	vec3 v1 = cross(gl_Normal, vec3(1.0, 0.0, 0.0));
-	vec3 v2 = cross(gl_Normal, vec3(0.0, 1.0, 0.0));
-	if(length(v1)>length(v2))
-		tangent=v1;
-	else
-		tangent=v2;
-	Vert.tangent = normalize(transform.normal * tangent);
-	Vert.binormal = cross(Vert.normal, Vert.tangent);
-  }
+  Vert.distance  = length(lightDir);
   
   Vert.viewDir  = transform.viewPosition - vec3(vertex);
   Vert.lightDir = lightDir.xyz;
@@ -91,77 +150,13 @@ void main(void)
 }
 #endif
 
-#ifdef _FRAGMENT_
 
-in Vertex {
-        vec2  texcoord;
-        vec3  normal;
-		vec3  tangent;
-		vec3  binormal;
-        vec3  lightDir;
-        vec3  viewDir;
-        float distance;
-		vec4  smcoord;
-		vec4  position;
-} Vert;
+#ifdef _FRAGMENT_
 
 layout(location = FRAG_OUTPUT0) out vec4 color;
 
-float PCF(in vec4 smcoord)
-{
-        float res = 0.0;
-
-        res += textureProjOffset(depthTexture, smcoord, ivec2(-1,-1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 0,-1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 1,-1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2(-1, 0));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 0, 0));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 1, 0));
-        res += textureProjOffset(depthTexture, smcoord, ivec2(-1, 1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 0, 1));
-        res += textureProjOffset(depthTexture, smcoord, ivec2( 1, 1));
-        
-		return (res / 9.0);
-}
-
-
-const float cutoff = 0.9f;
-
 void main(void)
 {
-  vec4 Texcol = texture2D(material.texture, Vert.texcoord);
-  if (Texcol.a < cutoff)
-  {
-    discard;
-  }
-  vec3 normal;
-  if(NoTangent != 0) {
-	vec3 t = Vert.tangent;
-	vec3 b = Vert.binormal;
-	vec3 n = Vert.normal;
-	mat3 mat = mat3(t.x,b.x,n.x,t.y,b.y,n.y,t.z,b.z,n.z);
-	vec3 norm = normalize(texture2D(material.normal, Vert.texcoord).xyz*2.0-1.0);
-	vec3 normal = normalize(norm * mat);
-  } else {
-	normal = normalize(Vert.normal);
-  }
-  vec4 smcoord = Vert.smcoord;
-  vec3 lightDir = normalize(Vert.lightDir);
-  vec3 viewDir = normalize(Vert.viewDir);
-  
-  color = vec4(0,0,0,1);
-  
-
-  //color += material.ambient;
-  float NdotL = max(dot(normal, lightDir), 0.0);
-  color += material.diffuse * NdotL;
-  float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir), material.shininess/2.f), 0.0);
-  color += material.specular * RdotVpow;
-  
-  color += (material.ambient + light.ambient)*material.diffuse;  
-  
-  color *= Texcol;
-  //luma
-  color.a = 1 - 0.2126*color.r + 0.7152*color.g + 0.0722*color.b;
+  color = vec4(1,0,0,1);
 }
 #endif

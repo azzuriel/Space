@@ -100,6 +100,8 @@ int Game::Initialize(){
     BasicShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     BasicShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/minnaert.glsl");
     BasicShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/minnaert.glsl");
+    BasicShader->loadShaderFromSource(GL_TESS_CONTROL_SHADER, "Shaders/minnaert.glsl");
+    BasicShader->loadShaderFromSource(GL_TESS_EVALUATION_SHADER, "Shaders/minnaert.glsl");
     BasicShader->Link();
     BasicShader->UpdateUniforms();
     BasicShader->LocateVars("transform.viewProjection"); //var0
