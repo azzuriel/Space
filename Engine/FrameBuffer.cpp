@@ -5,7 +5,7 @@ FrameBuffer::FrameBuffer(bool _depth)
 {
     depth = _depth;
     FBO = 0;
-    GLenum fboStatus;
+    GLenum fboStatus = 0;
 
     glGenFramebuffers(1, &FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
@@ -16,6 +16,7 @@ FrameBuffer::FrameBuffer(bool _depth)
 
 FrameBuffer::~FrameBuffer(void)
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &FBO);
 }
 

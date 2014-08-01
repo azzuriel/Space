@@ -12,5 +12,6 @@ public:
     static std::shared_ptr<BasicJargShader> cells;
     static std::shared_ptr<Texture> noise;
     static TextureGenerator tg;
+    static std::shared_ptr<Texture> temp;
 };
 

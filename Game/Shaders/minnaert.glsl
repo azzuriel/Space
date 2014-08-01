@@ -59,16 +59,29 @@ out TES_OUT
 
 void main(void)
 {
+	mat4 mvp = transform.viewProjection * transform.model;
+	
+    //vec2 tc1 = mix(tes_in[0].tc, tes_in[1].tc, gl_TessCoord.x);
+    //vec2 tc2 = mix(tes_in[2].tc, tes_in[3].tc, gl_TessCoord.x);
+    vec2 tc;//mix(tc2, tc1, gl_TessCoord.y);
+	
+	float u = gl_TessCoord.x;
+    float v = gl_TessCoord.y;
+	tc = vec2(u, v);
 
     vec4 p1 = mix(gl_in[0].gl_Position,
                   gl_in[1].gl_Position,
                   gl_TessCoord.x);
-
     vec4 p2 = mix(gl_in[2].gl_Position,
                   gl_in[3].gl_Position,
                   gl_TessCoord.x);
+    vec4 p = mix(p2, p1, gl_TessCoord.y);
 
-    gl_Position = mix(p1, p2, gl_TessCoord.y);
+    p.z += texture(material.texture, tc).r * 0.1;
+	//p.z += (sin(u*3.1415*2)+cos(v*3.1415*2))/10.0;
+
+	tes_out.tc = tc;
+    gl_Position = mvp * p;
 }
 #endif
 
@@ -99,11 +112,22 @@ void main ()
         p1 /= p1.w;
         p2 /= p2.w;
         p3 /= p3.w;
+        if (p0.z <= 0.0 ||
+            p1.z <= 0.0 ||
+            p2.z <= 0.0 ||
+            p3.z <= 0.0)
         {
-            float l0 = length(p2.xy - p0.xy) * 16.0 + 1.0;
-            float l1 = length(p3.xy - p2.xy) * 16.0 + 1.0;
-            float l2 = length(p3.xy - p1.xy) * 16.0 + 1.0;
-            float l3 = length(p1.xy - p0.xy) * 16.0 + 1.0;
+             gl_TessLevelOuter[0] = 0.0;
+             gl_TessLevelOuter[1] = 0.0;
+             gl_TessLevelOuter[2] = 0.0;
+             gl_TessLevelOuter[3] = 0.0;
+        }
+        else
+        {
+            float l0 = length(p2.xy - p0.xy) * 32.0 + 16.0;
+            float l1 = length(p3.xy - p2.xy) * 32.0 + 16.0;
+            float l2 = length(p3.xy - p1.xy) * 32.0 + 16.0;
+            float l3 = length(p1.xy - p0.xy) * 32.0 + 16.0;
             gl_TessLevelOuter[0] = l0;
             gl_TessLevelOuter[1] = l1;
             gl_TessLevelOuter[2] = l2;
@@ -112,7 +136,6 @@ void main ()
             gl_TessLevelInner[1] = min(l0, l2);
         }
     }
-
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
     tcs_out[gl_InvocationID].tc = tcs_in[gl_InvocationID].tc;
 }
@@ -125,28 +148,19 @@ layout(location = VERT_TEXCOORD) in vec2 texcoord;
 layout(location = VERT_NORMAL) in vec3 normal;
 
 out Vertex {
-        vec2  texcoord;
-        vec3  normal;
-        vec3  lightDir;
-        vec3  viewDir;
-        float distance;
-		vec4  smcoord;
-		vec4  position;
+        vec2 tc;
 } Vert;
 
 void main(void)
 {
-  vec4 vertex    = transform.model * vec4(position, 1.0);
-  vec4 lightDir  = light.position - vertex; // без вертекс?!
-  Vert.texcoord  = texcoord;
-  Vert.distance  = length(lightDir);
-  
-  Vert.viewDir  = transform.viewPosition - vec3(vertex);
-  Vert.lightDir = lightDir.xyz;
-  
-  Vert.smcoord  = transform.light * vertex;
-  Vert.position = transform.viewProjection * vertex;
-  gl_Position   = Vert.position;
+  const vec2 vetreces[] = vec2[] (
+  vec2(0,0),
+  vec2(1,0),
+  vec2(0,1),
+  vec2(1,1)
+  );
+  gl_Position = vec4(position, 1);
+  Vert.tc = vetreces[gl_VertexID];
 }
 #endif
 
@@ -155,8 +169,13 @@ void main(void)
 
 layout(location = FRAG_OUTPUT0) out vec4 color;
 
+in TES_OUT
+{
+    vec2 tc;
+} tes_out;
+
 void main(void)
 {
-  color = vec4(1,0,0,1);
+  color = vec4(texture(material.texture, tes_out.tc).xyz, 1);
 }
 #endif

@@ -11,6 +11,9 @@ Generation::Generation(void)
      noise = std::shared_ptr<Texture>(new Texture());
      noise->Load("noise.png");
 
+     temp = std::shared_ptr<Texture>(new Texture());
+     temp->Empty(vec2(128,128));
+
      tg = TextureGenerator();
 }
 
@@ -18,6 +21,8 @@ Generation::Generation(void)
 Generation::~Generation(void)
 {
 }
+
+std::shared_ptr<Texture> Generation::temp;
 
 TextureGenerator Generation::tg;
 

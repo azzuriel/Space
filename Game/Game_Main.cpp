@@ -1,6 +1,7 @@
 #include "Game_Main.h"
 #include "PerfomanceWindow.h"
 #include <gtc\matrix_transform.inl>
+#include "..\Engine\Generation.h"
 
 Game::Game(void)
 {

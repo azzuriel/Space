@@ -11,7 +11,13 @@
 #define VERT_NORMAL 2
 #define VERT_COLOR 3
 #define FRAG_OUTPUT0 0
-uniform sampler2D inputTex1;
+uniform sampler2D inputTex0; // noise texture
+
+uniform float param0; // offset param min x
+uniform float param1; // offset param min y
+uniform float param2; // offset param max x
+uniform float param3; // offset param max y
+uniform float param4; // scale
 
 #ifdef _VERTEX_
 
@@ -43,7 +49,7 @@ vec4 gpuGetCell3D(const in int x, const in int y, const in int z)
 {
 	float u = (x + y * 31) / 256.0;
 	float v = (z - x * 3) / 256.0;
-	return(texture2D(inputTex1, vec2(u, v)));
+	return(texture2D(inputTex0, vec2(u, v)));
 }
 
 vec2 gpuCellNoise3D(const in vec3 xyz)
@@ -88,7 +94,9 @@ vec2 gpuCellNoise3D(const in vec3 xyz)
 
 void main(void)
 {
-  vec2 b = gpuCellNoise3D(Vert.position*20.0);
+  vec3 min = vec3(param0, param1, 1);
+  vec3 max = vec3(param2, param3, 1);
+  vec2 b = gpuCellNoise3D(((Vert.position+vec3(1,1,0))/2.0 * (max - min) + min)*param4);
   float a = b.x / b.y;
   color = vec4(a,a,a,a);
   //color.w = 1;

@@ -109,8 +109,6 @@ int Game::Initialize(){
     BasicShader->LocateVars("transform.normal"); //var2
     BasicShader->LocateVars("material.texture");
 
-    Generation gen;
-
     //////////////////////////////////////////////////////////////////////////
 
     light.position = vec4(5.0f, 12.0f, 3.0f, 1.0f);
@@ -136,6 +134,8 @@ int Game::Initialize(){
     camera->SetPosition(vec3(2,2,2));
     camera->SetLookAt(vec3(0));
     gt = std::unique_ptr<GameTimer>(new GameTimer);
+
+    Generation gen;
 
     rs = new QuadTreePlane();
     rs->Init(BasicShader, *camera);

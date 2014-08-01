@@ -16,16 +16,19 @@ TextureGenerator::~TextureGenerator(void)
 {
 }
 
-void TextureGenerator::SetTextures(std::shared_ptr<Texture> tex, ...)
+void TextureGenerator::SetTextures(std::shared_ptr<Texture> tex)
 {
     texes.push_back(tex);
-    va_list argptr;
-    int num = 0;
-    va_start (argptr, num);
-    for(; num; num--) {
-        auto t = va_arg(argptr, std::shared_ptr<Texture>);
-        texes.push_back(t);
-    }
+}
+
+void TextureGenerator::Reset(){
+    texes.clear();
+    params.clear();
+}
+
+void TextureGenerator::SetParams(float tex)
+{
+    params.push_back(tex);
 }
 
 void TextureGenerator::SetResultTexture(std::shared_ptr<Texture> _tex)
@@ -43,7 +46,8 @@ void TextureGenerator::RenderOnTempFbo(std::function<void()> func) const
     FrameBuffer fbo;
     fbo.bindTexture(*target);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo.FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo.FBO); 
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     glViewport(0, 0, target->width, target->height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0,0,0,1);
@@ -54,7 +58,16 @@ void TextureGenerator::RenderOnTempFbo(std::function<void()> func) const
         glBindTexture(GL_TEXTURE_2D, texes[i]->textureId);
         std::string str = "inputTex";
         str.append(std::to_string(i));
-        glUniform1i(glGetUniformLocation(shader->program, str.c_str()), 0);
+        auto uni = glGetUniformLocation(shader->program, str.c_str());
+        glUniform1i(uni, 0);
+    }
+
+    for (int i=0; i<params.size(); i++)
+    {
+        std::string str = "param";
+        str.append(std::to_string(i));
+        auto uni = glGetUniformLocation(shader->program, str.c_str());
+        glUniform1f(uni, params[i]);
     }
     
     func();
@@ -63,5 +76,5 @@ void TextureGenerator::RenderOnTempFbo(std::function<void()> func) const
     quad_mesh.shader = shader;
     quad_mesh.Bind();
     quad_mesh.Render();
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

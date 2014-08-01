@@ -78,14 +78,21 @@ void QuadTreeNode::Init(std::shared_ptr<BasicJargShader> shader, float _K, float
 
     auto tex = std::shared_ptr<Texture>(new Texture());
     tex->Empty(glm::vec2(128,128), GL_TEXTURE_2D, GL_RGB);
-    
+     
     mesh->World = glm::scale(glm::mat4(1), glm::vec3(100,100,100));
 
     Generation::tg.SetShader(Generation::cells);
+    Generation::tg.Reset();
     Generation::tg.SetTextures(Generation::noise);
+    Generation::tg.SetParams(min.x);
+    Generation::tg.SetParams(min.y);
+    Generation::tg.SetParams(max.x);
+    Generation::tg.SetParams(max.y);
+    Generation::tg.SetParams(10);
     Generation::tg.SetResultTexture(tex);
     Generation::tg.RenderOnTempFbo();
-    mesh->material = std::shared_ptr<Material>(new Material());
+    //tex->Load("normal.png");
+    mesh->material = std::shared_ptr<Material>(new Material()); 
     mesh->material->texture = tex;
 }
 
