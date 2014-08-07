@@ -1,4 +1,4 @@
-#include "Bitmap.h"
+п»ї#include "Bitmap.h"
 
 #include <cstdio>
 #include <png.h>
@@ -45,7 +45,6 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 
     if (!png)
     {
-        //LOG(LOG_WARNING, "Libng. Невозможно создать png структуру.");
         return false;
     }
 
@@ -54,7 +53,6 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
     if (!info)
     {
         png_destroy_read_struct(&png, NULL, NULL);
-        //LOG(LOG_WARNING, "Libng. Невозможно создать png info структуру.");
         return false;
     }
 
@@ -140,19 +138,19 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 
     for (unsigned int i = 0; i < pass_count; i++)
     {
-        unsigned int offset = row_length * (height - 1);
+        int offset = (row_length * (height - 1)) * i;
 
-        for(unsigned int j = 0; j < height; j++)
+        for(int j = 0; j < height; j++)
         {
             png_read_row(png, data + offset, NULL);
-            offset -= row_length;
+            offset += row_length;
         }
     }
 
     png_destroy_read_struct(&png, &info, NULL);
     bitmap.Change(format, width, height, data);
 
-    return true; 
+    return true;
 }
 
 
@@ -163,7 +161,6 @@ static bool SaveBMP(const Bitmap &bitmap, FILE *file)
 
     if (!png)
     {
-        //LOG(LOG_WARNING, "Libng. Невозможно создать png структуру.");
         return false;
     }
 
@@ -172,7 +169,6 @@ static bool SaveBMP(const Bitmap &bitmap, FILE *file)
     if (!info)
     {
         png_destroy_write_struct(&png, NULL);
-        //LOG(LOG_WARNING, "Libng. Невозможно создать png info структуру.");
         return false;
     }
 
@@ -217,7 +213,6 @@ static bool SaveBMP(const Bitmap &bitmap, FILE *file)
 
     default:
         {
-            //LOG(LOG_WARNING, "Libng. неподдерживаемый тип цвета.");
             longjmp(png_jmpbuf(png), 1);
             break;
         }
@@ -291,9 +286,8 @@ void Bitmap::Change(unsigned int format_, unsigned int width_, unsigned int heig
 bool Bitmap::Load( std::string fileName )
 {
     FILE *file = fopen(fileName.c_str(), "rb");
-    if (file == NULL) 
+    if (file == NULL)
     {
-        //LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
         return false;
     }
 
@@ -304,16 +298,14 @@ bool Bitmap::Load( std::string fileName )
     }
 
     fclose(file);
-    //LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
     return false;
 }
 
 bool Bitmap::Save( std::string fileName ) const
 {
     FILE *file = fopen(fileName.c_str(), "wb");
-    if (!file) 
+    if (!file)
     {
-        //LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
         return false;
     }
 
@@ -324,7 +316,6 @@ bool Bitmap::Save( std::string fileName ) const
     }
 
     fclose(file);
-    //LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
     return false;
 }
 
@@ -490,10 +481,10 @@ bool Bitmap::Blit( i32vec2 *point, iRect *srcrect, Bitmap *bitmap )
             for(unsigned int k = 0; k < channelCount; k++)
             {
 
-                //yy + dstBitmapRect.y	// номер строки
+                //yy + dstBitmapRect.y // Г­Г®Г¬ГҐГ° Г±ГІГ°Г®ГЄГЁ
 
-                //(yy + dstBitmapRect.y) * width * channelCount // первый бит в yy строке
-                //(xx + dstBitmapRect.x) * channelCount + k // номер бита в строке
+                //(yy + dstBitmapRect.y) * width * channelCount // ГЇГҐГ°ГўГ»Г© ГЎГЁГІ Гў yy Г±ГІГ°Г®ГЄГҐ
+                //(xx + dstBitmapRect.x) * channelCount + k // Г­Г®Г¬ГҐГ° ГЎГЁГІГ  Гў Г±ГІГ°Г®ГЄГҐ
 
                 data[((yy + dstBitmapRect.y) * width + (xx + dstBitmapRect.x)) * channelCount + k]
                 = srcData[((yy + srcBitmapRect.y) * srcWidth + (xx + srcBitmapRect.x)) * channelCount + k];
@@ -544,7 +535,6 @@ void Bitmap::Generate( unsigned int format_, unsigned int width_, unsigned int h
         if( alpha == 1)
             data[i * channelCount + channelCount - 1] = colorA;
     }
-
 }
 
 void Bitmap::BlackToWhite()

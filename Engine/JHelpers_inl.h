@@ -24,6 +24,16 @@
 #define Ss 299792458
 #define Sy 9.46073047+15
 
+#ifdef NDEBUG 
+#define OPENGL_CHECK_ERRORS() \
+    while( unsigned int openGLError = glGetError()) \
+    { \
+    LOG(error) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError); \
+    };
+#else
+#define OPENGL_CHECK_ERRORS() ((void)0)
+#endif // NDEBUG
+
 inline std::string GetLumClass(int lumclass){
     switch (lumclass)
     {

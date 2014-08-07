@@ -7,12 +7,6 @@
 #include "Frustum.h"
 #include "JHelpers_inl.h"
 
-#define OPENGL_CHECK_ERRORS() \
-    while( unsigned int openGLError = glGetError()) \
-{ \
-    LOG(error) << "OpenGL Error " << openGLError<< " -- " << glewGetErrorString(openGLError); \
-};
-
 Mesh::Mesh(void) :
     World(mat4(1.0f)),
     shader(nullptr),
@@ -34,6 +28,7 @@ Mesh::~Mesh(void)
 
         delete[] m_vbo;
         m_vbo = nullptr;
+        OPENGL_CHECK_ERRORS();
     }
 }
 

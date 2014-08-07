@@ -85,9 +85,9 @@ void QuadTreeNode::Init(std::shared_ptr<BasicJargShader> shader, float _K, float
     Generation::tg.Reset();
     Generation::tg.SetTextures(Generation::noise);
     Generation::tg.SetParams(min.x);
-    Generation::tg.SetParams(min.y);
-    Generation::tg.SetParams(max.x);
     Generation::tg.SetParams(max.y);
+    Generation::tg.SetParams(max.x);
+    Generation::tg.SetParams(min.y);
     Generation::tg.SetParams(10);
     Generation::tg.SetResultTexture(tex);
     Generation::tg.RenderOnTempFbo();

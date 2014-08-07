@@ -3,12 +3,7 @@
 #include <glfw3.h>
 #include <fstream>
 #include "Heightmap.h"
-
-//#define OPENGL_CHECK_ERRORS()							\
-//	while( unsigned int openGLError = glGetError() )	\
-//	{													\
-//	LOG_ERROR("OpenGL Error 0x%X", openGLError);		\
-//	};
+#include "JHelpers_inl.h"
 
 unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing, bool mipmap)
 {
@@ -58,7 +53,7 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing, bool mipmap)
 
     default:
         {
-            //LOG(LOG_WARNING, "Generate GLBitmap. Не поддерживаемый тип цвета.");
+            LOG(warning) << "Generate GLBitmap. Не поддерживаемый тип цвета.";
             break;
         }
     }
@@ -66,14 +61,11 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing, bool mipmap)
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     glTexImage2D(GL_TEXTURE_2D, 0, colorType, bitmap.GetWidth(), bitmap.GetHeight(), 0, colorType, GL_UNSIGNED_BYTE, bitmap.GetData());
-    //OPENGL_CHECK_ERRORS();
 
-    if(mipmap)
-    {
-        // Создаем сами мипмапы.
-        glGenerateMipmap(GL_TEXTURE_2D);
-        //OPENGL_CHECK_ERRORS();
+    if(mipmap) {
+        glGenerateMipmap(GL_TEXTURE_2D); 
     }
+    OPENGL_CHECK_ERRORS();
 
     return glBitmap;
 }

@@ -40,14 +40,14 @@ void JargShader::Use() const
     glUseProgram(program);
 }
 
-GLint JargShader::LocateVars(std::string s)
+GLint JargShader::locateVars(const std::string &s)
 {
     GLint a = glGetUniformLocation(program, s.c_str());
     vars.push_back(a);
     return a;
 }
 
-void JargShader::loadShaderFromSource(GLenum type, std::string source) {
+void JargShader::loadShaderFromSource(GLenum type,const std::string &source) {
 
     std::stringstream ss;
     name = source;
@@ -110,7 +110,7 @@ bool JargShader::Link() {
     return true;
 }
 
-void JargShader::PushGlobalHeader(std::string source)
+void JargShader::PushGlobalHeader(const std::string &source)
 {
     std::stringstream ss;
     name = source;

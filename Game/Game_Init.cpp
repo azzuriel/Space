@@ -84,13 +84,13 @@ int Game::Initialize(){
     LinesShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/colored.glsl");
     LinesShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/colored.glsl");
     LinesShader->Link();
-    mvpLine = LinesShader->LocateVars("MVP");
+    mvpLine = LinesShader->locateVars("MVP");
 
     TextureShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     TextureShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/textured.glsl");
     TextureShader->loadShaderFromSource(GL_FRAGMENT_SHADER, "Shaders/textured.glsl");
     TextureShader->Link();
-    mvpTex = TextureShader->LocateVars("MVP");
+    mvpTex = TextureShader->locateVars("MVP");
 
     FXAAShader = std::shared_ptr<BasicJargShader>(new BasicJargShader());
     FXAAShader->loadShaderFromSource(GL_VERTEX_SHADER, "Shaders/fxaa.glsl");
@@ -104,10 +104,16 @@ int Game::Initialize(){
     BasicShader->loadShaderFromSource(GL_TESS_EVALUATION_SHADER, "Shaders/minnaert.glsl");
     BasicShader->Link();
     BasicShader->UpdateUniforms();
-    BasicShader->LocateVars("transform.viewProjection"); //var0
-    BasicShader->LocateVars("transform.model"); //var1
-    BasicShader->LocateVars("transform.normal"); //var2
-    BasicShader->LocateVars("material.texture");
+    BasicShader->locateVars("transform.viewProjection"); //var0
+    BasicShader->locateVars("transform.model"); //var1
+    BasicShader->locateVars("transform.normal"); //var2
+    BasicShader->locateVars("material.texture");
+
+    testtex = std::shared_ptr<Texture>(new Texture());
+    testtex->Empty(vec2(256,256));
+
+    uptex = std::shared_ptr<Texture>(new Texture());
+    uptex->Load("up.png");
 
     //////////////////////////////////////////////////////////////////////////
 

@@ -307,10 +307,10 @@ inline void Batched::innerDraw(glm::vec2 pos, glm::vec2 size, float rotation, co
     vertex[4*curn+1] = glm::vec3(pos.x + size.x, pos.y, curz);
     vertex[4*curn+2] = glm::vec3(pos.x, pos.y + size.y, curz);
     vertex[4*curn+3] = glm::vec3(pos.x + size.x, pos.y + size.y, curz);
-    uv[4*curn+3] = glm::vec2(sub.x + sub.w, sub.y);
-    uv[4*curn+2] = glm::vec2(sub.x, sub.y);
-    uv[4*curn+1] = glm::vec2(sub.x + sub.w, sub.y + sub.h);
-    uv[4*curn+0] = glm::vec2(sub.x, sub.y + sub.h);
+    uv[4*curn+3] = glm::vec2(sub.x + sub.w, sub.y + sub.h);
+    uv[4*curn+2] = glm::vec2(sub.x, sub.y + sub.h);
+    uv[4*curn+1] = glm::vec2(sub.x + sub.w, sub.y);
+    uv[4*curn+0] = glm::vec2(sub.x, sub.y);
     color[4*curn+0] = Colors::White;
     color[4*curn+1] = Colors::White;
     color[4*curn+2] = Colors::White;

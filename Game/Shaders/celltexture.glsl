@@ -96,9 +96,9 @@ void main(void)
 {
   vec3 min = vec3(param0, param1, 1);
   vec3 max = vec3(param2, param3, 1);
-  vec2 b = gpuCellNoise3D(((Vert.position+vec3(1,1,0))/2.0 * (max - min) + min)*param4);
+  vec2 b = gpuCellNoise3D(((Vert.position + vec3(1, 1, 0))/2.0 * (max - min) + min) * param4);
   float a = b.x / b.y;
-  color = vec4(a,a,a,a);
+  color = vec4(a, a, a, a);
   //color.w = 1;
 }
 #endif

@@ -31,6 +31,8 @@ public:
     static int width; static int height;
     static bool Running;
     std::string title;
+    std::shared_ptr<Texture> testtex;
+    std::shared_ptr<Texture> uptex;
 
     GLFWmonitor *monitor;
     GLFWwindow *window;

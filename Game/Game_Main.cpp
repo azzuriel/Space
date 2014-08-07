@@ -130,9 +130,6 @@ void Game::Draw()
 
     icos->World = glm::scale(mat4(1), vec3(0.0,0.0,0.0));
     icos->Render();
-    //test.World = glm::rotate(mat4(1), (float)-M_PI_2, vec3(1.0,0.0,0.0));
-    //test.World = glm::scale(test.World, vec3(10.0,10.0,10.0));
-    //test.Render();
 
     //if(!rs->Loaded) {
         rs->Update(camera->position);
